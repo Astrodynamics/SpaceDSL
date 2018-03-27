@@ -36,8 +36,9 @@
 *************************************************************************/
 
 #include "SpaceDSL/SpTimeSystem.h"
+#include "SpaceDSL/SpUtils.h"
 
-
+using namespace SpaceDSL;
 /*************************************************
  * Class type: Gregorian Calendar Time
  * Author: Niu ZhiYong
@@ -46,12 +47,17 @@
  *  Defined Gregorian Calendar Time Property and Behavior
  *  This Class is Thread Safe!
 **************************************************/
-SpCalendarTime::SpCalendarTime()
+CalendarTime::CalendarTime()
 {
-
+    this->m_Year = 0;
+    this->m_Mon = 0;
+    this->m_Day = 0;
+    this->m_Hour = 0;
+    this->m_Min = 0;
+    this->m_Sec = 0;
 }
 
-SpCalendarTime::SpCalendarTime(int year, int mon, int day, int hour, int min, double sec)
+CalendarTime::CalendarTime(int year, int mon, int day, int hour, int min, double sec)
 {
     this->m_Year = year;
     this->m_Mon = mon;
@@ -61,22 +67,12 @@ SpCalendarTime::SpCalendarTime(int year, int mon, int day, int hour, int min, do
     this->m_Sec = sec;
 }
 
-SpCalendarTime::SpCalendarTime(const SpCalendarTime &time)
-{
-    this->m_Year = time.Year();
-    this->m_Mon = time.Mon();
-    this->m_Day = time.Day();
-    this->m_Hour = time.Hour();
-    this->m_Min = time.Min();
-    this->m_Sec = time.Sec();
-}
-
-SpCalendarTime::~SpCalendarTime()
+CalendarTime::~CalendarTime()
 {
 
 }
 
-bool SpCalendarTime::operator==(const SpCalendarTime &time) const
+bool CalendarTime::operator==(const CalendarTime &time) const
 {
     if (this->m_Year != time.Year())
     {
@@ -106,7 +102,7 @@ bool SpCalendarTime::operator==(const SpCalendarTime &time) const
         return true;
 }
 
-bool SpCalendarTime::operator!=(const SpCalendarTime &time) const
+bool CalendarTime::operator!=(const CalendarTime &time) const
 {
     if (this->m_Year != time.Year())
     {
@@ -136,7 +132,7 @@ bool SpCalendarTime::operator!=(const SpCalendarTime &time) const
         return false;
 }
 
-bool SpCalendarTime::operator>(const SpCalendarTime &time) const
+bool CalendarTime::operator>(const CalendarTime &time) const
 {
     if (this->m_Year < time.Year())
     {
@@ -170,7 +166,7 @@ bool SpCalendarTime::operator>(const SpCalendarTime &time) const
         return true;
 }
 
-bool SpCalendarTime::operator>=(const SpCalendarTime &time) const
+bool CalendarTime::operator>=(const CalendarTime &time) const
 {
     if (this->m_Year < time.Year())
     {
@@ -200,7 +196,7 @@ bool SpCalendarTime::operator>=(const SpCalendarTime &time) const
         return true;
 }
 
-bool SpCalendarTime::operator<(const SpCalendarTime &time) const
+bool CalendarTime::operator<(const CalendarTime &time) const
 {
     if (this->m_Year > time.Year())
     {
@@ -234,7 +230,7 @@ bool SpCalendarTime::operator<(const SpCalendarTime &time) const
         return true;
 }
 
-bool SpCalendarTime::operator<=(const SpCalendarTime &time) const
+bool CalendarTime::operator<=(const CalendarTime &time) const
 {
     if (this->m_Year > time.Year())
     {
@@ -270,7 +266,7 @@ bool SpCalendarTime::operator<=(const SpCalendarTime &time) const
 //
 //====================================================================
 
-double SpTimeToMjd ( int Year, int Month, int Day, int Hour, int Min, double Sec )
+double CalendarTimeToMjd ( int Year, int Month, int Day, int Hour, int Min, double Sec )
 {
   // Variables
 
@@ -292,28 +288,7 @@ double SpTimeToMjd ( int Year, int Month, int Day, int Hour, int Min, double Sec
   return MjdMidnight + FracOfDay;
 }
 
-
-//------------------------------------------------------------------------------
-//
-// CalDat
-//
-// Purpose:
-//
-//   Calendar date and time from Modified Julian Date
-//
-// Input/output:
-//
-//   Mjd       Modified Julian Date
-//   Year      Calendar date components
-//   Month
-//   Day
-//   Hour      Time components
-//   Min
-//   Sec
-//
-//------------------------------------------------------------------------------
-
-void SpMjdToTime ( double Mjd,
+void MjdToCalendarTime ( double Mjd,
                     int& Year, int& Month, int& Day,
                     int& Hour, int& Min, double& Sec )
 {
