@@ -53,13 +53,13 @@ CartState::CartState()
     this->m_Vel.fill(0);
 }
 
-SpaceDSL::CartState::CartState(const Vector3d &pos, const Vector3d &vel)
+CartState::CartState(const Vector3d &pos, const Vector3d &vel)
 {
     this->m_Pos = pos;
     this->m_Vel = vel;
 }
 
-SpaceDSL::CartState::CartState(double xPos, double yPos, double zPos, double xVel, double yVel, double zVel)
+CartState::CartState(double xPos, double yPos, double zPos, double xVel, double yVel, double zVel)
 {
     this->m_Pos[0] = xPos;
     this->m_Pos[1] = yPos;
@@ -83,28 +83,28 @@ const CartState CartState::operator -() const
     return tempState;
 }
 
-const SpaceDSL::CartState SpaceDSL::CartState::operator +(const SpaceDSL::CartState &state) const
+const CartState CartState::operator +(const CartState &state) const
 {
     CartState tempState(m_Pos + state.Pos(), m_Vel + state.Vel());
 
     return tempState;
 }
 
-const SpaceDSL::CartState SpaceDSL::CartState::operator -(const SpaceDSL::CartState &state) const
+const CartState CartState::operator -(const CartState &state) const
 {
     CartState tempState(m_Pos - state.Pos(), m_Vel - state.Vel());
 
     return tempState;
 }
 
-const SpaceDSL::CartState &SpaceDSL::CartState::operator+=(const SpaceDSL::CartState &state)
+const CartState &CartState::operator+=(const CartState &state)
 {
     m_Pos += state.Pos();
     m_Vel += state.Vel();
     return *this;
 }
 
-const SpaceDSL::CartState &SpaceDSL::CartState::operator-=(const SpaceDSL::CartState &state)
+const CartState &CartState::operator-=(const CartState &state)
 {
     m_Pos -= state.Pos();
     m_Vel -= state.Vel();
@@ -116,7 +116,7 @@ const SpaceDSL::CartState &SpaceDSL::CartState::operator-=(const SpaceDSL::CartS
  * Date:2018-03-20
  *  This Class is Thread Safe!
 **************************************************/
-SpaceDSL::OrbitElem::OrbitElem()
+OrbitElem::OrbitElem()
 {
     this->m_SMajAx = 0;
     this->m_Ecc = 0;
@@ -126,7 +126,7 @@ SpaceDSL::OrbitElem::OrbitElem()
     this->m_TrueA = 0;
 }
 
-SpaceDSL::OrbitElem::OrbitElem(double sMajAx, double ecc, double i, double raan, double argPeri, double trueA)
+OrbitElem::OrbitElem(double sMajAx, double ecc, double i, double raan, double argPeri, double trueA)
 {
     this->m_SMajAx = sMajAx;
     this->m_Ecc = ecc;
@@ -147,12 +147,12 @@ OrbitElem::~OrbitElem()
  * Description:
  *  This Class is Thread Safe!
 **************************************************/
-SpaceDSL::ModOrbElem::ModOrbElem()
+ModOrbElem::ModOrbElem()
 {
 
 }
 
-SpaceDSL::ModOrbElem::ModOrbElem(double periRad, double ecc, double i, double raan, double argPeri, double trueA)
+ModOrbElem::ModOrbElem(double periRad, double ecc, double i, double raan, double argPeri, double trueA)
 {
 
 }
@@ -167,32 +167,32 @@ ModOrbElem::~ModOrbElem()
 // Grouping: Parameter Conversion
 //
 //====================================================================
-double SpaceDSL::MeanAnomalyToEcc(double meanAnomaly, double eccentricity)
+double MeanAnomalyToEcc(double meanAnomaly, double eccentricity)
+{
+    return 0;
+}
+
+double TrueAnomalyToEcc(double trueAnomaly, double eccentricity)
+{
+    return 0;
+}
+
+double MeanAnomalyToTrue(double meanAnomaly, double eccentricity)
+{
+    return 0;
+}
+
+double TrueAnomalyToMean(double trueAnomaly, double eccentricity)
+{
+    return 0;
+}
+
+void CartToOrbitElem(const CartState &cart, double gm, OrbitElem &elem)
 {
 
 }
 
-double SpaceDSL::TrueAnomalyToEcc(double trueAnomaly, double eccentricity)
-{
-
-}
-
-double SpaceDSL::MeanAnomalyToTrue(double meanAnomaly, double eccentricity)
-{
-
-}
-
-double SpaceDSL::TrueAnomalyToMean(double trueAnomaly, double eccentricity)
-{
-
-}
-
-void SpaceDSL::CartToOrbitElem(const SpaceDSL::CartState &cart, double gm, SpaceDSL::OrbitElem &elem)
-{
-
-}
-
-void SpaceDSL::OrbitElemToCart(const SpaceDSL::OrbitElem &elem, double gm, SpaceDSL::CartState &cart)
+void OrbitElemToCart(const OrbitElem &elem, double gm, CartState &cart)
 {
 
 }
