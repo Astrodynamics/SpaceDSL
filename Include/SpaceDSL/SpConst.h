@@ -37,11 +37,17 @@
 #ifndef SPCONST_H
 #define SPCONST_H
 
+// Standard C++ version
 #include <cmath>
+#include <limits>
 
 /// All the functions are in the namespace SpaceDSL
 ///
 namespace SpaceDSL {
+//
+// Machine accuracy
+//
+const double EPS = std::numeric_limits<double>::epsilon();
 
 //
 // Constants representing various multiples of PI.

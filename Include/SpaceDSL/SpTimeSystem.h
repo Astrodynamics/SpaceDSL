@@ -129,9 +129,17 @@ namespace SpaceDSL {
     /// @Param      Sec
     /// @Return     Modified Julian Date
     **********************************************************************/
-    double SPACEDSL_API CalendarTimeToMjd ( int Year,   int Month, int Day,
-                 int Hour=0, int Min=0, double Sec=0.0 );
-
+    double SPACEDSL_API CalendarTimeToMjd (int Year, int Month, int Day,
+                                        int Hour=0, int Min=0, double Sec=0.0 );
+    /********************************************************************
+    ///
+    /// @Author     Niu Zhiyong
+    /// @Date       2018-03-20
+    /// @Input
+    /// @Param      time                  CalendarTime
+    /// @Return     Modified Julian Date
+    **********************************************************************/
+    double SPACEDSL_API CalendarTimeToMjd (CalendarTime &time);
     /********************************************************************
     /// Calendar date and time from Modified Julian Date
     /// @Author     Niu Zhiyong
@@ -148,8 +156,19 @@ namespace SpaceDSL {
     /// @Return     void
     **********************************************************************/
     void SPACEDSL_API MjdToCalendarTime ( double Mjd,
-                  int& Year, int& Month, int& Day,
-                  int& Hour, int& Min, double& Sec );
+                                        int& Year, int& Month, int& Day,
+                                        int& Hour, int& Min, double& Sec);
+    /********************************************************************
+    /// Calendar date and time from Modified Julian Date
+    /// @Author     Niu Zhiyong
+    /// @Date       2018-03-20
+    /// @Input
+    /// @Param      Mjd         Modified Julian Date
+    /// @Output
+    /// @Param      time        CalendarTime
+    /// @Return     void
+    **********************************************************************/
+    void SPACEDSL_API MjdToCalendarTime ( double Mjd, CalendarTime &time);
 
 
 }
