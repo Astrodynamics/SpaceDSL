@@ -12,21 +12,16 @@ using namespace SpaceDSL;
 int main(int argc, char *argv[])
 {
     cout<<"SpaceDSL Test Run!"<<endl;
-
-    CartState state(1,2,3,0.1,0.2,0.3);
-    CalendarTime time(2018,3,28,4,0,0.0);
-    double mjd = CalendarTimeToMjd(time);
-
-    auto pos = state.Pos();
-
-    cout << pos << endl;
-
-    double f = Fraction(5.6);
-    double m = Modulo(9,4);
-    double y = 9 % 4;
     try
     {
-        //throw SPException(__FILE__, __FUNCTION__, __LINE__, "Test!");
+        OrbitElem elem1;
+        CartState cart1(-5107324.219684929600, -3582177.314118019800, -2477461.707380509900,
+                        4925.070866580500, -3984.883326371030, -4391.339344033090);
+        CartToOrbitElem(cart1, GM_Earth,elem1 );
+
+        //OrbitElem elem(6716300, 0.0006, 0.74612, 0.167579, 3.71648, 6.283185);
+        //CartState cart;
+        //OrbitElemToCart(elem, GM_Earth, cart);
     }
     catch (SPException &e)
     {

@@ -22,11 +22,11 @@
 * Author: Niu ZhiYong
 * Date:2017-03-20
 * Description:
-*   SpaceDSL_Global.h
+*   SpMath.h
 *
 *   Purpose:
 *
-*       Define SPACEDSL_LIBRARY to Compiling Dynamic Library
+*       Define The Math Function in Library
 *
 *
 *   Last modified:
@@ -34,28 +34,24 @@
 *   2017-03-20  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
-#ifndef SPACEDSL_GLOBAL_H
-#define SPACEDSL_GLOBAL_H
+#ifndef SPMATH_H
+#define SPMATH_H
 
-#include <exception>
+#include "SpaceDSL/SpaceDSL_Global.h"
 
+/// All the functions are in the namespace SpaceDSL
+///
+namespace SpaceDSL {
 
-#if defined(SPACEDSL_SHARED_LIBRARY)
-#  define SPACEDSL_API __declspec(dllexport)
-#  define EXPIMP_TEMPLATE
-#elif defined(SPACEDSL_SHARED_LIBRARY)
-#  define SPACEDSL_API __declspec(dllimport)
-#  define EXPIMP_TEMPLATE extern
-#endif
+//
+// Fractional part of a number (y=x-[x])
+//
+double SPACEDSL_API Fraction (double x);
 
-//#pragma warning(disable: 4251)
-
-#if defined(SPACEDSL_STATIC_LIBRARY)
-#  define SPACEDSL_API
-#  define EXPIMP_TEMPLATE
-#endif
-
-EXPIMP_TEMPLATE class SPACEDSL_API std::exception;
-
-
-#endif // SPACEDSL_GLOBAL_H
+//
+// X Modulo Y
+//
+double SPACEDSL_API Modulo (double x, double y);
+		
+}
+#endif //SPMATH_H

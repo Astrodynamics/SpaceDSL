@@ -69,7 +69,7 @@ const double SqrPI       = 9.869604401089358618834490999873;		///< PI*PI, PI squ
 //           Item                   Value                      Comments
 //
 const double Grav           	= 6.673e-11;				///< Constant of gravitation [m^3/kg*s^2] 
-const double EarthGrav      	= 3.986004418e14;			///< Geocentric gravitation constant (WGS84) [m^3/s^2]
+const double GM_Earth         	= 3.986004418e14;			///< Geocentric gravitation constant (WGS84) [m^3/s^2]
 const double AU             	= 1.49597870691e11;			///< Astronomical unit in meters (IAU 1976)[m]
 const double EarthRadius    	= 6378137.0;				///< Equatorial radius of the Earth (WGS84)[m]
 const double EarthMinRadius 	= 6.35675231424E6;			///< (WGS84)[m]
@@ -162,73 +162,73 @@ const double DX2SRE      = 6.96E8;					//IAU76 values
 //
 // moon parameter 
 //
-const double MoonGrav         = 4.9027949e12;		///< moon gravitation constant [m^3/s^2]
-const double MoonRadius       = 1738200.0;			///< Equatorial radius of the Moon [m]
-const double MoonMinRadius    = 1738200.0;			
+const double GM_Moon            = 4.9027949e12;		///< moon gravitation constant [m^3/s^2]
+const double MoonRadius         = 1738200.0;			///< Equatorial radius of the Moon [m]
+const double MoonMinRadius      = 1738200.0;
 
 //
 // Jupiter parameter
 //
-const double JupiterGrav      = 1.26712000000000e+017;
-const double JupiterRadius    = 7.14920000000000e+007;
-const double JupiterMinRadius = 6.68540000000000e+007;
+const double GM_Jupiter         = 1.26712000000000e+017;
+const double JupiterRadius      = 7.14920000000000e+007;
+const double JupiterMinRadius   = 6.68540000000000e+007;
 
 //
 // Mars parameter
 //
-const double MarsGrav         = 4.28282868534000e+013;
-const double MarsRadius       = 3.39700000000000e+006;
-const double MarsMinRadius    = 3.37500000000000e+006;
+const double GM_Mars            = 4.28282868534000e+013;
+const double MarsRadius         = 3.39700000000000e+006;
+const double MarsMinRadius      = 3.37500000000000e+006;
 
 //
 // Mercury parameter
 //
-const double MercuryGrav      = 2.20320800000000e+013;
-const double MercuryRadius    = 2.43970000000000e+006;
-const double MercuryMinRadius = 2.43970000000000e+006;
+const double GM_Mercury         = 2.20320800000000e+013;
+const double MercuryRadius      = 2.43970000000000e+006;
+const double MercuryMinRadius   = 2.43970000000000e+006;
 
 //
 // Neptune parameter 
 //
-const double NeptuneGrav      = 6.87130000000000e+015;
-const double NeptuneRadius    = 2.52690000000000e+007;
-const double NeptuneMinRadius = 2.48000000000000e+007;
+const double GM_Neptune         = 6.87130000000000e+015;
+const double NeptuneRadius      = 2.52690000000000e+007;
+const double NeptuneMinRadius   = 2.48000000000000e+007;
 
 //
 // Pluto parameter
 //
-const double PlutoGrav        = 1.00907600000000e+012;
-const double PlutoRadius      = 1.16200000000000e+006;
-const double PlutoMinRadius   = 1.16200000000000e+006;
+const double GM_Pluto           = 1.00907600000000e+012;
+const double PlutoRadius        = 1.16200000000000e+006;
+const double PlutoMinRadius     = 1.16200000000000e+006;
 
 //
 // Saturn parameter
 //
-const double SaturnGrav       = 3.79340000000000e+016;
-const double SaturnRadius     = 6.02680000000000e+007;
-const double SaturnMinRadius  = 5.43640000000000e+007;
+const double GM_Saturn          = 3.79340000000000e+016;
+const double SaturnRadius       = 6.02680000000000e+007;
+const double SaturnMinRadius    = 5.43640000000000e+007;
 
 //
 // Sun parameter
 //
-const double SunGrav          = 1.327122E20;				///< Heliocentric gravitation constant [m^3/s^2]
-const double SunRadius        = 695990000.0;				///< Equatorial radius of the Sun [m]
-const double SunMinRadius     = 695990000.0;
+const double GM_Sun             = 1.327122E20;				///< Heliocentric gravitation constant [m^3/s^2]
+const double SunRadius          = 695990000.0;				///< Equatorial radius of the Sun [m]
+const double SunMinRadius       = 695990000.0;
 
 
 //
 // Uranus parameter
 //
-const double UranusGrav       = 5.80320000000000e+015;
-const double UranusRadius     = 2.55590000000000e+007;
-const double UranusMinRadius  = 2.49730000000000e+007;
+const double GM_Uranus          = 5.80320000000000e+015;
+const double UranusRadius       = 2.55590000000000e+007;
+const double UranusMinRadius    = 2.49730000000000e+007;
 
 //
 // Venus parameter
 //
-const double VenusGrav        = 3.24858800000000e+014;
-const double VenusRadius      = 6.05190000000000e+006;
-const double VenusMinRadius   = 6.05190000000000e+006;
+const double GM_Venus           = 3.24858800000000e+014;
+const double VenusRadius        = 6.05190000000000e+006;
+const double VenusMinRadius     = 6.05190000000000e+006;
 
 
 //===================================

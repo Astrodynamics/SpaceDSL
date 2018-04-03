@@ -41,7 +41,7 @@
 #include "SpaceDSL_Global.h"
 
 #include <Eigen/Core>
-
+#include <Eigen/Geometry>
 
 using namespace Eigen;
 
@@ -233,75 +233,123 @@ namespace SpaceDSL {
     // Grouping: Parameter Conversion
     //
     //====================================================================
+    bool SPACEDSL_API CheakEccentricity (double eccentricity);
+    bool SPACEDSL_API CheakOrbit (double sMajAx, double eccentricity, double cbRadius);
+
+    /********************************************************************
+    ///Calculate Apogee Radius to Apogee Altitude
+    /// @Author     Niu Zhiyong
+    /// @Date       2018-03-20
+    /// @Input
+    /// @Param      apogeeRad/apogeeAlt
+    /// @Param      cbRadius      Center Body Radius
+    /// @Output
+    /// @Return     Apogee Altitude/Apogee Radius
+    **********************************************************************/
+    double SPACEDSL_API ApogeeRadToApoAlt (double apogeeRad, double cbRadius);
+
+    double SPACEDSL_API ApogeeAltToApoRad (double apogeeAlt, double cbRadius);
+
+    /********************************************************************
+    ///Calculate Apogee Radius to Mean Motion(rad/s)
+    /// @Author     Niu Zhiyong
+    /// @Date       2018-03-20
+    /// @Input
+    /// @Param      apogeeRad/meanMotion
+    /// @Param      eccentricity
+    /// @Param      gm
+    /// @Output
+    /// @Return     Mean Motion/Apogee Radius
+    **********************************************************************/
+    double SPACEDSL_API ApogeeRadToMeanMotn (double apogeeRad, double eccentricity, double gm);
+
+    double SPACEDSL_API MeanMotionToApoRad (double meanMotion, double eccentricity, double gm);
+
+    /********************************************************************
+    ///Calculate Apogee Radius to Perigee Radius.
+    /// @Author     Niu Zhiyong
+    /// @Date       2018-03-20
+    /// @Input
+    /// @Param      apogeeRad/perigeeRad
+    /// @Param      eccentricity
+    /// @Param      cbRadius        Center Body Radius
+    /// @Output
+    /// @Return     Perigee Radius/Apogee Radius
+    **********************************************************************/
+    double SPACEDSL_API ApogeeRadToPeriRad (double apogeeRad, double eccentricity, double cbRadius);
+
+    double SPACEDSL_API PerigeeRadToApoRad (double perigeeRad, double eccentricity, double cbRadius);
+
+    /********************************************************************
+    ///Calculate Apogee Radius to Perigee Altitude.
+    /// @Author     Niu Zhiyong
+    /// @Date       2018-03-20
+    /// @Input
+    /// @Param      apogeeRad/perigeeAlt
+    /// @Param      eccentricity
+    /// @Param      cbRadius        Center Body Radius
+    /// @Output
+    /// @Return     Perigee Altitude/Apogee Radius
+    **********************************************************************/
+    double SPACEDSL_API ApogeeRadToPeriAlt (double apogeeRad, double eccentricity, double cbRadius);
+
+    double SPACEDSL_API PerigeeAltToApoRad (double perigeeAlt, double eccentricity, double cbRadius);
+
     /********************************************************************
     ///Calculate Eccentric Anomaly in radians from Mean Anomaly
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
     /// @Input
-    /// @Param      meanAnomaly     (rad)
+    /// @Param      meanAnomaly/eccAnomaly     (rad)
     /// @Param      eccentricity
     /// @Output
-    /// @Return     Ecc Anomaly
+    /// @Return     Ecc Anomaly/ Mean Anomaly
     **********************************************************************/
     double SPACEDSL_API MeanAnomalyToEcc (double meanAnomaly, double eccentricity);
+
+    double SPACEDSL_API EccAnomalyToMean(double eccAnomaly, double eccentricity);
+
     /********************************************************************
     ///Calculate Eccentric Anomaly in radians from True Anomaly
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
     /// @Input
-    /// @Param      trueAnomaly     (rad)
+    /// @Param      trueAnomaly/eccAnomaly     (rad)
     /// @Param      eccentricity
     /// @Output
-    /// @Return     Ecc Anomaly
+    /// @Return     Ecc Anomaly/True Anomaly
     **********************************************************************/
     double SPACEDSL_API TrueAnomalyToEcc (double trueAnomaly, double eccentricity);
+
+    double SPACEDSL_API EccAnomalyToTrue (double eccAnomaly, double eccentricity);
+
     /********************************************************************
     ///Calculate True Anomaly in radians from Mean Anomaly
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
     /// @Input
-    /// @Param      meanAnomaly     (rad)
+    /// @Param      meanAnomaly/trueAnomaly     (rad)
     /// @Param      eccentricity
     /// @Output
-    /// @Return     True Anomaly
+    /// @Return     True Anomaly/Mean Anomaly
     **********************************************************************/
     double SPACEDSL_API MeanAnomalyToTrue (double meanAnomaly, double eccentricity);
-    /********************************************************************
-    ///Calculate Mean Anomaly in radians from True Anomaly
-    /// @Author     Niu Zhiyong
-    /// @Date       2018-03-20
-    /// @Input
-    /// @Param      meanAnomaly     (rad)
-    /// @Param      eccentricity
-    /// @Output
-    /// @Return     Mean Anomaly
-    **********************************************************************/
+
     double SPACEDSL_API TrueAnomalyToMean (double trueAnomaly, double eccentricity);
 
-
     /********************************************************************
-    ///Calculate The Position and Velocity Vector from The Orbits Elements
+    ///Calculate The Position and Velocity Vector from The Orbits Elements in J2000
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
     /// @Input
-    /// @Param      elem
+    /// @Param      elem/cart
     /// @Param      gm
     /// @Output
-    /// @Param      cart
+    /// @Param      cart/elem
     /// @Return     void
     **********************************************************************/
     void SPACEDSL_API OrbitElemToCart (const OrbitElem& elem, double gm, CartState& cart);
-    /********************************************************************
-    ///Calculate The Orbits Elements from The Position and Velocity Vector
-    /// @Author     Niu Zhiyong
-    /// @Date       2018-03-20
-    /// @Input
-    /// @Param      cart
-    /// @Param      gm
-    /// @Output
-    /// @Param      elem
-    /// @Return     void
-    **********************************************************************/
+
     void SPACEDSL_API CartToOrbitElem (const CartState& cart, double gm, OrbitElem& elem);
 		
 }
