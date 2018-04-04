@@ -22,11 +22,11 @@
 * Author: Niu ZhiYong
 * Date:2018-03-20
 * Description:
-*   SpMath.h
+*   SpGravity.cpp
 *
 *   Purpose:
 *
-*       Define The Math Function in Library
+*       Gravity Computation
 *
 *
 *   Last modified:
@@ -34,24 +34,24 @@
 *   2018-03-20  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
-#ifndef SPMATH_H
-#define SPMATH_H
 
-#include "SpaceDSL/SpaceDSL_Global.h"
+#include "SpaceDSL/SpGravity.h"
+
 
 /// All the functions are in the namespace SpaceDSL
 ///
 namespace SpaceDSL {
 
-//
-// Fractional part of a number (y=x-[x])
-//
-double SPACEDSL_API Fraction (double x);
+    GravityModel::GravityModel(const char *filename, int Ldegree, int Morder)
+    {
 
-//
-// X Modulo Y
-//
-double SPACEDSL_API Modulo (double x, double y);
-		
+    }
+
+    GravityModel::~GravityModel()
+    {
+
+    }
+
+
+
 }
-#endif //SPMATH_H

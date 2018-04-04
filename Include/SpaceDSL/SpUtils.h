@@ -1,5 +1,5 @@
 /************************************************************************
-* Copyright (C) 2017 Niu ZhiYong
+* Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2017-03-20
+* Date:2018-03-20
 * Description:
 *   SpUtils.h
 *
@@ -31,7 +31,7 @@
 *
 *   Last modified:
 *
-*   2017-03-20  Niu Zhiyong (1st edition)
+*   2018-03-20  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 #ifndef SPUTILS_H
@@ -224,7 +224,7 @@ namespace SpaceDSL {
     /*************************************************
     Class type: Class of Exception Handling
     Author: Niu ZhiYong
-    Date:2017-09-08
+    Date:2018-09-08
     Description:
     Defined self Exception Class
     **************************************************/

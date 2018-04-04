@@ -22,11 +22,11 @@
 * Author: Niu ZhiYong
 * Date:2018-03-20
 * Description:
-*   SpMath.h
+*   SpCoordSystem.cpp
 *
 *   Purpose:
 *
-*       Define The Math Function in Library
+*       CoordSystem computation and Translation
 *
 *
 *   Last modified:
@@ -34,24 +34,50 @@
 *   2018-03-20  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
-#ifndef SPMATH_H
-#define SPMATH_H
 
-#include "SpaceDSL/SpaceDSL_Global.h"
+#include <cmath>
 
-/// All the functions are in the namespace SpaceDSL
-///
+#include <Eigen/Geometry>
+
+#include "SpaceDSL/SpCoordSystem.h"
+#include "SpaceDSL/SpUtils.h"
+
 namespace SpaceDSL {
 
-//
-// Fractional part of a number (y=x-[x])
-//
-double SPACEDSL_API Fraction (double x);
+    Matrix3d RotateX(double angle)
+    {
+        const double C = cos(angle);
+        const double S = sin(angle);
+        Matrix3d U;
+        U(0, 0) = 1.0;  U(0, 1) = 0.0;  U(0, 2) = 0.0;
+        U(1, 0) = 0.0;  U(1, 1) =  +C;  U(1, 2) =  +S;
+        U(2, 0) = 0.0;  U(2, 1) =  -S;  U(2, 2) =  +C;
+        return U;
+    }
 
-//
-// X Modulo Y
-//
-double SPACEDSL_API Modulo (double x, double y);
-		
+    Matrix3d RotateY(double angle)
+    {
+        const double C = cos(angle);
+        const double S = sin(angle);
+        Matrix3d U;
+        U(0, 0) =  +C;  U(0, 1) = 0.0;  U(0, 2) =  -S;
+        U(1, 0) = 0.0;  U(1, 1) = 1.0;  U(1, 2) = 0.0;
+        U(2, 0) =  +S;  U(2, 1) = 0.0;  U(2, 2) =  +C;
+        return U;
+    }
+
+    Matrix3d RotateZ(double angle)
+    {
+        const double C = cos(angle);
+        const double S = sin(angle);
+        Matrix3d U;
+        U(0, 0) =  +C;  U(0, 1) =  +S;  U(0, 2) = 0.0;
+        U(1, 0) =  -S;  U(1, 1) =  +C;  U(1, 2) = 0.0;
+        U(2, 0) = 0.0;  U(2, 1) = 0.0;  U(2, 2) = 1.0;
+        return U;
+    }
+
+
+
 }
-#endif //SPMATH_H
+

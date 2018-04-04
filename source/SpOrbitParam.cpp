@@ -1,5 +1,5 @@
 /************************************************************************
-* Copyright (C) 2017 Niu ZhiYong
+* Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,10 @@
 
 #include <cmath>
 
+#include <Eigen/Geometry>
+
 #include "SpaceDSL/SpOrbitParam.h"
+#include "SpaceDSL/SpCoordSystem.h"
 #include "SpaceDSL/SpMath.h"
 #include "SpaceDSL/SpUtils.h"
 #include "SpaceDSL/SpConst.h"
@@ -477,7 +480,44 @@ namespace SpaceDSL{
 
     void OrbitElemToCart(const OrbitElem &elem, double gm, CartState &cart)
     {
+        // Variables
 
+        double  a, e, i, raan, argPeri, T;
+        double  E, cosE, sinE, fac, R, V;
+        Vector3d  r, v;
+        Matrix3d  PQW;
+
+        // Keplerian elements at epoch
+
+        a = elem.SMajAx();
+        e = elem.Ecc();
+        i = elem.I();
+        raan = elem.RAAN();
+        argPeri = elem.ArgPeri();
+        T = elem.TrueA();
+        // Eccentric anomaly
+        E = TrueAnomalyToEcc(T, e);
+        cosE = cos(E);
+        sinE = sin(E);
+        // Perifocal coordinates
+
+        fac = sqrt ( (1.0 - e) * (1.0 + e) );
+
+        R = a * (1.0 - e * cosE);   // Distance
+        V = sqrt( gm * a) / R;      // Velocity
+
+        r = Vector3d ( a * (cosE - e), a * fac * sinE , 0.0 );
+        v = Vector3d ( -V * sinE   , +V * fac * cosE, 0.0 );
+
+        // Transformation to reference system (Gaussian vectors)
+
+        PQW = RotateZ(-raan) * RotateX(-i) * RotateZ(-argPeri);
+
+        r = PQW * r;
+        v = PQW * v;
+
+        // State vector
+        cart = CartState(r, v);
     }
 
 }

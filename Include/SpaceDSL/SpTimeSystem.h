@@ -1,5 +1,5 @@
 /************************************************************************
-* Copyright (C) 2017 Niu ZhiYong
+* Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2017-03-20
+* Date:2018-03-20
 * Description:
 *   SpTimeSystem.h
 *
@@ -31,15 +31,13 @@
 *
 *   Last modified:
 *
-*   2017-03-20  Niu Zhiyong (1st edition)
+*   2018-03-20  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 
 #ifndef SPTIMESYSTEM_H
 #define SPTIMESYSTEM_H
 
-#include <cmath>
-#include <iostream>
 
 #include "SpaceDSL_Global.h"
 
@@ -66,20 +64,17 @@ namespace SpaceDSL {
     ///
     const double EarthSiderealDay  = 86164.09054;
     const double EarthSiderealYear = 365.25636;
-
     /*************************************************
      * Class type: Gregorian Calendar Time
      * Author: Niu ZhiYong
      * Date:2018-03-20
      * Description:
-     *  Defined Gregorian Calendar Time Property and Behavior
-     *  This Class is Thread Safe!
+     *  Defined Gregorian Calendar Time Base Class
     **************************************************/
     class SPACEDSL_API CalendarTime
     {
     public:
         CalendarTime();
-        CalendarTime(int year, int mon, int day, int hour, int min, double sec);
         virtual ~CalendarTime();
 
         inline int			Year() const {return m_Year;}
@@ -88,6 +83,13 @@ namespace SpaceDSL {
         inline int			Hour() const {return m_Hour;}
         inline int			Min () const {return m_Min;}
         inline double		Sec () const {return m_Sec;}
+
+        inline void			SetYear(int year)   { m_Year = year;}
+        inline void			SetMon (int mon)    { m_Mon = mon;}
+        inline void			SetDay (int day)    { m_Day = day;}
+        inline void			SetHour(int hour)   { m_Hour = hour;}
+        inline void			SetMin (int min)    { m_Min = min;}
+        inline void         SetSec (double sec) { m_Sec = sec;}
 
 
         bool				operator==(const CalendarTime& time) const;
@@ -109,6 +111,37 @@ namespace SpaceDSL {
         int		m_Min;		///< minute, 0 - 59
         double	m_Sec;		///< second, 0 - 59.99..
     };
+    /*************************************************
+     * Class type: UTC Time
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  Defined UTC Time Property and Behavior
+    **************************************************/
+    class SPACEDSL_API UTCCalTime : public CalendarTime
+    {
+    public:
+        UTCCalTime();
+        UTCCalTime(int year, int mon, int day, int hour, int min, double sec);
+        virtual ~UTCCalTime();
+
+    };
+
+    /*************************************************
+     * Class type: UT1 Time
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  Defined UT1 Time Property and Behavior
+    **************************************************/
+    class SPACEDSL_API UT1CalTime : public CalendarTime
+    {
+    public:
+        UT1CalTime();
+        UT1CalTime(int year, int mon, int day, int hour, int min, double sec);
+        virtual ~UT1CalTime();
+
+    };
 
     //====================================================================
     //
@@ -116,7 +149,7 @@ namespace SpaceDSL {
     //
     //====================================================================
 
-    /********************************************************************
+    /********************************************************************/
     ///
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -128,19 +161,21 @@ namespace SpaceDSL {
     /// @Param      Min
     /// @Param      Sec
     /// @Return     Modified Julian Date
-    **********************************************************************/
-    double SPACEDSL_API CalendarTimeToMjd (int Year, int Month, int Day,
-                                        int Hour=0, int Min=0, double Sec=0.0 );
-    /********************************************************************
+    /**********************************************************************/
+    double SPACEDSL_API CalendarTimeToMjd (int year, int month, int day,
+                                        int hour=0, int min=0, double sec=0.0 );
+
+    /********************************************************************/
     ///
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
     /// @Input
-    /// @Param      time                  CalendarTime
+    /// @Param      time                  UTCCalTime
     /// @Return     Modified Julian Date
-    **********************************************************************/
+    /**********************************************************************/
     double SPACEDSL_API CalendarTimeToMjd (CalendarTime &time);
-    /********************************************************************
+
+    /********************************************************************/
     /// Calendar date and time from Modified Julian Date
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -154,20 +189,21 @@ namespace SpaceDSL {
     /// @Param      Min
     /// @Param      Sec
     /// @Return     void
-    **********************************************************************/
-    void SPACEDSL_API MjdToCalendarTime ( double Mjd,
-                                        int& Year, int& Month, int& Day,
-                                        int& Hour, int& Min, double& Sec);
-    /********************************************************************
+    /**********************************************************************/
+    void SPACEDSL_API MjdToCalendarTime (double Mjd,
+                                        int& year, int& month, int& day,
+                                        int& hour, int& min, double& sec);
+
+    /********************************************************************/
     /// Calendar date and time from Modified Julian Date
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
     /// @Input
     /// @Param      Mjd         Modified Julian Date
     /// @Output
-    /// @Param      time        CalendarTime
+    /// @Param      time        UTCCalTime
     /// @Return     void
-    **********************************************************************/
+    /**********************************************************************/
     void SPACEDSL_API MjdToCalendarTime ( double Mjd, CalendarTime &time);
 
 

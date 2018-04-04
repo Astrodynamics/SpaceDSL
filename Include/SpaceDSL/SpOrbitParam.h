@@ -1,5 +1,5 @@
 /************************************************************************
-* Copyright (C) 2017 Niu ZhiYong
+* Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2017-03-20
+* Date:2018-03-20
 * Description:
 *   SpOrbitParam.h
 *
@@ -31,7 +31,7 @@
 *
 *   Last modified:
 *
-*   2017-03-27  Niu Zhiyong (1st edition)
+*   2018-03-27  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 
@@ -41,7 +41,7 @@
 #include "SpaceDSL_Global.h"
 
 #include <Eigen/Core>
-#include <Eigen/Geometry>
+
 
 using namespace Eigen;
 
@@ -67,6 +67,9 @@ namespace SpaceDSL {
 
             inline Vector3d     Pos() const {return m_Pos;}
             inline Vector3d     Vel() const {return m_Vel;}
+
+            inline void         SetPos(const Vector3d& pos) { m_Pos = pos;}
+            inline void         SetVel(const Vector3d& vel) { m_Vel = vel;}
 
             const CartState		operator -() const;
             const CartState		operator +(const CartState& state) const;
@@ -98,6 +101,13 @@ namespace SpaceDSL {
             inline double     RAAN()    const {return m_RAAN;}
             inline double     ArgPeri() const {return m_ArgPeri;}
             inline double     TrueA()   const {return m_TrueA;}
+
+            inline void       SetSMajAx(double sMajAx)   { m_SMajAx = sMajAx;}
+            inline void       SetEcc(double ecc)         { m_Ecc = ecc;}
+            inline void       SetI(double i)             { m_I = i;}
+            inline void       SetRAAN(double raan)       { m_RAAN = raan;}
+            inline void       SetArgPeri(double argPeri) { m_ArgPeri = argPeri;}
+            inline void       SetTrueA(double trueA)     { m_TrueA = trueA;}
     protected:
             double	m_SMajAx;	///< Semimajor axis
             double	m_Ecc;		///< Eccentricity
@@ -127,6 +137,13 @@ namespace SpaceDSL {
             inline double     RAAN()        const {return m_RAAN;}
             inline double     ArgPeri()     const {return m_ArgPeri;}
             inline double     TrueA()       const {return m_TrueA;}
+
+            inline void       SetPeriRad(double periRad) { m_PeriRad = periRad;}
+            inline void       SetEcc(double ecc)         { m_Ecc = ecc;}
+            inline void       SetI(double i)             { m_I = i;}
+            inline void       SetRAAN(double raan)       { m_RAAN = raan;}
+            inline void       SetArgPeri(double argPeri) { m_ArgPeri = argPeri;}
+            inline void       SetTrueA(double trueA)     { m_TrueA = trueA;}
 
     protected:
             double	m_PeriRad;	///< periapsis radius in m
@@ -236,7 +253,7 @@ namespace SpaceDSL {
     bool SPACEDSL_API CheakEccentricity (double eccentricity);
     bool SPACEDSL_API CheakOrbit (double sMajAx, double eccentricity, double cbRadius);
 
-    /********************************************************************
+    /********************************************************************/
     ///Calculate Apogee Radius to Apogee Altitude
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -245,12 +262,12 @@ namespace SpaceDSL {
     /// @Param      cbRadius      Center Body Radius
     /// @Output
     /// @Return     Apogee Altitude/Apogee Radius
-    **********************************************************************/
+    /**********************************************************************/
     double SPACEDSL_API ApogeeRadToApoAlt (double apogeeRad, double cbRadius);
 
     double SPACEDSL_API ApogeeAltToApoRad (double apogeeAlt, double cbRadius);
 
-    /********************************************************************
+    /********************************************************************/
     ///Calculate Apogee Radius to Mean Motion(rad/s)
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -260,12 +277,12 @@ namespace SpaceDSL {
     /// @Param      gm
     /// @Output
     /// @Return     Mean Motion/Apogee Radius
-    **********************************************************************/
+    /**********************************************************************/
     double SPACEDSL_API ApogeeRadToMeanMotn (double apogeeRad, double eccentricity, double gm);
 
     double SPACEDSL_API MeanMotionToApoRad (double meanMotion, double eccentricity, double gm);
 
-    /********************************************************************
+    /********************************************************************/
     ///Calculate Apogee Radius to Perigee Radius.
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -275,12 +292,12 @@ namespace SpaceDSL {
     /// @Param      cbRadius        Center Body Radius
     /// @Output
     /// @Return     Perigee Radius/Apogee Radius
-    **********************************************************************/
+    /**********************************************************************/
     double SPACEDSL_API ApogeeRadToPeriRad (double apogeeRad, double eccentricity, double cbRadius);
 
     double SPACEDSL_API PerigeeRadToApoRad (double perigeeRad, double eccentricity, double cbRadius);
 
-    /********************************************************************
+    /********************************************************************/
     ///Calculate Apogee Radius to Perigee Altitude.
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -290,12 +307,12 @@ namespace SpaceDSL {
     /// @Param      cbRadius        Center Body Radius
     /// @Output
     /// @Return     Perigee Altitude/Apogee Radius
-    **********************************************************************/
+    /**********************************************************************/
     double SPACEDSL_API ApogeeRadToPeriAlt (double apogeeRad, double eccentricity, double cbRadius);
 
     double SPACEDSL_API PerigeeAltToApoRad (double perigeeAlt, double eccentricity, double cbRadius);
 
-    /********************************************************************
+    /********************************************************************/
     ///Calculate Eccentric Anomaly in radians from Mean Anomaly
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -304,12 +321,12 @@ namespace SpaceDSL {
     /// @Param      eccentricity
     /// @Output
     /// @Return     Ecc Anomaly/ Mean Anomaly
-    **********************************************************************/
+    /**********************************************************************/
     double SPACEDSL_API MeanAnomalyToEcc (double meanAnomaly, double eccentricity);
 
     double SPACEDSL_API EccAnomalyToMean(double eccAnomaly, double eccentricity);
 
-    /********************************************************************
+    /********************************************************************/
     ///Calculate Eccentric Anomaly in radians from True Anomaly
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -318,12 +335,12 @@ namespace SpaceDSL {
     /// @Param      eccentricity
     /// @Output
     /// @Return     Ecc Anomaly/True Anomaly
-    **********************************************************************/
+    /**********************************************************************/
     double SPACEDSL_API TrueAnomalyToEcc (double trueAnomaly, double eccentricity);
 
     double SPACEDSL_API EccAnomalyToTrue (double eccAnomaly, double eccentricity);
 
-    /********************************************************************
+    /********************************************************************/
     ///Calculate True Anomaly in radians from Mean Anomaly
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -332,12 +349,12 @@ namespace SpaceDSL {
     /// @Param      eccentricity
     /// @Output
     /// @Return     True Anomaly/Mean Anomaly
-    **********************************************************************/
+    /**********************************************************************/
     double SPACEDSL_API MeanAnomalyToTrue (double meanAnomaly, double eccentricity);
 
     double SPACEDSL_API TrueAnomalyToMean (double trueAnomaly, double eccentricity);
 
-    /********************************************************************
+    /********************************************************************/
     ///Calculate The Position and Velocity Vector from The Orbits Elements in J2000
     /// @Author     Niu Zhiyong
     /// @Date       2018-03-20
@@ -347,7 +364,7 @@ namespace SpaceDSL {
     /// @Output
     /// @Param      cart/elem
     /// @Return     void
-    **********************************************************************/
+    /**********************************************************************/
     void SPACEDSL_API OrbitElemToCart (const OrbitElem& elem, double gm, CartState& cart);
 
     void SPACEDSL_API CartToOrbitElem (const CartState& cart, double gm, OrbitElem& elem);
