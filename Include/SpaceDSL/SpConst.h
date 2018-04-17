@@ -60,6 +60,26 @@ const double ThirdPI     = 1.047197551196597746154214461093;		///< PI/3
 const double QuarterPI   = 0.78539816339744830961566084581975;		///< PI/4
 const double SqrPI       = 9.869604401089358618834490999873;		///< PI*PI, PI squared
 
+///
+/// Date Conversion Constants
+///
+const double MJDOffset  = 2400000.5;
+const double TTMinusTAI = 32.184;
+
+
+///
+/// Coordinate System Epochs
+///
+const double B1950Epoch = 2433282.4234591;
+const double J2000Epoch = 2451545.0;			//2000-01-01 12:00:00 TDB
+const double MJD_J2000  = 51544.5;              // Modif. Julian Date of J2000.0
+
+
+///
+/// Earth_Motion_Constants
+///
+const double EarthSiderealDay  = 86164.09054;
+const double EarthSiderealYear = 365.25636;
 
 //===================================
 // Data for physical constant systems
@@ -70,7 +90,7 @@ const double SqrPI       = 9.869604401089358618834490999873;		///< PI*PI, PI squ
 //
 const double Grav           	= 6.673e-11;				///< Constant of gravitation [m^3/kg*s^2] 
 const double GM_Earth         	= 3.986004418e14;			///< Geocentric gravitation constant (WGS84) [m^3/s^2]
-const double AU             	= 1.49597870691e11;			///< Astronomical unit in meters (IAU 1976)[m]
+const double AU             	= 1.49597870700e11;			///< Astronomical unit in meters (IAU 2009)[m]
 const double EarthRadius    	= 6378137.0;				///< Equatorial radius of the Earth (WGS84)[m]
 const double EarthMinRadius 	= 6.35675231424E6;			///< (WGS84)[m]
 const double EarthFlatFact  	= 3.35281066475E-3;			///< Flattening factor of the Earth (WGS84)
@@ -83,80 +103,15 @@ const double EARTH_J3          	= -2.54e-6;				///< Earth Perturbation J3 Term
 const double EARTH_J4          	= -1.61e-6;				///< Earth Perturbation J4 Term
 
 //
-//WGS72 constant
-//
-const double WGS72RE     = 6.378135E6;
-const double WGS72RP     = 6.35679345212E6;
-const double WGS72F      = 3.34604831694E-3;
-const double WGS72GM     = 3.986008E14;
-const double WGS72J2     = 1.08261579E-3;
-const double WGS72WR     = 7.292115147E-5;
-const double WGS72J4     = -0.161E-5;		//IAU76
-const double WGS72SRE    = 6.96E8;			//IAU76
-
-//
 //WGS84 constant
 //
 const double WGS84RE     		= 6.378137E6;
 const double WGS84RP     		= 6.35675231424E6;
 const double WGS84F      		= 3.35281066475E-3;
-const double WGS84GM_old 		= 3.986005E14;
 const double WGS84GM     		= 3.986004418E14;
-const double WGS84J2     		= 1.08263E-3;
-const double WGS84WR_old 		= 7.2921151467E-5;
 const double WGS84WR     		= 7.2921158553E-5;
 const double WGS84WR_INERTIAL 	= 7.2921151467E-5;
-const double WGS84J4     		= -0.161E-5;		//IAU76
 const double WGS84SRE    		= 6.96E8;			//IAU76
-
-//
-//JGM2 constant
-//
-const double JGM2RE      = 6.3781363E6;
-const double JGM2RP      = 6.35675231424E6;			//WGS 84
-const double JGM2GM      = 3.98600441500e+14;
-const double JGM2F       = 1/298.2564;
-const double JGM2J2      = 0.0010826267243926970;
-const double JGM2J4      = -1.6204299899999999e-6;
-const double JGM2WR      = 7.292115E-5;				//DX2
-const double JGM2SRE     = 6.96E8;					//IAU76
-
-//
-//IAU64 constant
-//
-const double IAU64RE     = 6.378160E6;
-const double IAU64RP     = 6.35677471920E6;
-const double IAU64F      = 3.35289186924E-3;
-const double IAU64GM     = 3.98603E14;
-const double IAU64J2     = 1.08263E-3;				//WGS84
-const double IAU64WR     = 7.2921151467E-5;			//WGS84
-const double IAU64J4     = -0.161E-5;				//IAU76
-const double IAU64SRE    = 6.96E8;					//IAU76
-
-//
-//IAU76 constant
-//
-const double IAU76RE     = 6.378140E6;
-const double IAU76RP     = 6.35675528816E6;
-const double IAU76F      = 3.35281317790E-3;
-const double IAU76GM     = 3.986005E14;
-const double IAU76J2     = 1.08263E-3;
-const double IAU76J3     = -0.254E-5;
-const double IAU76J4     = -0.161E-5;
-const double IAU76SRE    = 6.96E8;
-const double IAU76WR     = 7.2921151467E-5;			//WGS84 values   
-
-//
-//DX2 constant
-//
-const double DX2RE       = 6.378140E6;
-const double DX2RP       = 6.35675231424E6;			//WGS 84
-const double DX2F        = 1/298.257223563;
-const double DX2GM       = 3.986005E14;
-const double DX2J2       = 1.08263E-3;
-const double DX2WR       = 7.292115E-5;
-const double DX2J4       = -0.161E-5;				//IAU76 values  
-const double DX2SRE      = 6.96E8;					//IAU76 values
 
 
 //
@@ -212,9 +167,9 @@ const double SaturnMinRadius    = 5.43640000000000e+007;
 // Sun parameter
 //
 const double GM_Sun             = 1.327122E20;				///< Heliocentric gravitation constant [m^3/s^2]
-const double SunRadius          = 695990000.0;				///< Equatorial radius of the Sun [m]
+const double SunRadius          = 695990000.0;				///< Equatorial radius of the Sun [m], Seidelmann 1992
 const double SunMinRadius       = 695990000.0;
-
+const double SolarRadPreAtAU    = 4.560E-6;                 ///< Solar Radiation pressure at 1 AU [N/m^2] (~1367 W/m^2); IERS 96
 
 //
 // Uranus parameter
@@ -292,7 +247,7 @@ const double DayToHour         = 24.0;
 const double CendayToSec       = 864.0;
 const double EarthTUToSec      = sqrt(pow(6.378137e06,3)/3.986004418e14);		///< sqrt(pow(ER,3)/EarthGrav), WGS84
 const double SunTUToSec        = sqrt(pow(1.49597870e11,3)/1.32712442076e20);	///< sqrt(pow(AU,3)/SunGrav)
-
+const double AUPerDay          = AU/DayToSec;                                   ///< AU/Day (IAU 2009)[m/s]
 
 //
 // Constants:   SmallTime_Dimension_Constants 

@@ -37,6 +37,7 @@
 #ifndef SPUTILS_H
 #define SPUTILS_H
 
+#include <iostream>
 #include <exception>
 #include <string>
 

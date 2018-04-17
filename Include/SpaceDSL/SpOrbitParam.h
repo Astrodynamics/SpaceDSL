@@ -71,6 +71,19 @@ namespace SpaceDSL {
             inline void         SetPos(const Vector3d& pos) { m_Pos = pos;}
             inline void         SetVel(const Vector3d& vel) { m_Vel = vel;}
 
+            inline void         SetPos(double xPos, double yPos, double zPos)
+            {
+                this->m_Pos[0] = xPos;
+                this->m_Pos[1] = yPos;
+                this->m_Pos[2] = zPos;
+            }
+            inline void         SetVel(double xVel, double yVel, double zVel)
+            {
+                this->m_Vel[0] = xVel;
+                this->m_Vel[1] = yVel;
+                this->m_Vel[2] = zVel;
+            }
+
             const CartState		operator -() const;
             const CartState		operator +(const CartState& state) const;
             const CartState		operator -(const CartState& state) const;

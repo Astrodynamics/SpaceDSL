@@ -36,6 +36,7 @@
 *************************************************************************/
 
 #include "SpaceDSL/SpTimeSystem.h"
+#include "SpaceDSL/SpMath.h"
 #include "SpaceDSL/SpConst.h"
 #include "SpaceDSL/SpUtils.h"
 

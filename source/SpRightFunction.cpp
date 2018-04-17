@@ -22,55 +22,44 @@
 * Author: Niu ZhiYong
 * Date:2018-03-20
 * Description:
-*   SpMath.h
+*   SpRightFunction.cpp
 *
 *   Purpose:
 *
-*       Define The Math Function in Library
+*       The class of right functions is used to 
+*		base classes of other right function computing classes.
 *
 *
 *   Last modified:
 *
-*   2018-03-20  Niu Zhiyong (1st edition)
+*   2018-03-27  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
-#ifndef SPMATH_H
-#define SPMATH_H
 
-#include "SpaceDSL_Global.h"
 
-/// All the functions are in the namespace SpaceDSL
-///
+
+#include "SpaceDSL/SpRightFunction.h"
+
+
 namespace SpaceDSL {
 
-    //====================================================================
-    //
-    // Grouping: Basic Mathematical Function
-    //
-    //====================================================================
-    //
-    /// Fractional part of a number (y=x-[x])
-    //
-    double SPACEDSL_API Fraction (double x);
+    /*************************************************
+     * Class type: The class of Right Functions of ODE
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  This Function is used to Integrate
+    **************************************************/
+    RightFunc::RightFunc()
+    {
 
-    //
-    /// X Modulo Y
-    //
-    double SPACEDSL_API Modulo (double x, double y);
+    }
 
-    //
-    /// Kronecker Function
-    // If n == m, its output value is 1, otherwise it will be 0.
-    //
-    double SPACEDSL_API Delta (int n, int m);
+    RightFunc::~RightFunc()
+    {
 
-    //
-    /// Factorial Function (n!)
-    //
-    long double SPACEDSL_API Factorial(long double n);
+    }
 
-
-
-		
+	
 }
-#endif //SPMATH_H
+

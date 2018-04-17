@@ -22,55 +22,47 @@
 * Author: Niu ZhiYong
 * Date:2018-03-20
 * Description:
-*   SpMath.h
+*   SpInterpolation.h
 *
 *   Purpose:
 *
-*       Define The Math Function in Library
+*         Numerical Interpolation Methods 
 *
 *
 *   Last modified:
 *
-*   2018-03-20  Niu Zhiyong (1st edition)
+*   2018-03-27  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
-#ifndef SPMATH_H
-#define SPMATH_H
+
+#ifndef SPINTERPOLATION_H
+#define SPINTERPOLATION_H
 
 #include "SpaceDSL_Global.h"
+
+
+#include <Eigen/Core>
+
+
+using namespace Eigen;
 
 /// All the functions are in the namespace SpaceDSL
 ///
 namespace SpaceDSL {
 
-    //====================================================================
-    //
-    // Grouping: Basic Mathematical Function
-    //
-    //====================================================================
-    //
-    /// Fractional part of a number (y=x-[x])
-    //
-    double SPACEDSL_API Fraction (double x);
+        /********************************************************************/
+        /// Unequidistant Linear Interpolation 
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-03-20
+        /// @Input
+        /// @Param  x    	Independent Variable Array
+        /// @Param	y		Function value array
+        /// @Param	t		Interpolation Point
+        /// @Output
+        /// @Param  result  Interpolation Result
+        /**********************************************************************/
+		double LinearInterpolation(const VectorXd& x, const VectorXd& y, double t);
 
-    //
-    /// X Modulo Y
-    //
-    double SPACEDSL_API Modulo (double x, double y);
-
-    //
-    /// Kronecker Function
-    // If n == m, its output value is 1, otherwise it will be 0.
-    //
-    double SPACEDSL_API Delta (int n, int m);
-
-    //
-    /// Factorial Function (n!)
-    //
-    long double SPACEDSL_API Factorial(long double n);
-
-
-
-		
 }
-#endif //SPMATH_H
+
+#endif //SPINTERPOLATION_H

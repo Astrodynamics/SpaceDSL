@@ -22,55 +22,59 @@
 * Author: Niu ZhiYong
 * Date:2018-03-20
 * Description:
-*   SpMath.h
+*   SpRightFunction.h
 *
 *   Purpose:
 *
-*       Define The Math Function in Library
+*       The class of right functions is used to 
+*		base classes of other right function computing classes.
 *
 *
 *   Last modified:
 *
-*   2018-03-20  Niu Zhiyong (1st edition)
+*   2018-03-27  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
-#ifndef SPMATH_H
-#define SPMATH_H
+
+#ifndef SPRIGHTFUNCTION_H
+#define SPRIGHTFUNCTION_H
 
 #include "SpaceDSL_Global.h"
+
+#include <Eigen/Core>
+
+
+using namespace Eigen;
 
 /// All the functions are in the namespace SpaceDSL
 ///
 namespace SpaceDSL {
+	/*************************************************
+     * Class type: The Base Class of Right Functions of ODE
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  This Function is used to Integrate
+    **************************************************/
+	class SPACEDSL_API RightFunc
+	{
+	public:
+        RightFunc();
+        virtual ~RightFunc();
 
-    //====================================================================
-    //
-    // Grouping: Basic Mathematical Function
-    //
-    //====================================================================
-    //
-    /// Fractional part of a number (y=x-[x])
-    //
-    double SPACEDSL_API Fraction (double x);
+        /********************************************************************/
+        ///     Pure Virtual Function
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-03-20
+        /// @Input
+        /// @Param	t		The value of the independent variable
+        /// @Param	x		Initial function value
+        /// @Output
+        /// @Param	result	The calculated value of the function
+        /**********************************************************************/
+        virtual	void operator() (double t, const VectorXd &x, VectorXd&result) const = 0;
 
-    //
-    /// X Modulo Y
-    //
-    double SPACEDSL_API Modulo (double x, double y);
-
-    //
-    /// Kronecker Function
-    // If n == m, its output value is 1, otherwise it will be 0.
-    //
-    double SPACEDSL_API Delta (int n, int m);
-
-    //
-    /// Factorial Function (n!)
-    //
-    long double SPACEDSL_API Factorial(long double n);
-
-
-
-		
+	};
 }
-#endif //SPMATH_H
+
+#endif //SPRIGHTFUNCTION_H

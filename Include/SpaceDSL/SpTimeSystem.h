@@ -45,25 +45,7 @@ using namespace std;
 /// All the functions are in the namespace SpaceDSL
 ///
 namespace SpaceDSL {
-    ///
-    /// Date Conversion Constants
-    ///
-    const double MJDOffset  = 2400000.5;
-    const double TTMinusTAI = 32.184;
 
-
-    ///
-    /// Coordinate System Epochs
-    ///
-    const double B1950Epoch = 2433282.4234591;
-    const double J2000Epoch = 2451545.0;			//2000-01-01 12:00:00 TDB
-
-
-    ///
-    /// Earth_Motion_Constants
-    ///
-    const double EarthSiderealDay  = 86164.09054;
-    const double EarthSiderealYear = 365.25636;
     /*************************************************
      * Class type: Gregorian Calendar Time
      * Author: Niu ZhiYong
@@ -205,7 +187,6 @@ namespace SpaceDSL {
     /// @Return     void
     /**********************************************************************/
     void SPACEDSL_API MjdToCalendarTime ( double Mjd, CalendarTime &time);
-
 
 }
 

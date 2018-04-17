@@ -22,64 +22,83 @@
 * Author: Niu ZhiYong
 * Date:2018-03-20
 * Description:
-*   SpMath.h
+*   SpInterpolation.cpp
 *
 *   Purpose:
 *
-*       Define The Math Function in Library
+*         Numerical Interpolation Methods 
 *
 *
 *   Last modified:
 *
-*   2018-03-20  Niu Zhiyong (1st edition)
+*   2018-03-27  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
-// Standard C++ version
-#include <cmath>
 
+#include "SpaceDSL/SpInterpolation.h"
 #include "SpaceDSL/SpMath.h"
+#include "SpaceDSL/SpConst.h"
 #include "SpaceDSL/SpUtils.h"
 
-namespace SpaceDSL{
 
-    //
-    // Fractional part of a number (y=x-[x])
-    //
-    double Fraction (double x)
-    {
-        return x - floor(x);
-    }
+namespace SpaceDSL {
 
-    //
-    // x mod y
-    //
-    double Modulo (double x, double y)
+    /// Unequidistant Linear Interpolation
+    double LinearInterpolation(const VectorXd &x, const VectorXd &y, double t)
     {
-        return y * Fraction(x/y);
-    }
+        int n = x.size();
+        if(n != y.size())
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "LinearInterpolation: x.size() != y.size()!");
 
-    //
-    // Kronecker function
-    //
-    double Delta(int n, int m)
-    {
-        if (n == m)
-            return 1;
+        int i;
+        double result;
+        result = 0.0;
+
+        if (n < 1)
+            return result;
+
+        if (n == 1)
+        {
+            result = y(0);
+            return result;
+        }
+        if (n == 2)
+        {
+            if(y(0) == y(1))
+                result = y(0);
+            else
+                result = (y(0) * (t - x(1)) - y(1) * (t - x(0))) / (x(0) - x(1));
+
+            return result;
+        }
+
+        if( t <= x(0) )
+        {
+            i = 1;
+        }
+        else if( t >= x(n-1) )
+        {
+            i = n-1;
+        }
         else
-            return 0;
+        {
+            i = 0;
+            while( (t >= x(i)) && (i < n) )
+            {
+                i = i+1;
+            }
+        }
+
+        if(y(i) == y(i-1))
+            result = y(i-1);
+        else
+            result = y(i-1) + (t - x(i-1)) * (y(i) - y(i-1)) / (x(i) - x(i-1));
+
+        return result;
     }
 
-    //
-    // Factorial Function (n!)
-    //
-    long double Factorial(long double n)
-    {
-        if (n < 0)
-            throw SPException(__FILE__, __FUNCTION__, __LINE__, "n!,The n is Less than Zero!");
-        if (n == 0 || n == 1)
-            return 1;
-        else
-            return (n * Factorial(n - 1));
-    }
+
+
 
 }
+
