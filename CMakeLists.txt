@@ -17,6 +17,7 @@ set(CMAKE_CXX_STANDARD 14)
 add_subdirectory(include)
 add_subdirectory(source)
 add_subdirectory(astrodata)
+add_subdirectory(doc)
 # Set Data File path
 SET(AstroData_DIR ${PROJECT_SOURCE_DIR}/astrodata)
 # Set src file list
