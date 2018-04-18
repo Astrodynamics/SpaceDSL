@@ -1,19 +1,6 @@
 #include <iostream>
 
-#include "SpaceDSL/SpOrbitParam.h"
-#include "SpaceDSL/SpTimeSystem.h"
-#include "SpaceDSL/SpJplEph.h"
-#include "SpaceDSL/SpCoordSystem.h"
-#include "SpaceDSL/SpGravity.h"
-#include "SpaceDSL/SpAtmosphere.h"
-#include "SpaceDSL/SpPerturbation.h"
-#include "SpaceDSL/SpInterpolation.h"
-#include "SpaceDSL/SpRightFunction.h"
-#include "SpaceDSL/SpIntegration.h"
-#include "SpaceDSL/SpOrbitPredict.h"
-#include "SpaceDSL/SpMath.h"
-#include "SpaceDSL/SpConst.h"
-#include "SpaceDSL/SpUtils.h"
+#include "SpaceDSL/SpaceDSL.h"
 
 using namespace std;
 using namespace SpaceDSL;

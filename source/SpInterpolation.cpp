@@ -46,7 +46,7 @@ namespace SpaceDSL {
     /// Unequidistant Linear Interpolation
     double LinearInterpolation(const VectorXd &x, const VectorXd &y, double t)
     {
-        int n = x.size();
+        int n = int(x.size());
         if(n != y.size())
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "LinearInterpolation: x.size() != y.size()!");
 
