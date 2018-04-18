@@ -13,8 +13,8 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 **SpaceDSL** contain all basic functions of astrodynamics simulation, including:
 - Astronomical Time System: `Support EOP web Service`, including the definition and conversion of various astronomical time. such as UTC, UT1, TT...
 - Reference Coordinate System: including the transformation equations of commonly used spatial coordinate system. such as ECI, TOD, ECEF, VVLH...
-- JPL Ephemeris: Repackage the JPL ephemeris reading module, providing the latest 'DE436' file, including data from '1950' to '2050'.
-- Earth Gravity Model: Using the spherical harmonic function to build the earth's high-precision gravitational model, with 'EGM200'8 data(80X80).
+- JPL Ephemeris: Repackage the JPL ephemeris reading module, providing the latest `DE436` file, including data from `1950` to `2050`.
+- Earth Gravity Model: Using the spherical harmonic function to build the earth's high-precision gravitational model, with `EGM2008` data(80X80).
 - Other Perturbation Models: Atmospheric Drag(`USSA1976`), Solar Radiation Pressure, Third Body Gravity.
 - High Precision Orbit Prediction For Spacecraft.
 
