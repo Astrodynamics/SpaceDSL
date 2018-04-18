@@ -28,7 +28,7 @@ LINK_DIRECTORIES("${PROJECT_SOURCE_DIR}/Build/")
 # Set source file to make executable
 add_executable(UnitTest TestMain.cpp)
 # Set if build SHARED LIBS  or not
-option(USE_SHAREDLIBS "USE SHARED LIBS" TRUE)
+option(USE_SHAREDLIBS "USE SHARED LIBS" FALSE)
 if (USE_SHAREDLIBS)
     ADD_DEFINITIONS(-DSPACEDSL_SHARED_LIBRARY)
     IF (CMAKE_BUILD_TYPE MATCHES "Release")

@@ -45,7 +45,7 @@ set(CMAKE_AUTOMOC ON)
 #
 
 # Set if build SHARED LIBS  or not
-option(BUILD_SHAREDLIBS "Build SHARED LIBS" TRUE)
+option(BUILD_SHAREDLIBS "Build SHARED LIBS" FALSE)
 if (BUILD_SHAREDLIBS)
     ADD_DEFINITIONS(-DSPACEDSL_SHARED_LIBRARY)
     # Set the build postfix extension according to what configuration is being built.

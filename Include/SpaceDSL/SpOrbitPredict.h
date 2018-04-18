@@ -53,12 +53,6 @@ using namespace Eigen;
 ///
 namespace SpaceDSL {
 
-    //控制量
-    enum EBurnType
-    {
-        AsEImpulse   = 0,
-        AsEDuration  = 1
-    };
     /*************************************************
      * struct type: Third Body Gravity Sign
      * Author: Niu ZhiYong
