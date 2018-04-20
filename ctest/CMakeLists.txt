@@ -13,8 +13,22 @@ include(CPack)
 enable_testing()
 
 # Set Include h file path
-set(SpaceDSL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
-INCLUDE_DIRECTORIES(${SpaceDSL_INCLUDE_DIR})
+# Set Include h file path
+list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include)
+
+# Set if build With OpenSSL or not
+option(USE_OPENSSL "Build With OpenSSL." TRUE)
+if (USE_OPENSSL)
+    Add_Definitions(-DWITH_OPENSSL)
+    find_package(OPENSSL)
+    if(OPENSSL_FOUND)
+        message(STATUS "#OPENSSL_INCLUDE_DIR = ${OPENSSL_INCLUDE_DIR}")
+        list(APPEND CTEST_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIR})
+    endif()
+endif()
+
+
+INCLUDE_DIRECTORIES(${CTEST_INCLUDE_DIRS})
 #
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -65,7 +79,10 @@ else()
     ENDIF()
 endif()
 
-
+if(OPENSSL_FOUND)
+    message(STATUS "#Target Link OPENSSL_LIBRARIES_DIR = ${OPENSSL_LIBRARIES}")
+    target_link_libraries(UnitTest ${OPENSSL_LIBRARIES})
+endif()
 
 add_test(UnitTest UnitTest)
 

@@ -17,17 +17,23 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - Earth Gravity Model: Using the spherical harmonic function to build the earth's high-precision gravitational model, with `EGM2008` data(80X80).
 - Other Perturbation Models: Atmospheric Drag(`USSA1976`), Solar Radiation Pressure, Third Body Gravity.
 - High Precision Orbit Prediction For Spacecraft.
+- Common Physical Constants
+- Support Multi Thread Log Output, And Exception Handling Based on STL.
 
 ### Later support
 
 - Perturbation Models: Earth Tide, Relativistic Effect .
 - Atmospheric Models: Harris-Priester Model.
+- Relative Motion Simulation of Spacecraft.
 - Orbital Maneuver Siumulation Features.
+- Orbit Deviation Prediction.
 
 ## Dependences
 
 - [Eigen3 library](http://eigen.tuxfamily.org): a C++ template library for linear algebra.`Be careful！ The library must be recompiled when using SpaceDSL dynamic library`.
 All the files of the Eigen3.3.4 have been included in the project.
+- [OpenSSL](https://www.openssl.org/):OpenSSL is a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
+If you want to use IERS Web Service, this library must be Precompiled.
 
 ## Supported compilers
 
@@ -37,8 +43,7 @@ All the files of the Eigen3.3.4 have been included in the project.
 4. Intel C++ compiler 16 or newer 
 
 ## Reference
-The formula used in this project is from `Oliver Montenbruck Eberhard Gill`'s book ``Satellite Orbit Model, Method and Appliction``.
-
+1. The formula used in this project is from `Oliver Montenbruck Eberhard Gill`'s book ``Satellite Orbit Model, Method and Appliction``.
 
 ## About
 

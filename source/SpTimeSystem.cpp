@@ -40,6 +40,11 @@
 #include "SpaceDSL/SpConst.h"
 #include "SpaceDSL/SpUtils.h"
 
+#include "SpaceDSL/gsoap/soapH.h"
+#include "SpaceDSL/gsoap/soapBinding.nsmap"
+
+#include <fstream>
+
 namespace SpaceDSL{
 
     /*************************************************
@@ -57,11 +62,13 @@ namespace SpaceDSL{
         this->m_Hour = 0;
         this->m_Min = 0;
         this->m_Sec = 0;
+        this->m_pTimeStr = NULL;
     }
 
     CalendarTime::~CalendarTime()
     {
-
+        if (m_pTimeStr != NULL)
+            free (m_pTimeStr);
     }
 
     bool CalendarTime::operator==(const CalendarTime &time) const
@@ -250,6 +257,29 @@ namespace SpaceDSL{
         }
         else
             return true;
+    }
+
+    void CalendarTime::ToCharArray(char *&pTimeStr)
+    {
+        this->FillTimeStr();
+        pTimeStr = m_pTimeStr;
+    }
+
+    void CalendarTime::FillTimeStr()
+    {
+        // char form "yyyy-mm-dd HH:MM:SS"
+        string tempStr = to_string(this->m_Year) + "-";
+        tempStr += ( to_string(this->m_Mon) + "-" );
+        tempStr += ( to_string(this->m_Day) + " " );
+        tempStr += ( to_string(this->m_Hour) + ":" );
+        tempStr += ( to_string(this->m_Min) + ":" );
+        tempStr += ( to_string(this->m_Sec));
+        if (m_pTimeStr != NULL)
+            free (m_pTimeStr);
+        int len = int(tempStr.size()) + 1;
+        m_pTimeStr = (char *)malloc(len * sizeof(m_pTimeStr[0]));
+
+        strcpy_s(m_pTimeStr, len, tempStr.c_str());
     }
     /*************************************************
      * Class type: Gregorian Calendar Time
@@ -456,6 +486,91 @@ namespace SpaceDSL{
         time.SetHour(hour);
         time.SetMin(min);
         time.SetSec(min);
+    }
+
+    /*************************************************
+     * Class type: IERS
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  Get IERS Data through a File or Web Service
+    **************************************************/
+    IERSService::IERSService()
+    {
+        #ifdef WITH_OPENSSL
+            m_bIsUseWebService = true;
+        #else
+            m_bIsUseWebService = false;
+        #endif
+    }
+
+    IERSService::~IERSService()
+    {
+
+    }
+
+    void IERSService::EnableWebService()
+    {
+        #ifdef WITH_OPENSSL
+            m_bIsUseWebService = true;
+        #endif
+    }
+
+    void IERSService::DisableWebService()
+    {
+        #ifdef WITH_OPENSSL
+            m_bIsUseWebService = false;
+        #endif
+    }
+
+    double IERSService::GetValue(double Mjd_UTC, char *param, char *series)
+    {
+        if (m_bIsUseWebService == true) //Use IERS Web Service
+        {
+            char *result = NULL;
+
+            UTCCalTime caltime;
+            MjdToCalendarTime(Mjd_UTC, caltime);
+            char *datetime = NULL;
+            caltime.ToCharArray(datetime);
+
+            string tempStr;
+            tempStr = to_string(Mjd_UTC);
+            char *mjd = const_cast<char*> (tempStr.c_str());
+
+            struct soap readIERS;
+            soap_init(&readIERS);
+            soap_ssl_init();
+            if (soap_ssl_client_context(&readIERS,
+                SOAP_SSL_NO_AUTHENTICATION, /* use SOAP_SSL_DEFAULT in production code */
+                NULL,       /* keyfile: required only when client must authenticate to
+                            server (see SSL docs on how to obtain this file) */
+                NULL,       /* password to read the keyfile */
+                NULL,      /* optional cacert file to store trusted certificates */
+                NULL,      /* optional capath to directory with trusted certificates */
+                NULL      /* if randfile!=NULL: use a file with random data to seed randomness */
+            ))
+            {
+                throw SPException(__FILE__, __FUNCTION__, __LINE__, "soap_ssl_client_context() Running error");
+            }
+            soap_set_namespaces(&readIERS, namespaces);
+
+            if (series == NULL)
+            {
+                soap_call_ns2__getTimescale(&readIERS, NULL, NULL, param, datetime, result);
+            }
+            else
+                soap_call_ns1__readEOP(&readIERS, NULL, NULL, param, series, mjd, result);
+
+            string resultStr = result;
+            return stod(resultStr);
+        }
+        else //Read File
+        {
+            string resultStr;
+            return stod(resultStr);
+        }
+
     }
 
 }

@@ -81,17 +81,31 @@ namespace SpaceDSL {
         bool				operator< (const CalendarTime& time) const;
         bool				operator<=(const CalendarTime& time) const;
 
+    public:
+        /********************************************************************/
+        /// Transform from Calendar Date to Char Array
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-03-20
+        /// @Input/Output
+        /// @Param      timeChar        Char Array Point Such as "yyyy-mm-dd HH:MM:SS"
+        /// @Return
+        /**********************************************************************/
+        void                ToCharArray(char *&pTimeStr);
+
+    protected:
+        void                FillTimeStr();
 
     ///
     ///Attribute.
     ///
     protected:
-        int		m_Year;		///< year
-        int		m_Mon;		///< month,  1 - 12
-        int		m_Day;		///< day,    1 - 31
-        int		m_Hour;		///< hour,   0 - 23
-        int		m_Min;		///< minute, 0 - 59
-        double	m_Sec;		///< second, 0 - 59.99..
+        int		m_Year;                 ///< year
+        int		m_Mon;                  ///< month,  1 - 12
+        int		m_Day;                  ///< day,    1 - 31
+        int		m_Hour;                 ///< hour,   0 - 23
+        int		m_Min;                  ///< minute, 0 - 59
+        double	m_Sec;                  ///< second, 0 - 59.99..
+        char    *m_pTimeStr;            ///< char form "yyyy-mm-dd HH:MM:SS"
     };
     /*************************************************
      * Class type: UTC Time
@@ -187,6 +201,57 @@ namespace SpaceDSL {
     /// @Return     void
     /**********************************************************************/
     void SPACEDSL_API MjdToCalendarTime ( double Mjd, CalendarTime &time);
+
+    /*************************************************
+     * Class type: IERS
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  Get IERS Data through a File or Web Service
+    **************************************************/
+    class SPACEDSL_API IERSService
+    {
+    public:
+        IERSService();
+        virtual ~IERSService();
+
+    public:
+
+        void        EnableWebService();
+        void        DisableWebService();
+        /********************************************************************/
+        /// Get IERS Data
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-03-20
+        /// @Input
+        /// @Param      Mjd_UTC         Modified Julian Date of UTC Time
+        /// @Param      param           Type of Data Required
+        /// @Param      series          The Series of Data
+        /// @Output
+        /// @Return     Value of Data   [sec]
+        /// Mote:
+        /// [param] Can be
+        ///     "x_pole", "sigma_x_pole", "y_pole", "sigma_y_pole", "UT1-UTC", "sigma_UT1-UTC",
+        ///     "LOD", "sigma_LOD", "dPsi", "sigma_dPsi", "dEpsilon", "sigma_dEpsilon",
+        ///     "dX", "sigma_dX", "dY", "sigma_dY"
+        ///     "leapseconds","mjd" , "UT1-UTC" , "UT1", "TAI", "TT"
+        /// [series] Can be
+        ///     "Finals All (IAU2000)", "Finals Daily (IAU2000)", "Finals Data (IAU2000)", "Finals All (IAU1980)",
+        ///     "Finals Daily (IAU1980)","Finals Data (IAU1980)","EOP 08 C04 (IAU1980)","EOP 08 C04 (IAU2000)",
+        ///     "EOP 14 C04 (IAU1980)","EOP 14 C04 (IAU2000)","GPS Rapid","GPS Rapid Daily",
+        ///     "Bulletin A","Bulletin B","EOP C01"
+        /**********************************************************************/
+        double      GetValue(double Mjd_UTC, char *param, char *series = NULL);
+
+
+    protected:
+
+        bool        m_bIsUseWebService;
+
+
+
+
+    };
 
 }
 
