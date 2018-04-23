@@ -540,19 +540,21 @@ namespace SpaceDSL{
 
             struct soap readIERS;
             soap_init(&readIERS);
-            soap_ssl_init();
-            if (soap_ssl_client_context(&readIERS,
-                SOAP_SSL_NO_AUTHENTICATION, /* use SOAP_SSL_DEFAULT in production code */
-                NULL,       /* keyfile: required only when client must authenticate to
-                            server (see SSL docs on how to obtain this file) */
-                NULL,       /* password to read the keyfile */
-                NULL,      /* optional cacert file to store trusted certificates */
-                NULL,      /* optional capath to directory with trusted certificates */
-                NULL      /* if randfile!=NULL: use a file with random data to seed randomness */
-            ))
-            {
-                throw SPException(__FILE__, __FUNCTION__, __LINE__, "soap_ssl_client_context() Running error");
-            }
+            #ifdef WITH_OPENSSL
+                soap_ssl_init();
+                if (soap_ssl_client_context(&readIERS,
+                    SOAP_SSL_NO_AUTHENTICATION, /* use SOAP_SSL_DEFAULT in production code */
+                    NULL,       /* keyfile: required only when client must authenticate to
+                                server (see SSL docs on how to obtain this file) */
+                    NULL,       /* password to read the keyfile */
+                    NULL,      /* optional cacert file to store trusted certificates */
+                    NULL,      /* optional capath to directory with trusted certificates */
+                    NULL      /* if randfile!=NULL: use a file with random data to seed randomness */
+                ))
+                {
+                    throw SPException(__FILE__, __FUNCTION__, __LINE__, "soap_ssl_client_context() Running error");
+                }
+            #endif
             soap_set_namespaces(&readIERS, namespaces);
 
             if (series == NULL)
