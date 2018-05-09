@@ -1,4 +1,4 @@
-#************************************************#
+﻿#************************************************#
 #                                                #
 # Copyright (C) 2017  Niu Zhiyong (China)        #
 # <tbnzhyxxx@163.com>                            #
@@ -51,9 +51,6 @@ INCLUDE_DIRECTORIES(${SpaceDSL_INCLUDE_DIRS})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed
 set(CMAKE_AUTOMOC ON)
-# Set source file to make executable
-#add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/source/main.cpp )
-#
 
 # Set if build SHARED LIBS  or not
 option(BUILD_SHAREDLIBS "Build SHARED LIBS" FALSE)

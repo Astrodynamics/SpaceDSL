@@ -50,6 +50,11 @@ using namespace Eigen;
 ///
 namespace SpaceDSL {
 
+        enum SPACEDSL_API InterpolationType
+        {
+            E_NotDefinedInterpolation     = 0,
+            E_LinearInterpolation         = 1,
+        };
         /********************************************************************/
         /// Unequidistant Linear Interpolation 
         /// @Author     Niu Zhiyong

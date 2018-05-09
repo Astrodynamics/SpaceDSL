@@ -1,4 +1,2 @@
 /Build
-/Include/SpaceDSL/ballistic/*.h
-/source/ballistic/*.cpp
 CMakeLists.txt.user
