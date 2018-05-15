@@ -40,7 +40,6 @@
 
 
 #include "SpaceDSL_Global.h"
-#include <vector>
 
 using namespace std;
 /// All the functions are in the namespace SpaceDSL

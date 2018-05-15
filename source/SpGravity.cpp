@@ -104,9 +104,9 @@ namespace SpaceDSL {
                     ++line;
                     string bufferstr = buffer;
                     int     n = stoi( bufferstr.substr(0,5));
-                    int     m = stoi( bufferstr.substr(5,10));
-                    double  C_nm = stod( bufferstr.substr(10,35));
-                    double  S_nm = stod( bufferstr.substr(35,60));
+                    int     m = stoi( bufferstr.substr(5,5));
+                    double  C_nm = stod( bufferstr.substr(10,25));
+                    double  S_nm = stod( bufferstr.substr(35,25));
 
                     if (m == 0)
                     {
