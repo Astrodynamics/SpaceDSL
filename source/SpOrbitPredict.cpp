@@ -39,11 +39,95 @@
 #include "SpaceDSL/SpCoordSystem.h"
 #include "SpaceDSL/SpTimeSystem.h"
 #include "SpaceDSL/SpMath.h"
-#include "SpaceDSL/SpConst.h"
 #include "SpaceDSL/SpUtils.h"
 
 
 namespace SpaceDSL {
+
+    /*************************************************
+     * Class type: Normalization Parameter
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+    **************************************************/
+    NormalizeParameter::NormalizeParameter()
+    {
+
+    }
+
+    NormalizeParameter::~NormalizeParameter()
+    {
+
+    }
+
+    double NormalizeParameter::GetLengthPara(SolarSysStarType centerStarType)
+    {
+        switch (centerStarType)
+        {
+        case E_Earth:
+            return EarthRadius;
+            break;
+        case E_Sun:
+            return AU;
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "NormalizeParameter: Center Star Type Unsupport ");
+            break;
+        }
+    }
+
+    double NormalizeParameter::GetSpeedPara(SolarSysStarType centerStarType)
+    {
+        switch (centerStarType)
+        {
+        case E_Earth:
+            return sqrt(GM_Earth/EarthRadius);
+            break;
+        case E_Sun:
+            return sqrt(GM_Sun/AU);
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "NormalizeParameter: Center Star Type Unsupport ");
+            break;
+        }
+    }
+
+    double NormalizeParameter::GetTimePara(SolarSysStarType centerStarType)
+    {
+        switch (centerStarType)
+        {
+        case E_Earth:
+            return EarthRadius/sqrt(GM_Earth/EarthRadius);
+            break;
+        case E_Sun:
+            return AU/sqrt(GM_Sun/AU);
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "NormalizeParameter: Center Star Type Unsupport ");
+            break;
+        }
+    }
+
+    double NormalizeParameter::GetThrustPara(SolarSysStarType centerStarType, double mass)
+    {
+        switch (centerStarType)
+        {
+        case E_Earth:
+            return  (GM_Earth*mass)/pow(EarthRadius,2);
+            break;
+        case E_Sun:
+            return (GM_Sun*mass)/pow(AU,2);
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "NormalizeParameter: Center Star Type Unsupport ");
+            break;
+        }
+    }
+
 
     /*************************************************
      * Class type: Orbit Prediction Parameters
@@ -62,11 +146,10 @@ namespace SpaceDSL {
 
     }
 
-    void OrbitPredictConfig::Initializer(SolarSysStarType centerStarType, double Mjd_UTC,
-                                           GravModelType gravModelType, int maxDegree, int maxOrder,
-                                           AtmosphereModelType atmModelType, double dragCoef, double dragArea,
-                                           double SRPCoef, double SRPArea, bool isUseDrag, bool isUseSRP,
-                                           ThirdBodyGravitySign thirdBodySign)
+    void OrbitPredictConfig::Initializer(SolarSysStarType centerStarType,ThirdBodyGravitySign thirdBodySign,
+                                         double Mjd_UTC,GravModelType gravModelType, int maxDegree, int maxOrder,
+                                         AtmosphereModelType atmModelType, double dragCoef, double dragArea,
+                                         double SRPCoef, double SRPArea, bool isUseDrag, bool isUseSRP, bool isUseNormalize)
     {
         m_CenterStarType    = centerStarType;
         m_MJD_UTC           = Mjd_UTC;
@@ -86,42 +169,43 @@ namespace SpaceDSL {
         m_bIsUseDrag        = isUseDrag;
         m_bIsUseSRP         = isUseSRP;
         m_ThirdBodySign     = thirdBodySign;
+        m_bIsUseNormalize   = isUseNormalize;
 
         //Data Cheak
         switch (centerStarType)
         {
         case E_Mercury:
-            m_ThirdBodySign.m_bIsUseMercuryGrav = false;
+            m_ThirdBodySign.bIsUseMercuryGrav = false;
             break;
         case E_Venus:
-            m_ThirdBodySign.m_bIsUseVenusGrav = false;
+            m_ThirdBodySign.bIsUseVenusGrav = false;
             break;
         case E_Earth:
-            m_ThirdBodySign.m_bIsUseEarthGrav = false;
+            m_ThirdBodySign.bIsUseEarthGrav = false;
             break;
         case E_Mars:
-            m_ThirdBodySign.m_bIsUseMarsGrav = false;
+            m_ThirdBodySign.bIsUseMarsGrav = false;
             break;
         case E_Jupiter:
-            m_ThirdBodySign.m_bIsUseJupiterGrav = false;
+            m_ThirdBodySign.bIsUseJupiterGrav = false;
             break;
         case E_Saturn:
-            m_ThirdBodySign.m_bIsUseSaturnGrav = false;
+            m_ThirdBodySign.bIsUseSaturnGrav = false;
             break;
         case E_Uranus:
-            m_ThirdBodySign.m_bIsUseUranusGrav = false;
+            m_ThirdBodySign.bIsUseUranusGrav = false;
             break;
         case E_Neptune:
-            m_ThirdBodySign.m_bIsUseNeptuneGrav = false;
+            m_ThirdBodySign.bIsUseNeptuneGrav = false;
             break;
         case E_Pluto:
-            m_ThirdBodySign.m_bIsUsePlutoGrav = false;
+            m_ThirdBodySign.bIsUsePlutoGrav = false;
             break;
         case E_Moon:
-            m_ThirdBodySign.m_bIsUseMoonGrav = false;
+            m_ThirdBodySign.bIsUseMoonGrav = false;
             break;
         case E_Sun:
-            m_ThirdBodySign.m_bIsUseSunGrav = false;
+            m_ThirdBodySign.bIsUseSunGrav = false;
             break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -140,7 +224,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_CenterStarType = type;
     }
 
@@ -148,15 +232,58 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_CenterStarType;
+    }
+
+    double OrbitPredictConfig::GetCenterStarGM() const
+    {
+        switch (m_CenterStarType)
+        {
+        case E_Mercury:
+            return GM_Mercury;
+            break;
+        case E_Venus:
+            return GM_Venus;
+            break;
+        case E_Earth:
+            return GM_Earth;
+            break;
+        case E_Mars:
+            return GM_Mars;
+            break;
+        case E_Jupiter:
+            return GM_Jupiter;
+            break;
+        case E_Saturn:
+            return GM_Saturn;
+            break;
+        case E_Uranus:
+            return GM_Uranus;
+            break;
+        case E_Neptune:
+            return GM_Neptune;
+            break;
+        case E_Pluto:
+            return GM_Pluto;
+            break;
+        case E_Moon:
+            return GM_Moon;
+            break;
+        case E_Sun:
+            return GM_Sun;
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,"OrbitPredictConfig:SolarSysStarType Unsupport ");
+            break;
+        }
     }
 
     void OrbitPredictConfig::SetMJD_UTC(double Mjd_UTC)
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_MJD_UTC = Mjd_UTC;
     }
 
@@ -164,7 +291,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MJD_UTC;
     }
 
@@ -172,7 +299,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_MJD_TT = Mjd_TT;
     }
 
@@ -180,7 +307,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MJD_TT;
     }
 
@@ -188,7 +315,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_GravModelType = type;
     }
 
@@ -196,7 +323,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
         return m_GravModelType;
     }
@@ -205,7 +332,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_MaxDegree = maxDegree;
     }
 
@@ -213,7 +340,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MaxDegree;
     }
 
@@ -221,7 +348,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_MaxOrder = maxOrder;
     }
 
@@ -229,7 +356,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MaxOrder;
     }
 
@@ -237,7 +364,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_AtmModelType = type;
     }
 
@@ -245,7 +372,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_AtmModelType;
     }
 
@@ -253,7 +380,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_DragCoef = coef;
     }
 
@@ -261,7 +388,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_DragCoef;
     }
 
@@ -269,7 +396,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_DragArea = area;
     }
 
@@ -277,7 +404,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_DragArea;
     }
 
@@ -285,7 +412,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_SRPCoef = coef;
     }
 
@@ -293,7 +420,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_SRPCoef;
     }
 
@@ -301,7 +428,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_SRPArea = area;
     }
 
@@ -309,7 +436,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_SRPArea;
     }
 
@@ -317,43 +444,43 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_ThirdBodySign = sign;
         //Data Cheak
         switch (m_CenterStarType)
         {
         case E_Mercury:
-            m_ThirdBodySign.m_bIsUseMercuryGrav = false;
+            m_ThirdBodySign.bIsUseMercuryGrav = false;
             break;
         case E_Venus:
-            m_ThirdBodySign.m_bIsUseVenusGrav = false;
+            m_ThirdBodySign.bIsUseVenusGrav = false;
             break;
         case E_Earth:
-            m_ThirdBodySign.m_bIsUseEarthGrav = false;
+            m_ThirdBodySign.bIsUseEarthGrav = false;
             break;
         case E_Mars:
-            m_ThirdBodySign.m_bIsUseMarsGrav = false;
+            m_ThirdBodySign.bIsUseMarsGrav = false;
             break;
         case E_Jupiter:
-            m_ThirdBodySign.m_bIsUseJupiterGrav = false;
+            m_ThirdBodySign.bIsUseJupiterGrav = false;
             break;
         case E_Saturn:
-            m_ThirdBodySign.m_bIsUseSaturnGrav = false;
+            m_ThirdBodySign.bIsUseSaturnGrav = false;
             break;
         case E_Uranus:
-            m_ThirdBodySign.m_bIsUseUranusGrav = false;
+            m_ThirdBodySign.bIsUseUranusGrav = false;
             break;
         case E_Neptune:
-            m_ThirdBodySign.m_bIsUseNeptuneGrav = false;
+            m_ThirdBodySign.bIsUseNeptuneGrav = false;
             break;
         case E_Pluto:
-            m_ThirdBodySign.m_bIsUsePlutoGrav = false;
+            m_ThirdBodySign.bIsUsePlutoGrav = false;
             break;
         case E_Moon:
-            m_ThirdBodySign.m_bIsUseMoonGrav = false;
+            m_ThirdBodySign.bIsUseMoonGrav = false;
             break;
         case E_Sun:
-            m_ThirdBodySign.m_bIsUseSunGrav = false;
+            m_ThirdBodySign.bIsUseSunGrav = false;
             break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -367,7 +494,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
         return m_ThirdBodySign;
     }
@@ -376,7 +503,7 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
         return m_bIsUseSRP;
     }
@@ -385,9 +512,18 @@ namespace SpaceDSL {
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
         return m_bIsUseDrag;
+    }
+
+    bool OrbitPredictConfig::IsUseNormalize() const
+    {
+        if ( bIsInitialized == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
+
+        return m_bIsUseNormalize;
     }
 
     /*************************************************
@@ -485,62 +621,67 @@ namespace SpaceDSL {
         }
 
         /// Third Body Gravity
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseEarthGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseEarthGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Earth, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseJupiterGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseJupiterGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Jupiter, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseMarsGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseMarsGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Mars, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseMercuryGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseMercuryGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Mercury, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseMoonGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseMoonGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Moon, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseNeptuneGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseNeptuneGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Neptune, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUsePlutoGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUsePlutoGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Pluto, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseSaturnGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseSaturnGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Saturn, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseSunGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseSunGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Sun, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseUranusGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseUranusGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Uranus, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
-        if (m_OrbitPredictConfig.GetThirdBodySign().m_bIsUseVenusGrav)
+        if (m_OrbitPredictConfig.GetThirdBodySign().bIsUseVenusGrav)
         {
             ThirdBodyGravity thirdBodyGrva(E_Venus, m_OrbitPredictConfig.GetCenterStarType());
             acceleration += thirdBodyGrva.AccelPointMassGravity(Mjd_TT, pos);
         }
 
+        if (m_OrbitPredictConfig.IsUseNormalize())
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictRightFunc: High Precision Orbit Prediction does not Support Normalize! ");
+        }
         /// make the right function
         for (int i = 0; i < 3; ++i)
         {
@@ -551,6 +692,131 @@ namespace SpaceDSL {
         result(5) = acceleration(2);
         result(6) = 1;
     }
-    
+
+    /*************************************************
+     * Class type: Tow Body Orbit Prediction
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  Orbit Prediction Algorithm and Function
+    **************************************************/
+    TwoBodyOrbitPredict::TwoBodyOrbitPredict()
+    {
+
+    }
+
+    TwoBodyOrbitPredict::~TwoBodyOrbitPredict()
+    {
+
+    }
+
+    void TwoBodyOrbitPredict::OrbitStep(OrbitPredictConfig predictConfig, double step, IntegMethodType integType,
+                                                  double &mass, Vector3d &pos, Vector3d &vel)
+    {
+        if (predictConfig.IsInitialized() == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "TwoBodyOrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+        if (predictConfig.IsUseNormalize())
+        {
+            SolarSysStarType centerStarType = predictConfig.GetCenterStarType();
+            double Mjd_TT = predictConfig.GetMJD_TT()/NormalizeParameter::GetTimePara(centerStarType);
+            double norm_step = step/NormalizeParameter::GetTimePara(centerStarType);
+            VectorXd x(7), result(7);
+            result.fill(0);
+            x(0) = pos(0)/NormalizeParameter::GetLengthPara(centerStarType);
+            x(1) = pos(1)/NormalizeParameter::GetLengthPara(centerStarType);
+            x(2) = pos(2)/NormalizeParameter::GetLengthPara(centerStarType);
+
+            x(3) = vel(0)/NormalizeParameter::GetSpeedPara(centerStarType);
+            x(4) = vel(1)/NormalizeParameter::GetSpeedPara(centerStarType);
+            x(5) = vel(2)/NormalizeParameter::GetSpeedPara(centerStarType);
+
+            x(6) = mass;
+
+            TwoBodyOrbitRightFunc rightFunc(predictConfig);
+            RungeKutta RK(integType);
+            RK.OneStep(rightFunc, Mjd_TT*DayToSec ,x, norm_step, result);
+
+            pos(0) = result(0)*NormalizeParameter::GetLengthPara(centerStarType);
+            pos(1) = result(1)*NormalizeParameter::GetLengthPara(centerStarType);
+            pos(2) = result(2)*NormalizeParameter::GetLengthPara(centerStarType);
+
+            vel(0) = result(3)*NormalizeParameter::GetSpeedPara(centerStarType);
+            vel(1) = result(4)*NormalizeParameter::GetSpeedPara(centerStarType);
+            vel(2) = result(5)*NormalizeParameter::GetSpeedPara(centerStarType);
+
+            mass   = result(6);
+        }
+        else
+        {
+            double Mjd_TT = predictConfig.GetMJD_TT();
+            VectorXd x(7), result(7);
+            result.fill(0);
+            x(0) = pos(0);  x(1) = pos(1);  x(2) = pos(2);
+            x(3) = vel(0);  x(4) = vel(1);  x(5) = vel(2);  x(6) = mass;
+
+            TwoBodyOrbitRightFunc rightFunc(predictConfig);
+            RungeKutta RK(integType);
+            RK.OneStep(rightFunc, Mjd_TT*DayToSec ,x, step, result);
+
+            pos(0) = result(0);     pos(1) = result(1);     pos(2) = result(2);
+            vel(0) = result(3);     vel(1) = result(4);     vel(2) = result(5);
+            mass   = result(6);
+        }
+
+    }
+
+    /*************************************************
+     * Class type: Tow Body Orbit Prediction Right Function
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+    **************************************************/
+    TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc(OrbitPredictConfig config)
+    {
+        m_OrbitPredictConfig = config;
+    }
+
+    TwoBodyOrbitRightFunc::~TwoBodyOrbitRightFunc()
+    {
+
+    }
+
+    void TwoBodyOrbitRightFunc::operator()(double t, const VectorXd &x, VectorXd &result) const
+    {
+        Vector3d pos;
+        pos(0) = x(0);  pos(1) = x(1);  pos(2) = x(2);
+        Vector3d vel;
+        vel(0) = x(3);  vel(1) = x(4);  vel(2) = x(5);
+        double r = pos.norm();
+        if (m_OrbitPredictConfig.IsUseNormalize())
+        {
+            /// make the right function
+            for (int i = 0; i < 3; ++i)
+            {
+                result(i) = vel(i);
+            }
+            result(3) = -pos(0)/pow(r,3);
+            result(4) = -pos(1)/pow(r,3);
+            result(5) = -pos(2)/pow(r,3);
+            result(6) = 1;
+        }
+        else
+        {
+            double GM = m_OrbitPredictConfig.GetCenterStarGM();
+            /// make the right function
+            for (int i = 0; i < 3; ++i)
+            {
+                result(i) = vel(i);
+            }
+            result(3) = -GM*pos(0)/pow(r,3);
+            result(4) = -GM*pos(1)/pow(r,3);
+            result(5) = -GM*pos(2)/pow(r,3);
+            result(6) = 1;
+        }
+
+
+    }
+
 }
 

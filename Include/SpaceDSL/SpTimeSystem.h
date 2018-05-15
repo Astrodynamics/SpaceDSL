@@ -40,6 +40,7 @@
 
 
 #include "SpaceDSL_Global.h"
+#include <vector>
 
 using namespace std;
 /// All the functions are in the namespace SpaceDSL
@@ -216,9 +217,10 @@ namespace SpaceDSL {
         virtual ~IERSService();
 
     public:
-
+        #ifdef WITH_OPENSSL
         void        EnableWebService();
         void        DisableWebService();
+        #endif
         /********************************************************************/
         /// Get IERS Data
         /// @Author     Niu Zhiyong
@@ -234,19 +236,23 @@ namespace SpaceDSL {
         ///     "x_pole", "sigma_x_pole", "y_pole", "sigma_y_pole", "UT1-UTC", "sigma_UT1-UTC",
         ///     "LOD", "sigma_LOD", "dPsi", "sigma_dPsi", "dEpsilon", "sigma_dEpsilon",
         ///     "dX", "sigma_dX", "dY", "sigma_dY"
-        ///     "leapseconds","mjd" , "UT1-UTC" , "UT1", "TAI", "TT"
+        ///     "leapseconds", "UT1-UTC" , "UT1", "TAI", "TT"
         /// [series] Can be
         ///     "Finals All (IAU2000)", "Finals Daily (IAU2000)", "Finals Data (IAU2000)", "Finals All (IAU1980)",
         ///     "Finals Daily (IAU1980)","Finals Data (IAU1980)","EOP 08 C04 (IAU1980)","EOP 08 C04 (IAU2000)",
         ///     "EOP 14 C04 (IAU1980)","EOP 14 C04 (IAU2000)","GPS Rapid","GPS Rapid Daily",
         ///     "Bulletin A","Bulletin B","EOP C01"
         /**********************************************************************/
-        double      GetValue(double Mjd_UTC, char *param, char *series = NULL);
+        double                      GetValue(double Mjd_UTC, char *param, char *series = NULL);
 
 
     protected:
 
-        bool        m_bIsUseWebService;
+        bool                        m_bIsUseWebService;
+        double                      **m_EOPData;
+        double                      **m_LeapsecondData;
+        int                         m_EOPDataLine;
+        int                         m_LeapsecondDataLine;
 
 
 

@@ -120,6 +120,7 @@ namespace SpaceDSL {
 
                 }
             }
+            fileStream.close();
             break;
         default:
             break;

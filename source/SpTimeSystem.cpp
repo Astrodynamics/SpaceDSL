@@ -36,6 +36,7 @@
 *************************************************************************/
 
 #include "SpaceDSL/SpTimeSystem.h"
+#include "SpaceDSL/SpInterpolation.h"
 #include "SpaceDSL/SpMath.h"
 #include "SpaceDSL/SpConst.h"
 #include "SpaceDSL/SpUtils.h"
@@ -44,6 +45,7 @@
 #include "SpaceDSL/gsoap/soapBinding.nsmap"
 
 #include <fstream>
+#include <iostream>
 
 namespace SpaceDSL{
 
@@ -499,29 +501,117 @@ namespace SpaceDSL{
     {
         #ifdef WITH_OPENSSL
             m_bIsUseWebService = true;
+            m_EOPData = NULL;
+            m_LeapsecondData = NULL;
+            m_EOPDataLine = 0;
+            m_LeapsecondDataLine = 0;
         #else
             m_bIsUseWebService = false;
+            ifstream file_EOP, file_leapsecond;
+            // Read EOP_2000A.dat
+            int line = 0;
+            file_EOP.open("./astrodata/IERS/EOP_2000A.dat");
+            if (file_EOP.is_open() == false)
+            {
+                throw SPException(__FILE__, __FUNCTION__, __LINE__, "EOP_2000A.dat File is Invalid!");
+            }
+
+            while ( !file_EOP.eof() )
+            {
+                char buffer[68];
+                file_EOP.getline(buffer, 68);
+                ++line;
+            }
+
+            m_EOPData = new double *[line];
+            for (int i = 0; i < line; ++i)
+            {
+                m_EOPData[i] = new double[7];
+            }
+            m_EOPDataLine = line;
+
+            file_EOP.seekg(0,ios::beg);
+            line = 0;
+            while ( !file_EOP.eof() )
+            {
+                char buffer[68];
+                file_EOP.getline(buffer, 68);
+
+                string bufferstr = buffer;
+                m_EOPData[line][0] = stod(bufferstr.substr(0,8));          //MJD
+                m_EOPData[line][1] = stod(bufferstr.substr(8,10));         //x_pole
+                m_EOPData[line][2] = stod(bufferstr.substr(18,9));         //sigma_x_pole
+                m_EOPData[line][3] = stod(bufferstr.substr(27,10));        //y_pole
+                m_EOPData[line][4] = stod(bufferstr.substr(37,9));         //sigma_y_pole
+                m_EOPData[line][5] = stod(bufferstr.substr(46,11));        //UT1-UTC
+                m_EOPData[line][6] = stod(bufferstr.substr(57,10));        //sigma_UT1-UTC
+
+                ++line;
+            }
+            file_EOP.close();
+            // Read leapseconds.dat
+            line = 0;
+            file_leapsecond.open("./astrodata/IERS/leapseconds.dat");
+            if (file_leapsecond.is_open() == false)
+            {
+                throw SPException(__FILE__, __FUNCTION__, __LINE__, "leapsecond.dat File is Invalid!");
+            }
+
+            while ( !file_leapsecond.eof() )
+            {
+                char buffer[37];
+                file_leapsecond.getline(buffer, 37);
+                ++line;
+            }
+
+            m_LeapsecondDataLine = line;
+            m_LeapsecondData = new double *[line];
+            for (int i = 0; i < line; ++i)
+            {
+                m_LeapsecondData[i] = new double[2];
+            }
+
+            file_leapsecond.seekg(0,ios::beg);
+            line = 0;
+            while ( !file_leapsecond.eof() )
+            {
+                char buffer[37];
+                file_leapsecond.getline(buffer, 37);
+
+                string bufferstr = buffer;
+                m_LeapsecondData[line][0] = stod(bufferstr.substr(0,10))/86400 + 15020;    //MJD = NTP /86400 + 15020
+                m_LeapsecondData[line][1] = stod(bufferstr.substr(10,14));                 //leapseconds
+                ++line;
+            }
+            file_leapsecond.close();
+
         #endif
     }
 
     IERSService::~IERSService()
     {
+        if (m_EOPData != NULL)
+            delete m_EOPData;
 
+        if (m_LeapsecondData != NULL)
+            delete m_LeapsecondData;
     }
 
+    #ifdef WITH_OPENSSL
     void IERSService::EnableWebService()
     {
-        #ifdef WITH_OPENSSL
+
             m_bIsUseWebService = true;
-        #endif
+
     }
 
     void IERSService::DisableWebService()
     {
-        #ifdef WITH_OPENSSL
+
             m_bIsUseWebService = false;
-        #endif
+
     }
+    #endif
 
     double IERSService::GetValue(double Mjd_UTC, char *param, char *series)
     {
@@ -564,15 +654,102 @@ namespace SpaceDSL{
             else
                 soap_call_ns1__readEOP(&readIERS, NULL, NULL, param, series, mjd, result);
 
-            string resultStr = result;
-            return stod(resultStr);
+            if (result == NULL)
+            {
+                return 0;
+            }
+            else
+            {
+                string resultStr = result;
+                return stod(resultStr);
+            }
         }
         else //Read File
         {
-            string resultStr;
-            return stod(resultStr);
+            char *x_poleStr = "x_pole";
+            char *sigma_x_poleStr = "sigma_x_pole";
+            char *y_poleStr = "y_pole";
+            char *sigma_y_poleStr = "sigma_y_pole";
+            char *UT1_UTCStr = "UT1-UTC";
+            char *sigma_UT1_UTCStr = "sigma_UT1-UTC";
+            char *leapsecondStr = "leapseconds";
+
+            if ( strcmp(param, leapsecondStr) != 0
+                 && (Mjd_UTC < m_EOPData[0][0] || Mjd_UTC > m_EOPData[m_EOPDataLine-1][0]) )
+            {
+                return 0;
+            }
+            if (strcmp(param, leapsecondStr) == 0 && Mjd_UTC > m_LeapsecondData[m_LeapsecondDataLine-1][0])
+            {
+                return m_LeapsecondData[m_LeapsecondDataLine-1][1];
+            }
+            if (strcmp(param, leapsecondStr) == 0 && Mjd_UTC < m_LeapsecondData[0][0])
+            {
+                return 0;
+            }
+
+            if (strcmp(param, leapsecondStr) == 0)
+            {
+                int line = 0;
+                for (line = 1; line < m_LeapsecondDataLine; ++line)
+                {
+                    if (Mjd_UTC >= m_LeapsecondData[line-1][0] && Mjd_UTC <= m_LeapsecondData[line][0])
+                    {
+                        return m_LeapsecondData[line-1][1];
+                    }
+                }
+            }
+            else
+            {
+                int line = 0;
+                for (line = 1; line < m_EOPDataLine; ++line)
+                {
+                    if (Mjd_UTC >= m_EOPData[line-1][0] && Mjd_UTC <= m_EOPData[line][0])
+                    {
+                        break;
+                    }
+                }
+
+                if (strcmp(param, x_poleStr) == 0)
+                {
+                    return (m_EOPData[line-1][1] + (Mjd_UTC - m_EOPData[line-1][0])
+                            *(m_EOPData[line][1] - m_EOPData[line-1][1])/(m_EOPData[line][0] - m_EOPData[line-1][0]));
+                }
+                else if (strcmp(param, sigma_x_poleStr) == 0)
+                {
+                    return (m_EOPData[line-1][2] + (Mjd_UTC - m_EOPData[line-1][0])
+                            *(m_EOPData[line][2] - m_EOPData[line-1][2])/(m_EOPData[line][0] - m_EOPData[line-1][0]));
+                }
+                else if (strcmp(param, y_poleStr) == 0)
+                {
+                    return (m_EOPData[line-1][3] + (Mjd_UTC - m_EOPData[line-1][0])
+                            *(m_EOPData[line][3] - m_EOPData[line-1][3])/(m_EOPData[line][0] - m_EOPData[line-1][0]));
+                }
+                else if (strcmp(param, sigma_y_poleStr) == 0)
+                {
+                    return (m_EOPData[line-1][4] + (Mjd_UTC - m_EOPData[line-1][0])
+                            *(m_EOPData[line][4] - m_EOPData[line-1][4])/(m_EOPData[line][0] - m_EOPData[line-1][0]));
+                }
+                else if (strcmp(param, UT1_UTCStr) == 0)
+                {
+                    return (m_EOPData[line-1][5] + (Mjd_UTC - m_EOPData[line-1][0])
+                            *(m_EOPData[line][5] - m_EOPData[line-1][5])/(m_EOPData[line][0] - m_EOPData[line-1][0]));
+                }
+                else if (strcmp(param, sigma_UT1_UTCStr) == 0)
+                {
+                    return (m_EOPData[line-1][6] + (Mjd_UTC - m_EOPData[line-1][0])
+                            *(m_EOPData[line][6] - m_EOPData[line-1][6])/(m_EOPData[line][0] - m_EOPData[line-1][0]));
+                }
+                else
+                {
+                    return 0;
+                }
+
+            }
+
         }
 
+        return 0;
     }
 
 }

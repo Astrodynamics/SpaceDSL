@@ -314,6 +314,6 @@ const double KilohertzToHertz  = 1.0e+03;
 const double MegahertzToHertz  = 1.0e+06;
 const double GigahertzToHertz  = 1.0e+09;   
 const double TerahertzToHertz  = 1.0e+12;   
-		
+
 }
 #endif //SPCONST_H

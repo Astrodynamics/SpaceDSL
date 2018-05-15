@@ -39,6 +39,7 @@
 #define SPORBITPREDICT_H
 
 #include "SpaceDSL_Global.h"
+#include "SpConst.h"
 #include "SpAtmosphere.h"
 #include "SpGravity.h"
 #include "SpPerturbation.h"
@@ -54,24 +55,44 @@ using namespace Eigen;
 namespace SpaceDSL {
 
     /*************************************************
+     * Class type: Normalization Parameter
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+    **************************************************/
+    class SPACEDSL_API NormalizeParameter
+    {
+    public:
+        NormalizeParameter();
+        virtual ~NormalizeParameter();
+    public:
+        static double       GetLengthPara(SolarSysStarType centerStarType);
+        static double       GetSpeedPara(SolarSysStarType centerStarType);
+        static double       GetTimePara(SolarSysStarType centerStarType);
+        static double       GetThrustPara(SolarSysStarType centerStarType, double mass);
+
+    protected:
+
+    };
+    /*************************************************
      * struct type: Third Body Gravity Sign
      * Author: Niu ZhiYong
      * Date:2018-03-20
      * Description:
     **************************************************/
-    struct ThirdBodyGravitySign
+    struct SPACEDSL_API ThirdBodyGravitySign
     {
-        bool                m_bIsUseMercuryGrav = false;
-        bool                m_bIsUseVenusGrav   = false;
-        bool                m_bIsUseEarthGrav   = false;
-        bool                m_bIsUseMarsGrav    = false;
-        bool                m_bIsUseJupiterGrav = false;
-        bool                m_bIsUseSaturnGrav  = false;
-        bool                m_bIsUseUranusGrav  = false;
-        bool                m_bIsUseNeptuneGrav = false;
-        bool                m_bIsUsePlutoGrav   = false;
-        bool                m_bIsUseMoonGrav    = false;
-        bool                m_bIsUseSunGrav     = false;
+        bool                bIsUseMercuryGrav = false;
+        bool                bIsUseVenusGrav   = false;
+        bool                bIsUseEarthGrav   = false;
+        bool                bIsUseMarsGrav    = false;
+        bool                bIsUseJupiterGrav = false;
+        bool                bIsUseSaturnGrav  = false;
+        bool                bIsUseUranusGrav  = false;
+        bool                bIsUseNeptuneGrav = false;
+        bool                bIsUsePlutoGrav   = false;
+        bool                bIsUseMoonGrav    = false;
+        bool                bIsUseSunGrav     = false;
     };
 
     /*************************************************
@@ -88,16 +109,16 @@ namespace SpaceDSL {
 
     public:
         /// Initializer() function must run before OrbitPredictConfig using!!!
-        void        Initializer(SolarSysStarType centerStarType, double Mjd_UTC,
-                                GravModelType gravModelType, int maxDegree, int maxOrder,
-                                AtmosphereModelType atmModelType, double dragCoef, double dragArea,
-                                double SRPCoef, double SRPArea, bool isUseDrag, bool isUseSRP,
-                                ThirdBodyGravitySign thirdBodySign);
+        void        Initializer(SolarSysStarType centerStarType, ThirdBodyGravitySign thirdBodySign, double Mjd_UTC = 0,
+                                GravModelType gravModelType = E_NotDefinedGravModel, int maxDegree = 0, int maxOrder = 0,
+                                AtmosphereModelType atmModelType = E_NotDefinedAtmosphereModel, double dragCoef = 0, double dragArea = 0,
+                                double SRPCoef = 0, double SRPArea = 0, bool isUseDrag = false, bool isUseSRP = false, bool isUseNormalize = false);
 
         bool                    IsInitialized();
 
         void                    SetCenterStarType(SolarSysStarType type);
         SolarSysStarType        GetCenterStarType() const;
+        double                  GetCenterStarGM() const;
 
         void                    SetMJD_UTC(double Mjd_UTC);
         double                  GetMJD_UTC() const;
@@ -127,12 +148,17 @@ namespace SpaceDSL {
         ThirdBodyGravitySign    GetThirdBodySign() const;
         bool                    IsUseSRP() const;
         bool                    IsUseDrag() const;
+        bool                    IsUseNormalize() const;
 
 
 
     protected:
         bool                    bIsInitialized = false;
+
         SolarSysStarType        m_CenterStarType;
+        //Third Body Gravity Sign
+        ThirdBodyGravitySign    m_ThirdBodySign;
+
         double                  m_MJD_UTC;			///< Modified Julian Date UTC
         double                  m_MJD_TT;			///< Modified Julian Date TT
 
@@ -157,8 +183,8 @@ namespace SpaceDSL {
         bool                    m_bIsUseSRP;        ///< Whether the use of Solar Radiation or not
         bool                    m_bIsUseDrag;       ///< Whether the use of Atmos. Drag. or not
 
-        //Third Body Gravity Sign
-        ThirdBodyGravitySign    m_ThirdBodySign;
+        //Normalize Sign
+        bool                    m_bIsUseNormalize;
 
     };
 
@@ -189,7 +215,6 @@ namespace SpaceDSL {
         /// @Param	pos                 m
         /// @Param	vel                 m/s
         /// @Output
-        /// @Param	accel               m/s^2
         /// @Return
         //********************************************************************
         void OrbitStep (OrbitPredictConfig predictConfig, double step, IntegMethodType integType,
@@ -210,6 +235,66 @@ namespace SpaceDSL {
     public:
         OrbitPredictRightFunc(OrbitPredictConfig config);
         ~OrbitPredictRightFunc();
+    public:
+        /// @Param  t                   sec
+        /// @Param	step                sec
+        /// @Param  x                   m,m/s
+        /// @Param  result              m,m/s
+        void operator() (double t, const VectorXd &x, VectorXd&result) const override;
+
+    protected:
+
+        OrbitPredictConfig      m_OrbitPredictConfig;
+    };
+
+    /*************************************************
+     * Class type: Tow Body Orbit Prediction
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  Orbit Prediction Algorithm and Function
+    **************************************************/
+    class SPACEDSL_API TwoBodyOrbitPredict
+    {
+    public:
+        TwoBodyOrbitPredict();
+        virtual ~TwoBodyOrbitPredict();
+    public:
+
+        //********************************************************************
+        /// Using the Two Body Orbit Model to Calculate the Orbit, One Step ,Without Maneuver
+        /// @author	Niu ZhiYong
+        /// @Date	2018-03-20
+        /// @Input
+        /// @Param  centerStarType      Solar System Star Type
+        /// @Param	step                sec
+        /// @Param	integType           IntegMethodType
+        /// @In/Out
+        /// @Param	mass                kg
+        /// @Param	pos                 m
+        /// @Param	vel                 m/s
+        /// @Output
+        /// @Param	accel               m/s^2
+        /// @Return
+        //********************************************************************
+        void OrbitStep (OrbitPredictConfig predictConfig, double step, IntegMethodType integType,
+                        double &mass, Vector3d &pos, Vector3d &vel);
+
+
+    protected:
+
+    };
+    /*************************************************
+     * Class type: Tow Body Orbit Prediction Right Function
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+    **************************************************/
+    class TwoBodyOrbitRightFunc : public RightFunc
+    {
+    public:
+        TwoBodyOrbitRightFunc(OrbitPredictConfig config);
+        ~TwoBodyOrbitRightFunc();
     public:
         /// @Param  t                   sec
         /// @Param	step                sec

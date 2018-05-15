@@ -27,7 +27,7 @@ aux_source_directory (${PROJECT_SOURCE_DIR}/source/ SRC_LIST)
 list(APPEND SpaceDSL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include)
 
 # Set if build With OpenSSL or not
-option(USE_OPENSSL "Build With OpenSSL." TRUE)
+option(USE_OPENSSL "Build With OpenSSL." FALSE)
 if (USE_OPENSSL)
     Add_Definitions(-DWITH_OPENSSL)
     find_package(OPENSSL)
