@@ -110,81 +110,85 @@ namespace SpaceDSL {
     public:
         /// Initializer() function must run before OrbitPredictConfig using!!!
         void        Initializer(SolarSysStarType centerStarType, ThirdBodyGravitySign thirdBodySign, double Mjd_UTC = 0,
-                                GravModelType gravModelType = E_NotDefinedGravModel, int maxDegree = 0, int maxOrder = 0,
-                                AtmosphereModelType atmModelType = E_NotDefinedAtmosphereModel, double dragCoef = 0, double dragArea = 0,
+                                GravityModel::GravModelType gravModelType = GravityModel::GravModelType::E_NotDefinedGravModel,
+                                int maxDegree = 0, int maxOrder = 0,
+                                AtmosphereModel::AtmosphereModelType atmModelType = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel,
+                                double dragCoef = 0, double dragArea = 0,
                                 double SRPCoef = 0, double SRPArea = 0, bool isUseDrag = false, bool isUseSRP = false, bool isUseNormalize = false);
 
-        bool                    IsInitialized();
+        bool                        IsInitialized();
 
-        void                    SetCenterStarType(SolarSysStarType type);
-        SolarSysStarType        GetCenterStarType() const;
-        double                  GetCenterStarGM() const;
+        void                        SetCenterStarType(SolarSysStarType type);
+        SolarSysStarType            GetCenterStarType() const;
+        double                      GetCenterStarGM() const;
 
-        void                    SetMJD_UTC(double Mjd_UTC);
-        double                  GetMJD_UTC() const;
-        void                    SetMJD_TT(double Mjd_TT);
-        double                  GetMJD_TT() const;
+        void                        SetMJD_UTC(double Mjd_UTC);
+        double                      GetMJD_UTC() const;
+        void                        SetMJD_TT(double Mjd_TT);
+        double                      GetMJD_TT() const;
 
-        void                    SetGravModelType(GravModelType type);
-        GravModelType           GetGravModelType() const;
-        void                    SetGravMaxDegree(int maxDegree);
-        int                     GetGravMaxDegree() const;
-        void                    SetGravMaxOrder(int maxOrder);
-        int                     GetGravMaxOrder() const;
+        void                        SetGravModelType(GravityModel::GravModelType type);
+        GravityModel::GravModelType GetGravModelType() const;
+        void                        SetGravMaxDegree(int maxDegree);
+        int                         GetGravMaxDegree() const;
+        void                        SetGravMaxOrder(int maxOrder);
+        int                         GetGravMaxOrder() const;
 
-        void                    SetAtmosphereModelType(AtmosphereModelType type);
-        AtmosphereModelType     GetAtmosphereModelType() const;
-        void                    SetDragCoef(double coef);
-        double                  GetDragCoef() const;
-        void                    SetDragArea(double area);
-        double                  GetDragArea() const;
+        void                        SetAtmosphereModelType(AtmosphereModel::AtmosphereModelType type);
+        AtmosphereModel::AtmosphereModelType
+                                    GetAtmosphereModelType() const;
+        void                        SetDragCoef(double coef);
+        double                      GetDragCoef() const;
+        void                        SetDragArea(double area);
+        double                      GetDragArea() const;
 
-        void                    SetSRPCoef(double coef);
-        double                  GetSRPCoef() const;
-        void                    SetSRPArea(double area);
-        double                  GetSRPArea() const;
+        void                        SetSRPCoef(double coef);
+        double                      GetSRPCoef() const;
+        void                        SetSRPArea(double area);
+        double                      GetSRPArea() const;
 
-        void                    SetThirdBodySign(ThirdBodyGravitySign sign);
-        ThirdBodyGravitySign    GetThirdBodySign() const;
-        bool                    IsUseSRP() const;
-        bool                    IsUseDrag() const;
-        bool                    IsUseNormalize() const;
+        void                        SetThirdBodySign(ThirdBodyGravitySign sign);
+        ThirdBodyGravitySign        GetThirdBodySign() const;
+        bool                        IsUseSRP() const;
+        bool                        IsUseDrag() const;
+        bool                        IsUseNormalize() const;
 
 
 
     protected:
-        bool                    bIsInitialized = false;
+        bool                        bIsInitialized = false;
 
-        SolarSysStarType        m_CenterStarType;
+        SolarSysStarType            m_CenterStarType;
         //Third Body Gravity Sign
-        ThirdBodyGravitySign    m_ThirdBodySign;
+        ThirdBodyGravitySign        m_ThirdBodySign;
 
-        double                  m_MJD_UTC;			///< Modified Julian Date UTC
-        double                  m_MJD_TT;			///< Modified Julian Date TT
+        double                      m_MJD_UTC;			///< Modified Julian Date UTC
+        double                      m_MJD_TT;			///< Modified Julian Date TT
 
         //Gravity Parameters
-        GravModelType           m_GravModelType;	///< Gravity Model
-        int                     m_MaxDegree;		///< Gravity Degree[n]
-        int                     m_MaxOrder;			///< Degree Order  [m]
+        GravityModel::GravModelType m_GravModelType;	///< Gravity Model
+        int                         m_MaxDegree;		///< Gravity Degree[n]
+        int                         m_MaxOrder;			///< Degree Order  [m]
 
         //Atmosphere Parameters
-        AtmosphereModelType     m_AtmModelType;
-        double                  m_DragCoef;			///< drag coefficient
-        double                  m_DragArea;         ///< drag term m2/kg
-        //double                m_F10p7;            ///< average F10.7
-        //double                m_DailyF10p7;       ///< daily F10.7
-        //double                m_Ap;               ///< geomagnetic index
+        AtmosphereModel::AtmosphereModelType
+                                    m_AtmModelType;
+        double                      m_DragCoef;			///< drag coefficient
+        double                      m_DragArea;         ///< drag term m2/kg
+        //double                    m_F10p7;            ///< average F10.7
+        //double                    m_DailyF10p7;       ///< daily F10.7
+        //double                    m_Ap;               ///< geomagnetic index
 
         //Solar Radiation Parameters
-        double                  m_SRPCoef;		///< Solar Radiation Pressure Coeff
-        double                  m_SRPArea;          ///< Area for SRP
+        double                      m_SRPCoef;		///< Solar Radiation Pressure Coeff
+        double                      m_SRPArea;          ///< Area for SRP
 
         //Perturbation Sign
-        bool                    m_bIsUseSRP;        ///< Whether the use of Solar Radiation or not
-        bool                    m_bIsUseDrag;       ///< Whether the use of Atmos. Drag. or not
+        bool                        m_bIsUseSRP;        ///< Whether the use of Solar Radiation or not
+        bool                        m_bIsUseDrag;       ///< Whether the use of Atmos. Drag. or not
 
         //Normalize Sign
-        bool                    m_bIsUseNormalize;
+        bool                        m_bIsUseNormalize;
 
     };
 
@@ -217,7 +221,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return
         //********************************************************************
-        void OrbitStep (OrbitPredictConfig predictConfig, double step, IntegMethodType integType,
+        void OrbitStep (OrbitPredictConfig predictConfig, double step, RungeKutta::IntegMethodType integType,
                         double &mass, Vector3d &pos, Vector3d &vel);
 
 
@@ -277,7 +281,7 @@ namespace SpaceDSL {
         /// @Param	accel               m/s^2
         /// @Return
         //********************************************************************
-        void OrbitStep (OrbitPredictConfig predictConfig, double step, IntegMethodType integType,
+        void OrbitStep (OrbitPredictConfig predictConfig, double step, RungeKutta::IntegMethodType integType,
                         double &mass, Vector3d &pos, Vector3d &vel);
 
 

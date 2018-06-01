@@ -147,8 +147,8 @@ namespace SpaceDSL {
     }
 
     void OrbitPredictConfig::Initializer(SolarSysStarType centerStarType,ThirdBodyGravitySign thirdBodySign,
-                                         double Mjd_UTC,GravModelType gravModelType, int maxDegree, int maxOrder,
-                                         AtmosphereModelType atmModelType, double dragCoef, double dragArea,
+                                         double Mjd_UTC,GravityModel::GravModelType gravModelType, int maxDegree, int maxOrder,
+                                         AtmosphereModel::AtmosphereModelType atmModelType, double dragCoef, double dragArea,
                                          double SRPCoef, double SRPArea, bool isUseDrag, bool isUseSRP, bool isUseNormalize)
     {
         m_CenterStarType    = centerStarType;
@@ -311,7 +311,7 @@ namespace SpaceDSL {
         return m_MJD_TT;
     }
 
-    void OrbitPredictConfig::SetGravModelType(GravModelType type)
+    void OrbitPredictConfig::SetGravModelType(GravityModel::GravModelType type)
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -319,7 +319,7 @@ namespace SpaceDSL {
         m_GravModelType = type;
     }
 
-    GravModelType OrbitPredictConfig::GetGravModelType() const
+    GravityModel::GravModelType OrbitPredictConfig::GetGravModelType() const
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -360,7 +360,7 @@ namespace SpaceDSL {
         return m_MaxOrder;
     }
 
-    void OrbitPredictConfig::SetAtmosphereModelType(AtmosphereModelType type)
+    void OrbitPredictConfig::SetAtmosphereModelType(AtmosphereModel::AtmosphereModelType type)
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -368,7 +368,7 @@ namespace SpaceDSL {
         m_AtmModelType = type;
     }
 
-    AtmosphereModelType OrbitPredictConfig::GetAtmosphereModelType() const
+    AtmosphereModel::AtmosphereModelType OrbitPredictConfig::GetAtmosphereModelType() const
     {
         if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -543,7 +543,7 @@ namespace SpaceDSL {
 
     }
 
-    void OrbitPredict::OrbitStep(OrbitPredictConfig predictConfig, double step, IntegMethodType integType,
+    void OrbitPredict::OrbitStep(OrbitPredictConfig predictConfig, double step, RungeKutta::IntegMethodType integType,
                                  double &mass, Vector3d &pos, Vector3d &vel)
     {
         if (predictConfig.IsInitialized() == false)
@@ -710,7 +710,7 @@ namespace SpaceDSL {
 
     }
 
-    void TwoBodyOrbitPredict::OrbitStep(OrbitPredictConfig predictConfig, double step, IntegMethodType integType,
+    void TwoBodyOrbitPredict::OrbitStep(OrbitPredictConfig predictConfig, double step, RungeKutta::IntegMethodType integType,
                                                   double &mass, Vector3d &pos, Vector3d &vel)
     {
         if (predictConfig.IsInitialized() == false)

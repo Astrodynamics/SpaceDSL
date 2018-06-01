@@ -98,7 +98,7 @@ namespace SpaceDSL {
     public:
 
         AtmosphericDrag();
-        AtmosphericDrag(AtmosphereModelType modelType);
+        AtmosphericDrag(AtmosphereModel::AtmosphereModelType modelType);
         virtual ~AtmosphericDrag();
 
     public:
@@ -122,7 +122,7 @@ namespace SpaceDSL {
 
     protected:
 
-        AtmosphereModelType     m_AtmosphericModelType;
+        AtmosphereModel::AtmosphereModelType     m_AtmosphericModelType;
 
     };
 

@@ -54,15 +54,14 @@ namespace SpaceDSL {
      * Date:2018-03-20
      * Description:
     **************************************************/
-    enum SPACEDSL_API GravModelType
-    {
-        E_NotDefinedGravModel   = 0,
-        E_EGM08Model            = 1,
-    };
-
     class SPACEDSL_API GravityModel
     {
     public:
+        enum SPACEDSL_API GravModelType
+        {
+            E_NotDefinedGravModel   = 0,
+            E_EGM08Model            = 1,
+        };
 
         GravityModel();
         GravityModel(GravModelType modelType);

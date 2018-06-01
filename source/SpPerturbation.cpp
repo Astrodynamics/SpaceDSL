@@ -126,10 +126,10 @@ namespace SpaceDSL {
     **************************************************/
     AtmosphericDrag::AtmosphericDrag()
     {
-        m_AtmosphericModelType = E_NotDefinedAtmosphereModel;
+        m_AtmosphericModelType = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel;
     }
 
-    AtmosphericDrag::AtmosphericDrag(AtmosphereModelType modelType)
+    AtmosphericDrag::AtmosphericDrag(AtmosphereModel::AtmosphereModelType modelType)
     {
         m_AtmosphericModelType = modelType;
     }
@@ -142,7 +142,7 @@ namespace SpaceDSL {
     Vector3d AtmosphericDrag::AccelAtmosphericDrag(double Mjd_TT, const Vector3d &pos, const Vector3d &vel,
                                                    const Matrix3d &ECIToTODMtx, double area,  double dragCoef,double mass)
     {
-        if (m_AtmosphericModelType == E_NotDefinedAtmosphereModel)
+        if (m_AtmosphericModelType == AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel)
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphericDrag: m_AtmosphericModelType = E_NotDefinedAtmosphereModel!");
 
         // Earth angular velocity vector [rad/s]
@@ -165,8 +165,8 @@ namespace SpaceDSL {
         v_rel = v_tod - omega.cross(r_tod);
         v_abs = v_rel.norm();
 
-        // Atmospheric density due to modified Harris-Priester model
-        AtmosphereModel atmoModel(E_1976StdAtmosphere);
+        // Atmospheric density due to AtmosphereModel::AtmosphereModelType
+        AtmosphereModel atmoModel(AtmosphereModel::AtmosphereModelType::E_1976StdAtmosphere);
         double density = atmoModel.GetAtmosphereDensity( r_tod.norm() - EarthRadius);
 
         // Acceleration

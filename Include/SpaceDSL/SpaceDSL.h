@@ -58,6 +58,7 @@
 #include "SpRightFunction.h"
 #include "SpIntegration.h"
 #include "SpOrbitPredict.h"
+#include "SpThread.h"
 #include "SpMath.h"
 #include "SpConst.h"
 #include "SpUtils.h"

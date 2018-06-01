@@ -54,21 +54,23 @@ namespace SpaceDSL {
      * Date:2018-03-20
      * Description:
     **************************************************/
-    enum SPACEDSL_API AtmosphereModelType
-    {
-        E_NotDefinedAtmosphereModel     = 0,
-        E_1976StdAtmosphere             = 1,
-        E_NRLMSISE00Atmosphere          = 2,
-        E_HarrisPriesterAtmosphere      = 3,
-    };
-
     class SPACEDSL_API AtmosphereModel
     {
     public:
+        enum SPACEDSL_API AtmosphereModelType
+        {
+            E_NotDefinedAtmosphereModel     = 0,
+            E_1976StdAtmosphere             = 1,
+            E_NRLMSISE00Atmosphere          = 2,
+            E_HarrisPriesterAtmosphere      = 3,
+        };
 
         AtmosphereModel();
         AtmosphereModel(AtmosphereModelType modelType);
         virtual ~AtmosphereModel();
+
+
+
 
     public:
         //********************************************************************

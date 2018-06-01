@@ -137,7 +137,7 @@ namespace SpaceDSL {
         m_GravModelType = modelType;
     }
 
-    GravModelType GravityModel::GetModelType()
+    GravityModel::GravModelType GravityModel::GetModelType()
     {
         return m_GravModelType;
     }
