@@ -42,6 +42,7 @@
 #include "SpConst.h"
 #include "SpAtmosphere.h"
 #include "SpGravity.h"
+#include "SpTimeSystem.h"
 #include "SpPerturbation.h"
 #include "SpIntegration.h"
 
@@ -74,26 +75,6 @@ namespace SpaceDSL {
     protected:
 
     };
-    /*************************************************
-     * struct type: Third Body Gravity Sign
-     * Author: Niu ZhiYong
-     * Date:2018-03-20
-     * Description:
-    **************************************************/
-    struct SPACEDSL_API ThirdBodyGravitySign
-    {
-        bool                bIsUseMercuryGrav = false;
-        bool                bIsUseVenusGrav   = false;
-        bool                bIsUseEarthGrav   = false;
-        bool                bIsUseMarsGrav    = false;
-        bool                bIsUseJupiterGrav = false;
-        bool                bIsUseSaturnGrav  = false;
-        bool                bIsUseUranusGrav  = false;
-        bool                bIsUseNeptuneGrav = false;
-        bool                bIsUsePlutoGrav   = false;
-        bool                bIsUseMoonGrav    = false;
-        bool                bIsUseSunGrav     = false;
-    };
 
     /*************************************************
      * Class type: Orbit Prediction Parameters
@@ -106,15 +87,37 @@ namespace SpaceDSL {
     public:
         OrbitPredictConfig();
         virtual ~OrbitPredictConfig();
+        /*************************************************
+         * struct type: Third Body Gravity Sign
+         * Author: Niu ZhiYong
+         * Date:2018-03-20
+         * Description:
+        **************************************************/
+        struct ThirdBodyGravitySign
+        {
+            bool                bIsUseMercuryGrav = false;
+            bool                bIsUseVenusGrav   = false;
+            bool                bIsUseEarthGrav   = false;
+            bool                bIsUseMarsGrav    = false;
+            bool                bIsUseJupiterGrav = false;
+            bool                bIsUseSaturnGrav  = false;
+            bool                bIsUseUranusGrav  = false;
+            bool                bIsUseNeptuneGrav = false;
+            bool                bIsUsePlutoGrav   = false;
+            bool                bIsUseMoonGrav    = false;
+            bool                bIsUseSunGrav     = false;
+        };
+        static ThirdBodyGravitySign DefaultThirdBodySign;
 
     public:
         /// Initializer() function must run before OrbitPredictConfig using!!!
-        void        Initializer(SolarSysStarType centerStarType, ThirdBodyGravitySign thirdBodySign, double Mjd_UTC = 0,
+        void        Initializer(double Mjd_UTC = 0, SolarSysStarType centerStarType = E_Earth, bool isUseNormalize = false,
                                 GravityModel::GravModelType gravModelType = GravityModel::GravModelType::E_NotDefinedGravModel,
                                 int maxDegree = 0, int maxOrder = 0,
+                                ThirdBodyGravitySign thirdBodyGravSign = DefaultThirdBodySign,
                                 AtmosphereModel::AtmosphereModelType atmModelType = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel,
                                 double dragCoef = 0, double dragArea = 0,
-                                double SRPCoef = 0, double SRPArea = 0, bool isUseDrag = false, bool isUseSRP = false, bool isUseNormalize = false);
+                                double SRPCoef = 0, double SRPArea = 0, bool isUseDrag = false, bool isUseSRP = false);
 
         bool                        IsInitialized();
 
@@ -124,8 +127,17 @@ namespace SpaceDSL {
 
         void                        SetMJD_UTC(double Mjd_UTC);
         double                      GetMJD_UTC() const;
-        void                        SetMJD_TT(double Mjd_TT);
+        double                      GetMJD_UT1() const;
         double                      GetMJD_TT() const;
+        double                      GetMJD_TAI() const;
+
+
+        double                      GetTAI_UTC() const;
+        double                      GetUT1_UTC() const;
+        double                      GetTT_UTC() const;
+
+        double                      GetX_Pole() const;
+        double                      GetY_Pole() const;
 
         void                        SetGravModelType(GravityModel::GravModelType type);
         GravityModel::GravModelType GetGravModelType() const;
@@ -133,6 +145,7 @@ namespace SpaceDSL {
         int                         GetGravMaxDegree() const;
         void                        SetGravMaxOrder(int maxOrder);
         int                         GetGravMaxOrder() const;
+        GravityModel                *GetGravityModel() const;
 
         void                        SetAtmosphereModelType(AtmosphereModel::AtmosphereModelType type);
         AtmosphereModel::AtmosphereModelType
@@ -147,8 +160,10 @@ namespace SpaceDSL {
         void                        SetSRPArea(double area);
         double                      GetSRPArea() const;
 
-        void                        SetThirdBodySign(ThirdBodyGravitySign sign);
-        ThirdBodyGravitySign        GetThirdBodySign() const;
+        void                        SetThirdBodySign(OrbitPredictConfig::ThirdBodyGravitySign sign);
+        OrbitPredictConfig::ThirdBodyGravitySign
+                                    GetThirdBodySign() const;
+
         bool                        IsUseSRP() const;
         bool                        IsUseDrag() const;
         bool                        IsUseNormalize() const;
@@ -160,15 +175,28 @@ namespace SpaceDSL {
 
         SolarSysStarType            m_CenterStarType;
         //Third Body Gravity Sign
-        ThirdBodyGravitySign        m_ThirdBodySign;
+        OrbitPredictConfig::ThirdBodyGravitySign
+                                    m_ThirdBodySign;
+        //Time Parameters
+        IERSService                 m_IERSService;
 
-        double                      m_MJD_UTC;			///< Modified Julian Date UTC
+        double                      m_MJD_UTC;			///< Modified Julian Date UTC(unit : day)
         double                      m_MJD_TT;			///< Modified Julian Date TT
+        double                      m_MJD_TAI;
+        double                      m_MJD_UT1;
+
+        double                      m_TAI_UTC;          ///< LeapSeconds = TAI - UTC(unit : sec)
+        double                      m_UT1_UTC;
+        double                      m_TT_UTC;
+        double                      m_X_Pole;
+        double                      m_Y_Pole;
+
 
         //Gravity Parameters
         GravityModel::GravModelType m_GravModelType;	///< Gravity Model
         int                         m_MaxDegree;		///< Gravity Degree[n]
         int                         m_MaxOrder;			///< Degree Order  [m]
+        GravityModel                *m_pGravityModel;
 
         //Atmosphere Parameters
         AtmosphereModel::AtmosphereModelType
@@ -221,7 +249,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return
         //********************************************************************
-        void OrbitStep (OrbitPredictConfig predictConfig, double step, RungeKutta::IntegMethodType integType,
+        void OrbitStep (OrbitPredictConfig &predictConfig, double step, RungeKutta::IntegMethodType integType,
                         double &mass, Vector3d &pos, Vector3d &vel);
 
 
@@ -237,7 +265,7 @@ namespace SpaceDSL {
     class OrbitPredictRightFunc : public RightFunc
     {
     public:
-        OrbitPredictRightFunc(OrbitPredictConfig config);
+        OrbitPredictRightFunc(OrbitPredictConfig *pConfig);
         ~OrbitPredictRightFunc();
     public:
         /// @Param  t                   sec
@@ -247,8 +275,9 @@ namespace SpaceDSL {
         void operator() (double t, const VectorXd &x, VectorXd&result) const override;
 
     protected:
-
-        OrbitPredictConfig      m_OrbitPredictConfig;
+        OrbitPredictConfig      *m_pOrbitPredictConfig;
+        GravityModel            *m_pGravityModel;
+        ThirdBodyGravity        *m_pThirdBodyGrva;
     };
 
     /*************************************************
@@ -281,7 +310,7 @@ namespace SpaceDSL {
         /// @Param	accel               m/s^2
         /// @Return
         //********************************************************************
-        void OrbitStep (OrbitPredictConfig predictConfig, double step, RungeKutta::IntegMethodType integType,
+        void OrbitStep (OrbitPredictConfig &predictConfig, double step, RungeKutta::IntegMethodType integType,
                         double &mass, Vector3d &pos, Vector3d &vel);
 
 
@@ -297,7 +326,7 @@ namespace SpaceDSL {
     class TwoBodyOrbitRightFunc : public RightFunc
     {
     public:
-        TwoBodyOrbitRightFunc(OrbitPredictConfig config);
+        TwoBodyOrbitRightFunc(OrbitPredictConfig *pConfig);
         ~TwoBodyOrbitRightFunc();
     public:
         /// @Param  t                   sec
@@ -308,7 +337,7 @@ namespace SpaceDSL {
 
     protected:
 
-        OrbitPredictConfig      m_OrbitPredictConfig;
+        OrbitPredictConfig      *m_pOrbitPredictConfig;
     };
 
 	

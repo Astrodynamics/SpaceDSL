@@ -80,7 +80,7 @@ namespace SpaceDSL {
         return U;
     }
 
-    double GMST(double mjd_UT1)
+    double GMST(double Mjd_UT1)
     {
         // Constants
 
@@ -92,10 +92,10 @@ namespace SpaceDSL {
 
         // Mean Sidereal Time
 
-        Mjd_0 = floor(mjd_UT1);
-        UT1   = Secs*(mjd_UT1 - Mjd_0);          // [s]
+        Mjd_0 = floor(Mjd_UT1);
+        UT1   = Secs*(Mjd_UT1 - Mjd_0);          // [s]
         T_0   = (Mjd_0  - MJD_J2000)/36525.0;
-        T     = (mjd_UT1 - MJD_J2000)/36525.0;
+        T     = (Mjd_UT1 - MJD_J2000)/36525.0;
 
         gmst  = 24110.54841 + 8640184.812866*T_0 + 1.002737909350795*UT1
               + (0.093104-6.2e-6*T)*T*T; // [s]
@@ -103,23 +103,23 @@ namespace SpaceDSL {
         return  TwoPI*Fraction(gmst/Secs);       // [rad], 0..2pi
     }
 
-    double GAST(double mjd_UT1)
+    double GAST(double Mjd_UT1)
     {
-        return Modulo ( GMST(mjd_UT1) + EquationEquinox(mjd_UT1), TwoPI );
+        return Modulo ( GMST(Mjd_UT1) + EquationEquinox(Mjd_UT1), TwoPI );
     }
 
-    double MeanObliquity(double mjd_TT)
+    double MeanObliquity(double Mjd_TT)
     {
-        const double T = (mjd_TT - MJD_J2000)/36525.0;
+        const double T = (Mjd_TT - MJD_J2000)/36525.0;
 
         return DegToRad*( 23.43929111-(46.8150+(0.00059-0.001813*T)*T)*T/3600.0 );
     }
 
-    void NutationAngles(double mjd_TT, double &dpsi, double &deps)
+    void NutationAngles(double Mjd_TT, double &dpsi, double &deps)
     {
         // Constants
 
-        const double T  = (mjd_TT - MJD_J2000)/36525.0;
+        const double T  = (Mjd_TT - MJD_J2000)/36525.0;
         const double T2 = T*T;
         const double T3 = T2*T;
         const double rev = 360.0*3600.0;  // arcsec/revolution
@@ -127,7 +127,7 @@ namespace SpaceDSL {
         const int  N_coeff = 106;
         const long C[N_coeff][9] =
         {
-        //
+        // IAU 1980 Nutation Theory
         // l  l' F  D Om    dpsi    *T     deps     *T       #
         //
         {  0, 0, 0, 0, 1,-1719960,-1742,  920250,   89 },   //   1
@@ -277,27 +277,27 @@ namespace SpaceDSL {
         deps = 1.0E-5 * deps * ArcSecToRad;
     }
 
-    double EquationEquinox(double mjd_TT)
+    double EquationEquinox(double Mjd_TT)
     {
         // Nutation angles
         double dpsi, deps;
 
         // Nutation in longitude and obliquity
 
-        NutationAngles (mjd_TT, dpsi,deps );
+        NutationAngles (Mjd_TT, dpsi,deps );
 
         // Equation of the equinoxes
 
-        return  dpsi * cos ( MeanObliquity(mjd_TT) );
+        return  dpsi * cos ( MeanObliquity(Mjd_TT) );
     }
 
-    Matrix3d PrecessMatrix(double mjd_TT1, double mjd_TT2)
+    Matrix3d PrecessMatrix(double Mjd_TT1, double Mjd_TT2)
     {
 
       // Constants
 
-      const double T  = (mjd_TT1 - MJD_J2000)/36525.0;
-      const double dT = (mjd_TT2 - mjd_TT1)/36525.0;
+      const double T  = (Mjd_TT1 - MJD_J2000)/36525.0;
+      const double dT = (Mjd_TT2 - Mjd_TT1)/36525.0;
 
       // Variables
 
@@ -317,26 +317,31 @@ namespace SpaceDSL {
 
     }
 
-    Matrix3d NutationMatrix(double mjd_TT)
+    Matrix3d NutationMatrix(double Mjd_TT)
     {
         double dpsi, deps, eps;
 
         // Mean obliquity of the ecliptic
 
-        eps = MeanObliquity(mjd_TT);
+        eps = MeanObliquity(Mjd_TT);
 
         // Nutation in longitude and obliquity
 
-        NutationAngles (mjd_TT, dpsi, deps);
+        NutationAngles (Mjd_TT, dpsi, deps);
 
         // Transformation from mean to true equator and equinox
 
         return  RotateX(-eps-deps)*RotateZ(-dpsi)*RotateX(+eps);
     }
 
-    Matrix3d GWHourAngMatrix(double mjd_UT1)
+    Matrix3d GWHourAngMatrix(double Mjd_UT1)
     {
-        return  RotateZ ( GAST(mjd_UT1) );
+        return  RotateZ ( GAST(Mjd_UT1) );
+    }
+
+    Matrix3d PoleMatrix( double x_pole, double y_pole)
+    {
+        return  RotateY(-x_pole) * RotateX(-y_pole);
     }
 
 }

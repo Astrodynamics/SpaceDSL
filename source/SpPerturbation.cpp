@@ -104,6 +104,65 @@ namespace SpaceDSL {
 
     }
 
+    void ThirdBodyGravity::SetThirdBodyStar(SolarSysStarType thirdBodyStarType)
+    {
+        m_ThirdBodyStarType = thirdBodyStarType;
+        switch (thirdBodyStarType)
+        {
+        case E_Mercury:
+            m_GM = GM_Mercury;
+            break;
+        case E_Venus:
+            m_GM = GM_Venus;
+            break;
+        case E_Earth:
+            m_GM = GM_Earth;
+            break;
+        case E_Mars:
+            m_GM = GM_Mars;
+            break;
+        case E_Jupiter:
+            m_GM = GM_Jupiter;
+            break;
+        case E_Saturn:
+            m_GM = GM_Saturn;
+            break;
+        case E_Uranus:
+            m_GM = GM_Uranus;
+            break;
+        case E_Neptune:
+            m_GM = GM_Neptune;
+            break;
+        case E_Pluto:
+            m_GM = GM_Pluto;
+            break;
+        case E_Moon:
+            m_GM = GM_Moon;
+            break;
+        case E_Sun:
+            m_GM = GM_Sun;
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "ThirdBodyGravity: SolarSysStarType Unsupport ");
+            break;
+        }
+    }
+
+    void ThirdBodyGravity::SetCenterStar(SolarSysStarType centerStarType)
+    {
+        m_CenterStarType = centerStarType;
+    }
+
+    SolarSysStarType ThirdBodyGravity::GetThirdBodyStar()
+    {
+        return m_ThirdBodyStarType;
+    }
+
+    SolarSysStarType ThirdBodyGravity::GetCenterStar()
+    {
+        return m_CenterStarType;
+    }
+
     Vector3d ThirdBodyGravity::AccelPointMassGravity(double Mjd_TT, const Vector3d &pos)
     {
         if (m_ThirdBodyStarType == E_NotDefinedStarType || m_CenterStarType == E_NotDefinedStarType)
@@ -111,8 +170,7 @@ namespace SpaceDSL {
         Vector3d relativePos;
         Vector3d bodyPos;
         //  Relative position vector of satellite w.r.t. point mass
-        JplEphemeris jpl;
-        jpl.GetJplEphemeris(Mjd_TT + MJDOffset, m_ThirdBodyStarType, m_CenterStarType, bodyPos);
+        m_JPLEphemeris.GetJplEphemeris(Mjd_TT + MJDOffset, m_ThirdBodyStarType, m_CenterStarType, bodyPos);
         relativePos = pos - bodyPos;
         // Acceleration
         return  (-m_GM) * ( relativePos/pow(relativePos.norm(), 3) + bodyPos/pow(bodyPos.norm(), 3) );
@@ -166,8 +224,9 @@ namespace SpaceDSL {
         v_abs = v_rel.norm();
 
         // Atmospheric density due to AtmosphereModel::AtmosphereModelType
-        AtmosphereModel atmoModel(AtmosphereModel::AtmosphereModelType::E_1976StdAtmosphere);
-        double density = atmoModel.GetAtmosphereDensity( r_tod.norm() - EarthRadius);
+        AtmosphereModel atmoModel(m_AtmosphericModelType);
+        //// Calculation lat lon get F107A F107 ap/kp...................
+        double density = atmoModel.GetAtmosphereDensity( Mjd_TT, r_tod.norm() - EarthRadius);
 
         // Acceleration
         a_tod = -0.5 * dragCoef* (area/mass) * density * v_abs * v_rel;

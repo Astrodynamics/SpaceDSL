@@ -244,6 +244,9 @@ namespace SpaceDSL {
         /**********************************************************************/
         double                      GetValue(double Mjd_UTC, char *param, char *series = NULL);
 
+    public:
+        static double               TT_TAI;         // TT-TAI time difference [s]
+        static double               GPS_TAI;        // GPS-TAI time difference [s]
 
     protected:
 

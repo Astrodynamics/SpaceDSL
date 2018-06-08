@@ -64,6 +64,9 @@ namespace SpaceDSL {
 
     public:
 
+        void                SetThirdBodyStar(SolarSysStarType thirdBodyStarType);
+        void                SetCenterStar(SolarSysStarType centerStarType);
+
         SolarSysStarType    GetThirdBodyStar();
         SolarSysStarType    GetCenterStar();
 
@@ -83,6 +86,7 @@ namespace SpaceDSL {
         double              m_GM;
         SolarSysStarType    m_ThirdBodyStarType;
         SolarSysStarType    m_CenterStarType;
+        JplEphemeris        m_JPLEphemeris;
 
 
     };

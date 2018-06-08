@@ -65,7 +65,7 @@
 #include "SpaceDSL/jpl/jpleph.h"
 #include "SpaceDSL/jpl/jpl_int.h"
 
-typedef int bool;
+//typedef int bool;
 #define true 1
 #define false 0
 

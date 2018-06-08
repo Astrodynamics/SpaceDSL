@@ -110,12 +110,12 @@ namespace SpaceDSL {
 
                     if (m == 0)
                     {
-                         m_MatrixCS(n, m) = C_nm * sqrt( (2 - Delta(n,m)) * (2*n + 1) * Factorial(n - m)/Factorial(n + m) );
+                         m_MatrixCS(n, m) = C_nm * sqrt( (2 - Delta(0,m)) * (2*n + 1) * Factorial(n - m)/Factorial(n + m) );
                     }
                     else
                     {
-                        m_MatrixCS(n, m) = C_nm * sqrt( (2 - Delta(n,m)) * (2*n + 1) * Factorial(n - m)/Factorial(n + m) );
-                        m_MatrixCS(m-1, n) = S_nm * sqrt( (2 - Delta(n,m)) * (2*n + 1) * Factorial(n - m)/Factorial(n + m) );
+                        m_MatrixCS(n, m) = C_nm * sqrt( (2 - Delta(0,m)) * (2*n + 1) * Factorial(n - m)/Factorial(n + m) );
+                        m_MatrixCS(m-1, n) = S_nm * sqrt( (2 - Delta(0,m)) * (2*n + 1) * Factorial(n - m)/Factorial(n + m) );
                     }
 
                 }
@@ -132,11 +132,6 @@ namespace SpaceDSL {
 
     }
 
-    void GravityModel::SetModelType(GravModelType modelType)
-    {
-        m_GravModelType = modelType;
-    }
-
     GravityModel::GravModelType GravityModel::GetModelType()
     {
         return m_GravModelType;
@@ -144,6 +139,8 @@ namespace SpaceDSL {
 
     Vector3d GravityModel::AccelHarmonicGravity(const Vector3d &pos, const Matrix3d &ECItoBFCMtx, int n_max, int m_max)
     {
+        if (m_GravModelType == E_NotDefinedGravModel)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Gravity Model Type!");
         if (m_max > n_max )
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "GravityModel: m_max > n_max");
         if (n_max > m_Nmax)

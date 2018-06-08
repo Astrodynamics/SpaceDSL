@@ -23,4 +23,4 @@ Day Month Year : epoch in clear
 
 NTP Time       DTAI       Day Month Year
 2272060800      10      # 1 Jan 1972
-[1-10]		  [11-24]
+[1-10]	     [11-24]

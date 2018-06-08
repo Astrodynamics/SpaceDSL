@@ -497,6 +497,8 @@ namespace SpaceDSL{
      * Description:
      *  Get IERS Data through a File or Web Service
     **************************************************/
+    double IERSService::TT_TAI  = 32.184;
+    double IERSService::GPS_TAI = -19.0;
     IERSService::IERSService()
     {
         #ifdef WITH_OPENSSL
@@ -591,10 +593,23 @@ namespace SpaceDSL{
     IERSService::~IERSService()
     {
         if (m_EOPData != NULL)
-            delete m_EOPData;
+        {
+            for (int i = 0; i < m_EOPDataLine; ++i)
+            {
+                delete[]  m_EOPData[i];
+            }
+            delete[] m_EOPData;
+        }
+
 
         if (m_LeapsecondData != NULL)
-            delete m_LeapsecondData;
+        {
+            for (int i = 0; i < m_LeapsecondDataLine; ++i)
+            {
+                delete[]  m_LeapsecondData[i];
+            }
+            delete[] m_LeapsecondData;
+        }
     }
 
     #ifdef WITH_OPENSSL

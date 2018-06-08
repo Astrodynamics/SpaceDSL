@@ -52,6 +52,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed
 set(CMAKE_AUTOMOC ON)
 
+message(STATUS "#CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 # Set if build SHARED LIBS  or not
 option(BUILD_SHAREDLIBS "Build SHARED LIBS" FALSE)
 if (BUILD_SHAREDLIBS)

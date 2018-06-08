@@ -68,7 +68,7 @@ namespace SpaceDSL {
     /// @Param	mjd_UT1	Modified Julian Date (Terrestrial Time)
     /// @Return GMST in [rad]
     /********************************************************************/
-    double SPACEDSL_API GMST (double mjd_UT1);
+    double SPACEDSL_API GMST (double Mjd_UT1);
 
     /********************************************************************/
     /// Greenwich Apparent Sidereal Time
@@ -78,7 +78,7 @@ namespace SpaceDSL {
     /// @Param	mjd_UT1	Modified Julian Date (Terrestrial Time)
     /// @Return GMST in [rad]
     /********************************************************************/
-    double SPACEDSL_API GAST (double mjd_UT1);
+    double SPACEDSL_API GAST (double Mjd_UT1);
 
     /********************************************************************/
     /// Computes the Mean Obliquity of the Ecliptic
@@ -88,7 +88,7 @@ namespace SpaceDSL {
     /// @Param	mjd_TT	Modified Julian Date (Terrestrial Time)
     /// @Return Mean Obliquity of the Ecliptic
     /********************************************************************/
-    double SPACEDSL_API MeanObliquity (double mjd_TT);
+    double SPACEDSL_API MeanObliquity (double Mjd_TT);
 
     /********************************************************************/
     /// Nutation in Longitude and Obliquity
@@ -101,7 +101,7 @@ namespace SpaceDSL {
     /// @Param  deps
     /// @Return
     /********************************************************************/
-    void SPACEDSL_API NutationAngles (double mjd_TT, double& dpsi, double& deps);
+    void SPACEDSL_API NutationAngles (double Mjd_TT, double& dpsi, double& deps);
 
     /********************************************************************/
     /// Computation of the Equation of the Equinoxes
@@ -115,7 +115,7 @@ namespace SpaceDSL {
     ///   mean equinox referred to the true equator and equinox and is equal to the
     ///   difference between apparent and mean sidereal time.
     /********************************************************************/
-    double SPACEDSL_API EquationEquinox (double mjd_TT);
+    double SPACEDSL_API EquationEquinox (double Mjd_TT);
 
     /********************************************************************/
     /// Precession Transformation of Equatorial Coordinates
@@ -126,7 +126,7 @@ namespace SpaceDSL {
     /// @Param  mjd_TT2     Epoch to precess to (Modified Julian Date TT)
     /// @Return Precession Transformation Matrix
     /********************************************************************/
-    Matrix3d SPACEDSL_API PrecessMatrix (double mjd_TT1, double mjd_TT2);
+    Matrix3d SPACEDSL_API PrecessMatrix (double Mjd_TT1, double Mjd_TT2);
 
     /********************************************************************/
     /// Transformation from Mean to True Equator and Equinox
@@ -136,7 +136,7 @@ namespace SpaceDSL {
     /// @Param	mjd_TT      Modified Julian Date (Terrestrial Time)
     /// @Return Nutation matrix
     /********************************************************************/
-    Matrix3d SPACEDSL_API NutationMatrix (double mjd_TT);
+    Matrix3d SPACEDSL_API NutationMatrix (double Mjd_TT);
 
     /********************************************************************/
     /// Transformation from True Equator and Equinox to
@@ -147,7 +147,18 @@ namespace SpaceDSL {
     /// @Param	mjd_UT1      Modified Julian Date UT1
     /// @Return Greenwich Hour Angle matrix
     /********************************************************************/
-    Matrix3d SPACEDSL_API GWHourAngMatrix (double mjd_UT1);
+    Matrix3d SPACEDSL_API GWHourAngMatrix (double Mjd_UT1);
+
+    /********************************************************************/
+    /// Transformation from Pseudo Earth-fixed to Earth-fixed Coordinates
+    /// @Author	Niu Zhiyong
+    /// @Date	2018-03-20
+    /// @Input
+    /// @Param	Mjd_UTC      Modified Julian Date UTC
+    /// @Return Pole matrix
+    /********************************************************************/
+    Matrix3d SPACEDSL_API PoleMatrix (double x_pole, double y_pole);
+
 
 }
 #endif //SPCOORDSYSTEM_H

@@ -68,7 +68,6 @@ namespace SpaceDSL {
         virtual ~GravityModel();
 
     public:
-        void            SetModelType(GravModelType modelType);
         GravModelType   GetModelType();
 
     public:
