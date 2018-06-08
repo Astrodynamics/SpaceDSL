@@ -36,9 +36,12 @@
 *************************************************************************/
 #include "SpaceDSL/SpAtmosphere.h"
 #include "SpaceDSL/SpInterpolation.h"
+#include "SpaceDSL/SpTimeSystem.h"
 #include "SpaceDSL/SpMath.h"
 #include "SpaceDSL/SpConst.h"
 #include "SpaceDSL/SpUtils.h"
+
+#include "SpaceDSL/nrlmsise00/nrlmsise00.h"
 
 namespace SpaceDSL {
 
@@ -63,7 +66,8 @@ namespace SpaceDSL {
 
     }
 
-    double AtmosphereModel::GetAtmosphereTemperature(double altitude)
+    double AtmosphereModel::GetAtmosphereTemperature(double Mjd_TT, double altitude, double latitude, double longitude,
+                                                     double f107A, double f107, double ap[], bool useDailyAp)
     {
         switch (m_AtmosphericModelType) {
         case E_NotDefinedAtmosphereModel:
@@ -76,13 +80,19 @@ namespace SpaceDSL {
             else
                 return GetUSSA1976Temperature(altitude);
             break;
+        case E_NRLMSISE00Atmosphere:
+            altitude /= 1000;//m to km
+            return GetNRLMSISE2000Temperature(Mjd_TT, altitude, latitude, longitude,
+                                              f107A, f107, ap, useDailyAp);
+            break;
         default:
             break;
         }
         return 0;
     }
 
-    double AtmosphereModel::GetAtmospherePressure(double altitude)
+    double AtmosphereModel::GetAtmospherePressure(double Mjd_TT, double altitude, double latitude, double longitude,
+                                                  double f107A, double f107, double ap[], bool useDailyAp)
     {
         switch (m_AtmosphericModelType) {
         case E_NotDefinedAtmosphereModel:
@@ -95,13 +105,17 @@ namespace SpaceDSL {
             else
                 return GetUSSA1976Pressure(altitude);
             break;
+        case E_NRLMSISE00Atmosphere:
+            return 0;
+            break;
         default:
             break;
         }
         return 0;
     }
 
-    double AtmosphereModel::GetAtmosphereDensity(double altitude)
+    double AtmosphereModel::GetAtmosphereDensity(double Mjd_TT, double altitude, double latitude, double longitude,
+                                                 double f107A, double f107, double ap[], bool useDailyAp)
     {
         switch (m_AtmosphericModelType) {
         case E_NotDefinedAtmosphereModel:
@@ -114,14 +128,22 @@ namespace SpaceDSL {
             else
                 return GetUSSA1976Density(altitude);
             break;
+        case E_NRLMSISE00Atmosphere:
+            altitude /= 1000;//m to km
+            return GetNRLMSISE2000Density(Mjd_TT, altitude, latitude, longitude,
+                                          f107A, f107, ap, useDailyAp);
+            break;
         default:
             break;
         }
         return 0;
     }
 
-
-    /// Protect Function
+    ///=============================================
+    /// 1976 Standard Atmosphere Calculator(USSA1976)
+    /// @Author	Niu Zhiyong
+    /// @Date	2018-03-20
+    ///=============================================
     VectorXd AtmosphereModel::GetUSSA1976Composition(double altitude, int stepNum)
     {
         double division = 100;
@@ -603,7 +625,138 @@ namespace SpaceDSL {
         return tau_Z-tau_11;
     }
 
-	
+///-----------------------------------------------------------------------------------------------------------
+///-----------------------------------------------------------------------------------------------------------
+
+    ///===================================================
+    /// NRLMSIS-00 Empirical Atmosphere Model Calculator
+    /// Reencapsulate Dominik Brodowski The C version.
+    /// @Author	Niu Zhiyong
+    /// @Date	2018-06-05
+    ///===================================================
+    double AtmosphereModel::GetNRLMSISE2000Density(double Mjd_TT, double altitude, double latitude, double longitude,
+                                                   double f107A, double f107, double ap[], bool useDailyAp)
+    {
+        struct nrlmsise_output output;
+        struct nrlmsise_input input;
+        struct nrlmsise_flags flags;
+        struct ap_array aph;
+
+        /* input values */
+        if (ap == NULL)
+        {
+            aph.a[0] = 14.9186481659685;
+            for (int i=1;i<7;i++)
+            {
+                aph.a[i]=0;
+            }
+        }
+        else
+        {
+            for (int i=0;i<7;i++)
+            {
+                aph.a[i]=ap[i];
+            }
+        }
+
+
+        for (int i=0;i<24;i++)
+        {
+            flags.switches[i]=1;
+        }
+
+        if (useDailyAp == false)
+            flags.switches[9] = -1;
+
+        //Neglecting deviation between Mjd_TT and Mjd_UTC
+        UTCCalTime time;
+        UTCCalTime time0;
+        MjdToCalendarTime(Mjd_TT, time);
+        time0 = time;
+        time0.SetMon(1);
+        time0.SetDay(1);
+        time0.SetHour(0);
+        time0.SetMin(0);
+        time0.SetSec(0);
+        double Mjd_TT0 = CalendarTimeToMjd(time0);
+
+        input.year  = time.Year();                                      // without effect
+        input.doy   = int(Mjd_TT - Mjd_TT0);
+        input.sec   = time.Hour()*3600 + time.Min()*60 + time.Sec();
+        input.alt   = altitude;                                         //km
+        input.g_lat = latitude;                                         //rad
+        input.g_long= longitude;                                        //rad
+        input.lst   = input.sec/3600 + input.g_long/15;                 //hour
+        input.f107A = f107A;
+        input.f107  = f107;
+        input.ap    = aph.a[0];
+        input.ap_a  = &aph;
+        gtd7d(&input, &flags, &output);
+
+        return output.d[5];
+    }
+
+    double AtmosphereModel::GetNRLMSISE2000Temperature(double Mjd_TT, double altitude, double latitude, double longitude,
+                                                       double f107A, double f107, double ap[], bool useDailyAp)
+    {
+        struct nrlmsise_output output;
+        struct nrlmsise_input input;
+        struct nrlmsise_flags flags;
+        struct ap_array aph;
+
+        /* input values */
+        if (ap == NULL)
+        {
+            aph.a[0] = 14.9186481659685;
+            for (int i=1;i<7;i++)
+            {
+                aph.a[i]=0;
+            }
+        }
+        else
+        {
+            for (int i=0;i<7;i++)
+            {
+                aph.a[i]=ap[i];
+            }
+        }
+
+        for (int i=0;i<24;i++)
+        {
+            flags.switches[i]=1;
+        }
+
+        if (useDailyAp == false)
+            flags.switches[9] = -1;
+
+        //Neglecting deviation between Mjd_TT and Mjd_UTC
+        UTCCalTime time;
+        UTCCalTime time0;
+        MjdToCalendarTime(Mjd_TT, time);
+        time0 = time;
+        time0.SetMon(1);
+        time0.SetDay(1);
+        time0.SetHour(0);
+        time0.SetMin(0);
+        time0.SetSec(0);
+        double Mjd_TT0 = CalendarTimeToMjd(time0);
+
+        input.year  = time.Year();                                      // without effect
+        input.doy   = int(Mjd_TT - Mjd_TT0);
+        input.sec   = time.Hour()*3600 + time.Min()*60 + time.Sec();
+        input.alt   = altitude;                                         //km
+        input.g_lat = latitude;                                         //rad
+        input.g_long= longitude;                                        //rad
+        input.lst   = input.sec/3600 + input.g_long/15;                 //hour
+        input.f107A = f107A;
+        input.f107  = f107;
+        input.ap    = aph.a[0];
+        input.ap_a  = &aph;
+        gtd7d(&input, &flags, &output);
+
+        return output.t[1];
+    }
+
 	
 	
 }
