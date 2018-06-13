@@ -43,12 +43,13 @@
 #include "SpAtmosphere.h"
 #include "SpGravity.h"
 #include "SpTimeSystem.h"
+#include "SpCoordSystem.h"
 #include "SpPerturbation.h"
 #include "SpIntegration.h"
 
 #include <Eigen/Core>
 
-
+#include <fstream>
 using namespace Eigen;
 
 /// All the functions are in the namespace SpaceDSL
@@ -115,60 +116,109 @@ namespace SpaceDSL {
                                 GravityModel::GravModelType gravModelType = GravityModel::GravModelType::E_NotDefinedGravModel,
                                 int maxDegree = 0, int maxOrder = 0,
                                 ThirdBodyGravitySign thirdBodyGravSign = DefaultThirdBodySign,
+                                GeodeticCoordSystem::GeodeticCoordType geodeticType = GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,
                                 AtmosphereModel::AtmosphereModelType atmModelType = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel,
-                                double dragCoef = 0, double dragArea = 0,
+                                double dragCoef = 0, double dragArea = 0, double f107A = 150, double f107 = 150, double ap[] = NULL,
                                 double SRPCoef = 0, double SRPArea = 0, bool isUseDrag = false, bool isUseSRP = false);
 
         bool                        IsInitialized();
 
         void                        SetCenterStarType(SolarSysStarType type);
+
         SolarSysStarType            GetCenterStarType() const;
+
         double                      GetCenterStarGM() const;
 
         void                        SetMJD_UTC(double Mjd_UTC);
+
         double                      GetMJD_UTC() const;
+
         double                      GetMJD_UT1() const;
+
         double                      GetMJD_TT() const;
+
         double                      GetMJD_TAI() const;
 
 
         double                      GetTAI_UTC() const;
+
         double                      GetUT1_UTC() const;
+
         double                      GetTT_UTC() const;
 
         double                      GetX_Pole() const;
+
         double                      GetY_Pole() const;
 
         void                        SetGravModelType(GravityModel::GravModelType type);
+
         GravityModel::GravModelType GetGravModelType() const;
+
         void                        SetGravMaxDegree(int maxDegree);
+
         int                         GetGravMaxDegree() const;
+
         void                        SetGravMaxOrder(int maxOrder);
+
         int                         GetGravMaxOrder() const;
-        GravityModel                *GetGravityModel() const;
 
         void                        SetAtmosphereModelType(AtmosphereModel::AtmosphereModelType type);
+
         AtmosphereModel::AtmosphereModelType
                                     GetAtmosphereModelType() const;
+
         void                        SetDragCoef(double coef);
+
         double                      GetDragCoef() const;
+
         void                        SetDragArea(double area);
+
         double                      GetDragArea() const;
 
+        void                        SetAverageF107(double f107A);
+
+        double                      GetAverageF107() const;
+
+        void                        SetDailyF107(double f107);
+
+        double                      GetDailyF107() const;
+
+        void                        SetGeomagneticIndex(double ap[]);
+
+        double                      *GetGeomagneticIndex() const;
+
         void                        SetSRPCoef(double coef);
+
         double                      GetSRPCoef() const;
+
         void                        SetSRPArea(double area);
+
         double                      GetSRPArea() const;
 
         void                        SetThirdBodySign(OrbitPredictConfig::ThirdBodyGravitySign sign);
+
         OrbitPredictConfig::ThirdBodyGravitySign
                                     GetThirdBodySign() const;
 
+
+
+        bool                        IsUseThirdBodyGravity() const;
+
         bool                        IsUseSRP() const;
+
         bool                        IsUseDrag() const;
+
         bool                        IsUseNormalize() const;
 
+        GravityModel                *GetGravityModel() const;
 
+        GeodeticCoordSystem         *GetGeodeticCoordSystem() const;
+
+        ThirdBodyGravity            *GetThirdBodyGravity() const;
+
+        AtmosphericDrag             *GetAtmosphericDrag() const;
+
+        SolarRadPressure            *GetSolarRadPressure() const;
 
     protected:
         bool                        bIsInitialized = false;
@@ -191,24 +241,22 @@ namespace SpaceDSL {
         double                      m_X_Pole;
         double                      m_Y_Pole;
 
-
         //Gravity Parameters
         GravityModel::GravModelType m_GravModelType;	///< Gravity Model
         int                         m_MaxDegree;		///< Gravity Degree[n]
         int                         m_MaxOrder;			///< Degree Order  [m]
-        GravityModel                *m_pGravityModel;
 
         //Atmosphere Parameters
         AtmosphereModel::AtmosphereModelType
                                     m_AtmModelType;
         double                      m_DragCoef;			///< drag coefficient
         double                      m_DragArea;         ///< drag term m2/kg
-        //double                    m_F10p7;            ///< average F10.7
-        //double                    m_DailyF10p7;       ///< daily F10.7
-        //double                    m_Ap;               ///< geomagnetic index
+        double                      m_F107A;            ///< average F10.7
+        double                      m_F107;             ///< daily F10.7
+        double                      *m_Ap;              ///< geomagnetic index
 
         //Solar Radiation Parameters
-        double                      m_SRPCoef;		///< Solar Radiation Pressure Coeff
+        double                      m_SRPCoef;          ///< Solar Radiation Pressure Coeff
         double                      m_SRPArea;          ///< Area for SRP
 
         //Perturbation Sign
@@ -218,6 +266,43 @@ namespace SpaceDSL {
         //Normalize Sign
         bool                        m_bIsUseNormalize;
 
+
+        GeodeticCoordSystem         *m_pGeodeticSystem; ///< Geodetic Coordinate System
+        ThirdBodyGravity            *m_pThirdBodyGrva;
+        GravityModel                *m_pGravityModel;
+        AtmosphericDrag             *m_pAtmosphericDrag;
+        SolarRadPressure            *m_pSolarRadPressure;
+
+    };
+
+    /*************************************************
+     * Class type: Orbit Prediction Right Function
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+    **************************************************/
+    class OrbitPredictRightFunc : public RightFunc
+    {
+    public:
+        OrbitPredictRightFunc();
+        OrbitPredictRightFunc(OrbitPredictConfig *pConfig);
+        ~OrbitPredictRightFunc();
+
+        void SetOrbitPredictConfig(OrbitPredictConfig *pConfig);
+    public:
+        /// @Param  t                   sec
+        /// @Param	step                sec
+        /// @Param  x                   m,m/s
+        /// @Param  result              m,m/s
+        void operator() (double t, const VectorXd &x, VectorXd&result) const override;
+
+    protected:
+        OrbitPredictConfig      *m_pOrbitPredictConfig;
+        GravityModel            *m_pGravityModel;
+        GeodeticCoordSystem     *m_pGeodeticSystem;
+        ThirdBodyGravity        *m_pThirdBodyGrva;
+        AtmosphericDrag         *m_pAtmosphericDrag;
+        SolarRadPressure        *m_pSolarRadPressure;
     };
 
     /*************************************************
@@ -255,18 +340,25 @@ namespace SpaceDSL {
 
     protected:
 
+         OrbitPredictRightFunc          *m_pRightFunc;
+         RungeKutta                     *m_pRungeKutta;
+
     };
+
     /*************************************************
-     * Class type: Orbit Prediction Right Function
+     * Class type: Tow Body Orbit Prediction Right Function
      * Author: Niu ZhiYong
      * Date:2018-03-20
      * Description:
     **************************************************/
-    class OrbitPredictRightFunc : public RightFunc
+    class TwoBodyOrbitRightFunc : public RightFunc
     {
     public:
-        OrbitPredictRightFunc(OrbitPredictConfig *pConfig);
-        ~OrbitPredictRightFunc();
+        TwoBodyOrbitRightFunc();
+        TwoBodyOrbitRightFunc(OrbitPredictConfig *pConfig);
+        ~TwoBodyOrbitRightFunc();
+
+        void SetOrbitPredictConfig(OrbitPredictConfig *pConfig);
     public:
         /// @Param  t                   sec
         /// @Param	step                sec
@@ -275,9 +367,8 @@ namespace SpaceDSL {
         void operator() (double t, const VectorXd &x, VectorXd&result) const override;
 
     protected:
+
         OrbitPredictConfig      *m_pOrbitPredictConfig;
-        GravityModel            *m_pGravityModel;
-        ThirdBodyGravity        *m_pThirdBodyGrva;
     };
 
     /*************************************************
@@ -315,32 +406,11 @@ namespace SpaceDSL {
 
 
     protected:
+        TwoBodyOrbitRightFunc           *m_pRightFunc;
+        RungeKutta                      *m_pRungeKutta;
 
     };
-    /*************************************************
-     * Class type: Tow Body Orbit Prediction Right Function
-     * Author: Niu ZhiYong
-     * Date:2018-03-20
-     * Description:
-    **************************************************/
-    class TwoBodyOrbitRightFunc : public RightFunc
-    {
-    public:
-        TwoBodyOrbitRightFunc(OrbitPredictConfig *pConfig);
-        ~TwoBodyOrbitRightFunc();
-    public:
-        /// @Param  t                   sec
-        /// @Param	step                sec
-        /// @Param  x                   m,m/s
-        /// @Param  result              m,m/s
-        void operator() (double t, const VectorXd &x, VectorXd&result) const override;
 
-    protected:
-
-        OrbitPredictConfig      *m_pOrbitPredictConfig;
-    };
-
-	
 }
 
 #endif //SPORBITPREDICT_H

@@ -41,6 +41,7 @@
 #include "SpaceDSL/SpUtils.h"
 
 
+
 namespace SpaceDSL {
 
     /*************************************************
@@ -139,19 +140,36 @@ namespace SpaceDSL {
                         = OrbitPredictConfig::ThirdBodyGravitySign();
     OrbitPredictConfig::OrbitPredictConfig()
     {
-        m_pGravityModel = NULL;
+        m_pGravityModel     = NULL;
+        m_pGeodeticSystem   = NULL;
+        m_pThirdBodyGrva    = NULL;
+        m_pAtmosphericDrag  = NULL;
+        m_pSolarRadPressure = NULL;
     }
 
     OrbitPredictConfig::~OrbitPredictConfig()
     {
         if (m_pGravityModel != NULL)
             delete m_pGravityModel;
+
+        if (m_pGeodeticSystem != NULL)
+            delete m_pGeodeticSystem;
+
+        if (m_pThirdBodyGrva != NULL)
+            delete m_pThirdBodyGrva;
+
+        if (m_pAtmosphericDrag != NULL)
+            delete m_pAtmosphericDrag;
+
+        if (m_pSolarRadPressure != NULL)
+            delete m_pSolarRadPressure;
     }
 
     void OrbitPredictConfig::Initializer(double Mjd_UTC, SolarSysStarType centerStarType, bool isUseNormalize,
                                          GravityModel::GravModelType gravModelType, int maxDegree, int maxOrder,
-                                         ThirdBodyGravitySign thirdBodyGravSign,
+                                         ThirdBodyGravitySign thirdBodyGravSign, GeodeticCoordSystem::GeodeticCoordType geodeticType,
                                          AtmosphereModel::AtmosphereModelType atmModelType, double dragCoef, double dragArea,
+                                         double f107A, double f107, double ap[],
                                          double SRPCoef, double SRPArea, bool isUseDrag, bool isUseSRP)
     {
         m_CenterStarType    = centerStarType;
@@ -172,13 +190,13 @@ namespace SpaceDSL {
         m_GravModelType     = gravModelType;
         m_MaxDegree         = maxDegree;
         m_MaxOrder          = maxOrder;
-        if (gravModelType != GravityModel::GravModelType::E_NotDefinedGravModel)
-            m_pGravityModel     = new GravityModel(gravModelType);
 
         m_AtmModelType      = atmModelType;
         m_DragCoef          = dragCoef;
         m_DragArea          = dragArea;
-
+        m_F107A             = f107A;
+        m_F107              = f107;
+        m_Ap                = ap;
         m_SRPCoef           = SRPCoef;
         m_SRPArea           = SRPArea;
 
@@ -228,6 +246,29 @@ namespace SpaceDSL {
                               "OrbitPredictConfig: SolarSysStarType Unsupport ");
             break;
         }
+
+        if (gravModelType != GravityModel::GravModelType::E_NotDefinedGravModel)
+            m_pGravityModel = new GravityModel(gravModelType);
+
+        if (geodeticType != GeodeticCoordSystem::GeodeticCoordType::E_NotDefinedGeodeticType)
+            m_pGeodeticSystem = new GeodeticCoordSystem(geodeticType);
+
+        if (IsUseThirdBodyGravity() == true)
+        {
+            m_pThirdBodyGrva = new ThirdBodyGravity();
+            m_pThirdBodyGrva->SetCenterStar(centerStarType);
+        }
+
+        if (m_bIsUseDrag == true)
+        {
+            m_pAtmosphericDrag = new AtmosphericDrag(atmModelType, m_pGeodeticSystem);
+        }
+
+        if (m_bIsUseSRP == true)
+        {
+            m_pSolarRadPressure = new SolarRadPressure();
+        }
+
         bIsInitialized = true;
     }
 
@@ -432,14 +473,6 @@ namespace SpaceDSL {
         return m_MaxOrder;
     }
 
-    GravityModel *OrbitPredictConfig::GetGravityModel() const
-    {
-        if ( bIsInitialized == false)
-            throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
-        return m_pGravityModel;
-    }
-
     void OrbitPredictConfig::SetAtmosphereModelType(AtmosphereModel::AtmosphereModelType type)
     {
         if ( bIsInitialized == false)
@@ -486,6 +519,45 @@ namespace SpaceDSL {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_DragArea;
+    }
+
+    void OrbitPredictConfig::SetAverageF107(double f107A)
+    {
+        m_F107A = f107A;
+    }
+
+    double OrbitPredictConfig::GetAverageF107() const
+    {
+        if ( bIsInitialized == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
+        return m_F107A;
+    }
+
+    void OrbitPredictConfig::SetDailyF107(double f107)
+    {
+        m_F107 = f107;
+    }
+
+    double OrbitPredictConfig::GetDailyF107() const
+    {
+        if ( bIsInitialized == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
+        return m_F107;
+    }
+
+    void OrbitPredictConfig::SetGeomagneticIndex(double ap[])
+    {
+        m_Ap = ap;
+    }
+
+    double *OrbitPredictConfig::GetGeomagneticIndex() const
+    {
+        if ( bIsInitialized == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
+        return m_Ap;
     }
 
     void OrbitPredictConfig::SetSRPCoef(double coef)
@@ -579,6 +651,25 @@ namespace SpaceDSL {
         return m_ThirdBodySign;
     }
 
+    bool OrbitPredictConfig::IsUseThirdBodyGravity() const
+    {
+        if (m_ThirdBodySign.bIsUseEarthGrav == true ||
+            m_ThirdBodySign.bIsUseJupiterGrav ==true ||
+            m_ThirdBodySign.bIsUseMarsGrav ==true ||
+            m_ThirdBodySign.bIsUseMercuryGrav ==true ||
+            m_ThirdBodySign.bIsUseMoonGrav ==true ||
+            m_ThirdBodySign.bIsUseNeptuneGrav ==true ||
+            m_ThirdBodySign.bIsUsePlutoGrav ==true ||
+            m_ThirdBodySign.bIsUseSaturnGrav ==true ||
+            m_ThirdBodySign.bIsUseSunGrav ==true ||
+            m_ThirdBodySign.bIsUseUranusGrav ==true ||
+            m_ThirdBodySign.bIsUseVenusGrav ==true )
+
+            return true;
+        else
+            return false;
+    }
+
     bool OrbitPredictConfig::IsUseSRP() const
     {
         if ( bIsInitialized == false)
@@ -606,44 +697,46 @@ namespace SpaceDSL {
         return m_bIsUseNormalize;
     }
 
-    /*************************************************
-     * Class type: Orbit Prediction
-     * Author: Niu ZhiYong
-     * Date:2018-03-20
-     * Description:
-     *  Orbit Prediction Algorithm and Function
-    **************************************************/
-    OrbitPredict::OrbitPredict()
+
+    GravityModel *OrbitPredictConfig::GetGravityModel() const
     {
-
-    }
-
-    OrbitPredict::~OrbitPredict()
-    {
-
-    }
-
-    void OrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, double step, RungeKutta::IntegMethodType integType,
-                                 double &mass, Vector3d &pos, Vector3d &vel)
-    {
-        if (predictConfig.IsInitialized() == false)
+        if ( bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
+        return m_pGravityModel;
+    }
 
-        double Mjd_TT = predictConfig.GetMJD_TT();
-        VectorXd x(7), result(7);
-        result.fill(0);
-        x(0) = pos(0);  x(1) = pos(1);  x(2) = pos(2);
-        x(3) = vel(0);  x(4) = vel(1);  x(5) = vel(2);  x(6) = mass;
+    GeodeticCoordSystem *OrbitPredictConfig::GetGeodeticCoordSystem() const
+    {
+        if ( bIsInitialized == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
-        OrbitPredictRightFunc rightFunc(&predictConfig);
+        return m_pGeodeticSystem;
+    }
 
-        RungeKutta RK(integType);
-        RK.OneStep(rightFunc, Mjd_TT*DayToSec ,x, step, result);
-        pos(0) = result(0);     pos(1) = result(1);     pos(2) = result(2);
-        vel(0) = result(3);     vel(1) = result(4);     vel(2) = result(5);
-        mass   = result(6);
+    ThirdBodyGravity *OrbitPredictConfig::GetThirdBodyGravity() const
+    {
+        if ( bIsInitialized == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
+        return m_pThirdBodyGrva;
+    }
 
+    AtmosphericDrag *OrbitPredictConfig::GetAtmosphericDrag() const
+    {
+        if ( bIsInitialized == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
+        return m_pAtmosphericDrag;
+    }
+
+    SolarRadPressure *OrbitPredictConfig::GetSolarRadPressure() const
+    {
+        if ( bIsInitialized == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
+        return m_pSolarRadPressure;
     }
 
     /*************************************************
@@ -652,17 +745,61 @@ namespace SpaceDSL {
      * Date:2018-03-20
      * Description:
     **************************************************/
+    OrbitPredictRightFunc::OrbitPredictRightFunc()
+    {
+        m_pOrbitPredictConfig   = NULL;
+        m_pGravityModel         = NULL;
+        m_pGeodeticSystem       = NULL;
+        m_pThirdBodyGrva        = NULL;
+        m_pAtmosphericDrag      = NULL;
+        m_pSolarRadPressure     = NULL;
+    }
+
     OrbitPredictRightFunc::OrbitPredictRightFunc(OrbitPredictConfig *pConfig)
     {
         m_pOrbitPredictConfig = pConfig;
+
         m_pGravityModel = m_pOrbitPredictConfig->GetGravityModel();
-        m_pThirdBodyGrva = new ThirdBodyGravity();
+        if (m_pGravityModel == NULL)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictRightFunc: GravityModel == NULL! ");
+
+        m_pGeodeticSystem = m_pOrbitPredictConfig->GetGeodeticCoordSystem();
+        if (m_pGeodeticSystem == NULL)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictRightFunc: GeodeticSystem == NULL! ");
+
+        m_pThirdBodyGrva = m_pOrbitPredictConfig->GetThirdBodyGravity();
+
+        m_pAtmosphericDrag = m_pOrbitPredictConfig->GetAtmosphericDrag();
+
+        m_pSolarRadPressure = m_pOrbitPredictConfig->GetSolarRadPressure();
     }
 
     OrbitPredictRightFunc::~OrbitPredictRightFunc()
-    { 
-        if (m_pThirdBodyGrva != NULL)
-            delete m_pThirdBodyGrva;
+    {
+
+    }
+
+    void OrbitPredictRightFunc::SetOrbitPredictConfig(OrbitPredictConfig *pConfig)
+    {
+        m_pOrbitPredictConfig = pConfig;
+
+        m_pGravityModel = m_pOrbitPredictConfig->GetGravityModel();
+        if (m_pGravityModel == NULL)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictRightFunc: GravityModel == NULL! ");
+
+        m_pGeodeticSystem = m_pOrbitPredictConfig->GetGeodeticCoordSystem();
+        if (m_pGeodeticSystem == NULL)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictRightFunc: GeodeticSystem == NULL! ");
+
+        m_pThirdBodyGrva = m_pOrbitPredictConfig->GetThirdBodyGravity();
+
+        m_pAtmosphericDrag = m_pOrbitPredictConfig->GetAtmosphericDrag();
+
+        m_pSolarRadPressure = m_pOrbitPredictConfig->GetSolarRadPressure();
     }
 
     void OrbitPredictRightFunc::operator()(double t, const VectorXd &x, VectorXd &result) const
@@ -674,38 +811,40 @@ namespace SpaceDSL {
         pos(0) = x(0);  pos(1) = x(1);  pos(2) = x(2);
         Vector3d vel;
         vel(0) = x(3);  vel(1) = x(4);  vel(2) = x(5);
-
-        double Mjd_UT1 = Mjd_TT + (m_pOrbitPredictConfig->GetUT1_UTC() - m_pOrbitPredictConfig->GetTT_UTC())/DayToSec;
         double Mjd_UTC = Mjd_TT - m_pOrbitPredictConfig->GetTT_UTC()/DayToSec;
-        Matrix3d ECIToTODMtx = NutationMatrix(Mjd_TT) * PrecessMatrix(MJD_J2000,Mjd_TT);
-        Matrix3d ECItoBFCMtx = PoleMatrix(m_pOrbitPredictConfig->GetX_Pole()*PI/180/360, m_pOrbitPredictConfig->GetY_Pole()*PI/180/360) *
-                                GWHourAngMatrix(Mjd_UT1) * ECIToTODMtx;//
+        Matrix3d J2000toECFMtx = m_pOrbitPredictConfig->GetGeodeticCoordSystem()->GetJ2000ToECFMtx(Mjd_UTC);
 
         /// Harmonic Gravity
-        acceleration += m_pGravityModel->AccelHarmonicGravity(pos, ECItoBFCMtx,
+        acceleration += m_pGravityModel->AccelHarmonicGravity(pos, J2000toECFMtx,
                                                             m_pOrbitPredictConfig->GetGravMaxDegree(),
                                                             m_pOrbitPredictConfig->GetGravMaxOrder());
         /// Atmospheric Drag
         if (m_pOrbitPredictConfig->IsUseDrag())
         {
-            AtmosphericDrag atmoDrag(m_pOrbitPredictConfig->GetAtmosphereModelType());
-            acceleration += atmoDrag.AccelAtmosphericDrag(Mjd_TT, pos, vel, ECIToTODMtx,
-                                                            m_pOrbitPredictConfig->GetDragArea(),
-                                                            m_pOrbitPredictConfig->GetDragCoef(),
-                                                            x(6));
+
+            double Mjd_UT1 = Mjd_TT + (m_pOrbitPredictConfig->GetUT1_UTC() - m_pOrbitPredictConfig->GetTT_UTC())/DayToSec;
+            Vector3d dragAccel = m_pAtmosphericDrag->AccelAtmosphericDrag(  Mjd_UTC,Mjd_UT1,
+                                                                            pos, vel,
+                                                                            m_pOrbitPredictConfig->GetDragArea(),
+                                                                            m_pOrbitPredictConfig->GetDragCoef(),
+                                                                            x(6),
+                                                                            m_pOrbitPredictConfig->GetAverageF107(),
+                                                                            m_pOrbitPredictConfig->GetDailyF107(),
+                                                                            m_pOrbitPredictConfig->GetGeomagneticIndex());
+            //cout<<Mjd_UTC<<"  "<<dragAccel(0)<<"  "<<dragAccel(1)<<"  "<<dragAccel(2)<<endl;
+            acceleration += dragAccel;
         }
+
         /// Solar Rad. Pressure
         if (m_pOrbitPredictConfig->IsUseSRP())
         {
-            SolarRadPressure SRPPressure;
-            acceleration += SRPPressure.AccelSolarRad(Mjd_TT, pos,
-                                                      m_pOrbitPredictConfig->GetSRPArea(),
-                                                      m_pOrbitPredictConfig->GetDragCoef(),
-                                                      x(6));
+            acceleration += m_pSolarRadPressure->AccelSolarRad( Mjd_TT, pos,
+                                                                m_pOrbitPredictConfig->GetSRPArea(),
+                                                                m_pOrbitPredictConfig->GetDragCoef(),
+                                                                x(6));
         }
 
         /// Third Body Gravity
-        m_pThirdBodyGrva->SetCenterStar(m_pOrbitPredictConfig->GetCenterStarType());
         if (m_pOrbitPredictConfig->GetThirdBodySign().bIsUseEarthGrav)
         {
             m_pThirdBodyGrva->SetThirdBodyStar(E_Earth);
@@ -789,6 +928,61 @@ namespace SpaceDSL {
     }
 
     /*************************************************
+     * Class type: Orbit Prediction
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  Orbit Prediction Algorithm and Function
+    **************************************************/
+    OrbitPredict::OrbitPredict()
+    {
+        m_pRightFunc = NULL;
+        m_pRungeKutta = NULL;
+    }
+
+    OrbitPredict::~OrbitPredict()
+    {
+        if (m_pRightFunc != NULL)
+            delete m_pRightFunc;
+
+        if (m_pRungeKutta != NULL)
+            delete m_pRungeKutta;
+    }
+
+    void OrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, double step, RungeKutta::IntegMethodType integType,
+                                 double &mass, Vector3d &pos, Vector3d &vel)
+    {
+        if (predictConfig.IsInitialized() == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+
+        double Mjd_TT = predictConfig.GetMJD_TT();
+        VectorXd x(7), result(7);
+        result.fill(0);
+        x(0) = pos(0);  x(1) = pos(1);  x(2) = pos(2);
+        x(3) = vel(0);  x(4) = vel(1);  x(5) = vel(2);  x(6) = mass;
+
+        if (m_pRightFunc == NULL)
+            m_pRightFunc = new OrbitPredictRightFunc(&predictConfig);
+        else
+            m_pRightFunc->SetOrbitPredictConfig(&predictConfig);
+
+        if (m_pRungeKutta == NULL)
+            m_pRungeKutta = new RungeKutta(integType);
+        else
+            m_pRungeKutta->SetIntegMethodType(integType);
+
+        m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, step, result);
+
+        pos(0) = result(0);     pos(1) = result(1);     pos(2) = result(2);
+        vel(0) = result(3);     vel(1) = result(4);     vel(2) = result(5);
+        mass   = result(6);
+
+    }
+
+
+
+    /*************************************************
      * Class type: Tow Body Orbit Prediction
      * Author: Niu ZhiYong
      * Date:2018-03-20
@@ -797,12 +991,17 @@ namespace SpaceDSL {
     **************************************************/
     TwoBodyOrbitPredict::TwoBodyOrbitPredict()
     {
-
+        m_pRightFunc = NULL;
+        m_pRungeKutta = NULL;
     }
 
     TwoBodyOrbitPredict::~TwoBodyOrbitPredict()
     {
+        if (m_pRightFunc != NULL)
+            delete m_pRightFunc;
 
+        if (m_pRungeKutta != NULL)
+            delete m_pRungeKutta;
     }
 
     void TwoBodyOrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, double step, RungeKutta::IntegMethodType integType,
@@ -828,9 +1027,17 @@ namespace SpaceDSL {
 
             x(6) = mass;
 
-            TwoBodyOrbitRightFunc rightFunc(&predictConfig);
-            RungeKutta RK(integType);
-            RK.OneStep(rightFunc, Mjd_TT*DayToSec ,x, norm_step, result);
+            if (m_pRightFunc == NULL)
+                m_pRightFunc = new TwoBodyOrbitRightFunc(&predictConfig);
+            else
+                m_pRightFunc->SetOrbitPredictConfig(&predictConfig);
+
+            if (m_pRungeKutta == NULL)
+                m_pRungeKutta = new RungeKutta(integType);
+            else
+                m_pRungeKutta->SetIntegMethodType(integType);
+
+            m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, norm_step, result);
 
             pos(0) = result(0)*NormalizeParameter::GetLengthPara(centerStarType);
             pos(1) = result(1)*NormalizeParameter::GetLengthPara(centerStarType);
@@ -852,7 +1059,7 @@ namespace SpaceDSL {
 
             TwoBodyOrbitRightFunc rightFunc(&predictConfig);
             RungeKutta RK(integType);
-            RK.OneStep(rightFunc, Mjd_TT*DayToSec ,x, step, result);
+            RK.OneStep(&rightFunc, Mjd_TT*DayToSec ,x, step, result);
 
             pos(0) = result(0);     pos(1) = result(1);     pos(2) = result(2);
             vel(0) = result(3);     vel(1) = result(4);     vel(2) = result(5);
@@ -867,6 +1074,11 @@ namespace SpaceDSL {
      * Date:2018-03-20
      * Description:
     **************************************************/
+    TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc()
+    {
+        m_pOrbitPredictConfig = NULL;
+    }
+
     TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc(OrbitPredictConfig *pConfig)
     {
         m_pOrbitPredictConfig = pConfig;
@@ -875,6 +1087,11 @@ namespace SpaceDSL {
     TwoBodyOrbitRightFunc::~TwoBodyOrbitRightFunc()
     {
 
+    }
+
+    void TwoBodyOrbitRightFunc::SetOrbitPredictConfig(OrbitPredictConfig *pConfig)
+    {
+        m_pOrbitPredictConfig = pConfig;
     }
 
     void TwoBodyOrbitRightFunc::operator()(double t, const VectorXd &x, VectorXd &result) const

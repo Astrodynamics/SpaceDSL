@@ -118,6 +118,34 @@ namespace SpaceDSL{
         m_Vel -= state.Vel();
         return *this;
     }
+
+    /*************************************************
+     * Class type: Geodetic Coordinate
+     * Author: Niu ZhiYong
+     * Date:2018-06-08
+     * Description:
+     *  Longitude [rad] Latitude [rad] Altitude [m]
+     *  This Class is Thread Safe!
+    **************************************************/
+    GeodeticCoord::GeodeticCoord()
+    {
+        m_Longitude = 0;
+        m_Latitude  = 0;
+        m_Altitude  = 0;
+    }
+
+    GeodeticCoord::GeodeticCoord(double longitude, double latitude, double altitude)
+    {
+        m_Longitude = longitude;
+        m_Latitude  = latitude;
+        m_Altitude  = altitude;
+    }
+
+    GeodeticCoord::~GeodeticCoord()
+    {
+
+    }
+
     /*************************************************
      * Class type: Classic Orbit Element
      * Author: Niu ZhiYong
@@ -519,5 +547,7 @@ namespace SpaceDSL{
         // State vector
         cart = CartState(r, v);
     }
+
+
 
 }

@@ -40,6 +40,7 @@
 
 #include "SpaceDSL_Global.h"
 #include "SpAtmosphere.h"
+#include "SpCoordSystem.h"
 #include "SpJplEph.h"
 #include <Eigen/Core>
 
@@ -102,7 +103,7 @@ namespace SpaceDSL {
     public:
 
         AtmosphericDrag();
-        AtmosphericDrag(AtmosphereModel::AtmosphereModelType modelType);
+        AtmosphericDrag(AtmosphereModel::AtmosphereModelType modelType, GeodeticCoordSystem *pGeodeticSystem);
         virtual ~AtmosphericDrag();
 
     public:
@@ -121,12 +122,14 @@ namespace SpaceDSL {
         /// @Param  dragCoef        Drag coefficient
         /// @Return Acceleration
         //********************************************************************
-        Vector3d    AccelAtmosphericDrag(double Mjd_TT, const Vector3d& pos, const Vector3d& vel,
-                                         const Matrix3d& ECIToTODMtx, double area, double dragCoef, double mass);
+        Vector3d    AccelAtmosphericDrag(double Mjd_UTC, double Mjd_UT1, const Vector3d& pos, const Vector3d& vel,
+                                         double area, double dragCoef, double mass,
+                                         double f107A = 150, double f107 = 160, double ap[] = NULL);
 
     protected:
 
         AtmosphereModel::AtmosphereModelType     m_AtmosphericModelType;
+        GeodeticCoordSystem                     *m_pGeodeticSystem;
 
     };
 

@@ -266,16 +266,16 @@ const double SecToPicoSec      = 1.0e+12;
 //
 // Constants:   Angle_Dimension_Constants 
 //
-const double RadToDeg          = 57.2957795130823208767;			///< 180.0/PI
-const double RadToArcSec       = 206264.8062470964;					///< RadToDeg*3600.0
+const double RadToDeg          = 57.295779513082320876798154814105;	///< 180.0/PI
+const double RadToArcSec       = 206264.80624709635515647335733078;	///< RadToDeg*3600.0
 const double RadToArcMin       = 57.2957795130823208767*60.0;		///< RadToDeg*60.0
 const double RadToSecArc       = 206264.8062470964/15;				///< RadToArcSec/15
 
 const double DegToRad          = 0.017453292519943295769236907684886;	///< PI/180.0
-const double ArcSecToRad       = 4.848136811095359935899141e-6;			///< DegToRad/3600.0 度分秒的秒转换到rad
-const double ArcMinToRad       = 2.9088820866572159615394846141477e-4;	///< DegToRad/60.0 度分秒的分转换到rad
-const double SecArcToRad       = 7.2722052166430399038487115353692e-5;	///< ArcSecToRad*15 时分秒的秒转换到rad
-const double MinArcToRad       = 0.0043633231299858239423092269212215;	///< 时分秒的分转换到rad
+const double ArcSecToRad       = 4.8481368110953599358991410235795e-6;	///< DegToRad/3600.0
+const double ArcMinToRad       = 2.9088820866572159615394846141477e-4;	///< DegToRad/60.0
+const double SecArcToRad       = 7.2722052166430399038487115353692e-5;	///< ArcSecToRad*15
+const double MinArcToRad       = 0.0043633231299858239423092269212215;
 
 
 //

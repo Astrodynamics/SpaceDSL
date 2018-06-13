@@ -95,6 +95,44 @@ namespace SpaceDSL {
             Vector3d	m_Pos;		///< position(m)
             Vector3d	m_Vel;		///< velocity(m/s)
     };
+
+    /*************************************************
+     * Class type: Geodetic Coordinate
+     * Author: Niu ZhiYong
+     * Date:2018-06-08
+     * Description:
+     *  Longitude [rad] Latitude [rad] Altitude [m]
+     *  This Class is Thread Safe!
+    **************************************************/
+    class SPACEDSL_API GeodeticCoord
+    {
+    public:
+            GeodeticCoord();
+            GeodeticCoord(double longitude, double latitude, double altitude);
+            virtual ~GeodeticCoord();
+
+            inline double Longitude()   const {return m_Longitude;}
+            inline double Latitude()    const {return m_Latitude;}
+            inline double Altitude()    const {return m_Altitude;}
+
+            inline void   SetLongitude(const double longitude)  { m_Longitude = longitude;}
+            inline void   SetLatitude(const double latitude)    { m_Latitude  = latitude;}
+            inline void   SetAltitude(const double altitude)    { m_Altitude = altitude;}
+
+            inline void   SetGeodeticCoord(double longitude, double latitude, double altitude)
+            {
+                m_Longitude = longitude;
+                m_Latitude  = latitude;
+                m_Altitude  = altitude;
+            }
+
+    protected:
+
+            double m_Longitude;                 // Longitude [rad]
+            double m_Latitude;                  // Latitude [rad]
+            double m_Altitude;                  // Altitude [m]
+    };
+
     /*************************************************
      * Class type: Classic Orbit Element
      * Author: Niu ZhiYong

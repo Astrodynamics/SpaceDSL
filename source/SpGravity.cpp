@@ -54,6 +54,16 @@ namespace SpaceDSL {
     GravityModel::GravityModel(GravModelType modelType)
     {
         m_GravModelType = modelType;
+        this->DataPreprocess();
+    }
+
+    GravityModel::~GravityModel()
+    {
+
+    }
+
+    void GravityModel::DataPreprocess()
+    {
         ifstream fileStream;
         int line = 0;
         switch (m_GravModelType)
@@ -67,7 +77,7 @@ namespace SpaceDSL {
 
             fileStream.open("./astrodata/Earth/EGM2008.gm");
             if (fileStream.is_open() == false)
-            {  
+            {
                 throw SPException(__FILE__, __FUNCTION__, __LINE__, "EGM2008.gm File is Invalid!");
             }
 
@@ -127,9 +137,10 @@ namespace SpaceDSL {
         }
     }
 
-    GravityModel::~GravityModel()
+    void GravityModel::SetModelType(GravityModel::GravModelType modelType)
     {
-
+        m_GravModelType = modelType;
+        this->DataPreprocess();
     }
 
     GravityModel::GravModelType GravityModel::GetModelType()
@@ -137,7 +148,7 @@ namespace SpaceDSL {
         return m_GravModelType;
     }
 
-    Vector3d GravityModel::AccelHarmonicGravity(const Vector3d &pos, const Matrix3d &ECItoBFCMtx, int n_max, int m_max)
+    Vector3d GravityModel::AccelHarmonicGravity(const Vector3d &pos, const Matrix3d &J2000toECFMtx, int n_max, int m_max)
     {
         if (m_GravModelType == E_NotDefinedGravModel)
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Gravity Model Type!");
@@ -160,7 +171,7 @@ namespace SpaceDSL {
         MatrixXd  W(n_max+2,n_max+2);   W.fill(0);  // work array (0..n_max+1,0..n_max+1)
 
         // Body-fixed position
-        r_bf = ECItoBFCMtx * pos;
+        r_bf = J2000toECFMtx * pos;
 
         // Auxiliary quantities
         r_sqr =  r_bf.dot(r_bf);               // Square of distance
@@ -246,8 +257,10 @@ namespace SpaceDSL {
         a_bf = (m_GM/(m_Radius*m_Radius)) * Vector3d(ax,ay,az);
 
         // Inertial acceleration
-        return  ECItoBFCMtx.transpose()*a_bf;
+        return  J2000toECFMtx.transpose()*a_bf;
     }
+
+
 
 
 }

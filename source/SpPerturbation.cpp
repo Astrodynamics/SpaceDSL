@@ -185,11 +185,13 @@ namespace SpaceDSL {
     AtmosphericDrag::AtmosphericDrag()
     {
         m_AtmosphericModelType = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel;
+        m_pGeodeticSystem = NULL;
     }
 
-    AtmosphericDrag::AtmosphericDrag(AtmosphereModel::AtmosphereModelType modelType)
+    AtmosphericDrag::AtmosphericDrag(AtmosphereModel::AtmosphereModelType modelType, GeodeticCoordSystem *pGeodeticSystem)
     {
         m_AtmosphericModelType = modelType;
+        m_pGeodeticSystem = pGeodeticSystem;
     }
 
     AtmosphericDrag::~AtmosphericDrag()
@@ -197,8 +199,8 @@ namespace SpaceDSL {
 
     }
 
-    Vector3d AtmosphericDrag::AccelAtmosphericDrag(double Mjd_TT, const Vector3d &pos, const Vector3d &vel,
-                                                   const Matrix3d &ECIToTODMtx, double area,  double dragCoef,double mass)
+    Vector3d AtmosphericDrag::AccelAtmosphericDrag(double Mjd_UTC, double Mjd_UT1, const Vector3d& pos, const Vector3d& vel, double area, double dragCoef, double mass,
+                                                   double f107A, double f107, double ap[])
     {
         if (m_AtmosphericModelType == AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel)
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphericDrag: m_AtmosphericModelType = E_NotDefinedAtmosphereModel!");
@@ -208,30 +210,36 @@ namespace SpaceDSL {
 
         // Variables
         double      v_abs;
-        Vector3d    r_tod, v_tod;
-        Vector3d    v_rel, a_tod;
-        Matrix3d    TODToECIMtx;
-
+        Vector3d    r_ECF, v_ECF;
+        Vector3d    r_TOD, v_TOD;
+        Vector3d    v_rel, a_TOD;
         // Transformation matrix to ICRF/EME2000 system
-        TODToECIMtx = ECIToTODMtx.transpose();
+        Matrix3d    J2000ToECFMtx = m_pGeodeticSystem->GetJ2000ToECFMtx(Mjd_UTC);
+        Matrix3d    J2000ToTODMtx = m_pGeodeticSystem->GetJ2000ToTODMtx(Mjd_UTC);
+        Matrix3d    TODToJ2000Mtx = J2000ToTODMtx.transpose();
 
         // Position and velocity in true-of-date system
-        r_tod = ECIToTODMtx * pos;
-        v_tod = ECIToTODMtx * vel;
+        r_ECF = J2000ToECFMtx * pos;
+        v_ECF = J2000ToECFMtx * vel;
+
+        r_TOD = J2000ToTODMtx * pos;
+        v_TOD = J2000ToTODMtx * vel;
 
         // Velocity relative to the Earth's atmosphere
-        v_rel = v_tod - omega.cross(r_tod);
+        v_rel = v_TOD - omega.cross(r_TOD);
         v_abs = v_rel.norm();
 
         // Atmospheric density due to AtmosphereModel::AtmosphereModelType
         AtmosphereModel atmoModel(m_AtmosphericModelType);
-        //// Calculation lat lon get F107A F107 ap/kp...................
-        double density = atmoModel.GetAtmosphereDensity( Mjd_TT, r_tod.norm() - EarthRadius);
+        // Calculation lat lon and h
+        GeodeticCoord lla = m_pGeodeticSystem->GetGeodeticCoord(r_ECF);
+
+        double density = atmoModel.GetAtmosphereDensity( Mjd_UT1, lla.Altitude(), lla.Latitude() , lla.Longitude(), f107A, f107, ap);
 
         // Acceleration
-        a_tod = -0.5 * dragCoef* (area/mass) * density * v_abs * v_rel;
+        a_TOD = -0.5 * dragCoef* (area/mass) * density * v_abs * v_rel;
 
-        return TODToECIMtx * a_tod;
+        return TODToJ2000Mtx * a_TOD;
     }
 
     /*************************************************

@@ -68,8 +68,11 @@ namespace SpaceDSL {
             E_RungeKutta8 = 2
         };
 
+        RungeKutta();
         RungeKutta(IntegMethodType type = E_RungeKutta4);
         ~RungeKutta();
+
+        void SetIntegMethodType(IntegMethodType type);
 
     public:
         /********************************************************************/
@@ -84,7 +87,7 @@ namespace SpaceDSL {
         /// @Param  result  Integral Result
         /**********************************************************************/
 
-        void OneStep(RightFunc &rightFunc, double t, const VectorXd &x, double step, VectorXd &result);
+        void OneStep(RightFunc *rightFunc, double t, const VectorXd &x, double step, VectorXd &result);
 
         /********************************************************************/
         /// Runge Kutta Integral Mult Step
@@ -98,7 +101,7 @@ namespace SpaceDSL {
         /// @Param  result  Integral Result
         /**********************************************************************/
 
-        void MultStep(RightFunc &rightFunc, double t, const VectorXd &x, double step, int stepNum, VectorXd &result);
+        void MultStep(RightFunc *rightFunc, double t, const VectorXd &x, double step, int stepNum, VectorXd &result);
 
     protected:
 

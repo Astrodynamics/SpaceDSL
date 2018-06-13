@@ -57,7 +57,7 @@ namespace SpaceDSL {
     class SPACEDSL_API GravityModel
     {
     public:
-        enum SPACEDSL_API GravModelType
+        enum GravModelType
         {
             E_NotDefinedGravModel   = 0,
             E_EGM08Model            = 1,
@@ -68,6 +68,8 @@ namespace SpaceDSL {
         virtual ~GravityModel();
 
     public:
+        void            SetModelType(GravModelType modelType);
+
         GravModelType   GetModelType();
 
     public:
@@ -82,7 +84,10 @@ namespace SpaceDSL {
         /// @Param	m_max           Maximum order (m_max<=n_max; m_max=0 for zonals, only)
         /// @Return Acceleration
         //********************************************************************
-        Vector3d AccelHarmonicGravity (const Vector3d& pos, const Matrix3d& ECItoBFCMtx, int n_max, int m_max );
+        Vector3d        AccelHarmonicGravity (const Vector3d& pos, const Matrix3d& J2000toECFMtx, int n_max, int m_max );
+    protected:
+
+        void            DataPreprocess();
 
     protected:
 

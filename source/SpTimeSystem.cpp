@@ -487,7 +487,7 @@ namespace SpaceDSL{
         time.SetDay(day);
         time.SetHour(hour);
         time.SetMin(min);
-        time.SetSec(min);
+        time.SetSec(sec);
     }
 
     /*************************************************

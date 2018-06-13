@@ -50,6 +50,11 @@ namespace SpaceDSL {
      * Date:2018-03-20
      * Description:
     **************************************************/
+    RungeKutta::RungeKutta()
+    {
+        m_IntegMethodType = E_NotDefindIntegMethodType;
+    }
+
     RungeKutta::RungeKutta(IntegMethodType type)
     {
         m_IntegMethodType = type;
@@ -60,7 +65,12 @@ namespace SpaceDSL {
 
     }
 
-    void RungeKutta::OneStep(RightFunc &rightFunc, double t, const VectorXd &x, double step, VectorXd &result)
+    void RungeKutta::SetIntegMethodType(RungeKutta::IntegMethodType type)
+    {
+        m_IntegMethodType = type;
+    }
+
+    void RungeKutta::OneStep(RightFunc *rightFunc, double t, const VectorXd &x, double step, VectorXd &result)
     {
         if (m_IntegMethodType == E_RungeKutta4)
         {
@@ -87,7 +97,7 @@ namespace SpaceDSL {
                     auto kk = K[j];
                     sigma += A(i,j)*K[j];
                 }
-                rightFunc( t + step*C(i), x + step*sigma, Ki);
+                (*rightFunc)( t + step*C(i), x + step*sigma, Ki);
                 K.push_back(Ki);
             }
             /************************************************************/
@@ -115,7 +125,7 @@ namespace SpaceDSL {
 
     }
 
-    void RungeKutta::MultStep(RightFunc &rightFunc, double t, const VectorXd &x, double step, int stepNum, VectorXd &result)
+    void RungeKutta::MultStep(RightFunc *rightFunc, double t, const VectorXd &x, double step, int stepNum, VectorXd &result)
     {
         VectorXd x_temp = x;
         if (m_IntegMethodType == E_RungeKutta4)
@@ -145,7 +155,7 @@ namespace SpaceDSL {
                     {
                         sigma += A(i,j)*K[j];
                     }
-                    rightFunc( t + step*C(i), x_temp + step*sigma, Ki);
+                    (*rightFunc)( t + step*C(i), x_temp + step*sigma, Ki);
                     K.push_back(Ki);
                 }
                 /************************************************************/
