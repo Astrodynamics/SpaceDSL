@@ -57,7 +57,7 @@ namespace SpaceDSL {
     class SPACEDSL_API AtmosphereModel
     {
     public:
-        enum SPACEDSL_API AtmosphereModelType
+        enum AtmosphereModelType
         {
             E_NotDefinedAtmosphereModel     = 0,
             E_1976StdAtmosphere             = 1,
@@ -68,6 +68,10 @@ namespace SpaceDSL {
         AtmosphereModel();
         AtmosphereModel(AtmosphereModelType modelType);
         virtual ~AtmosphereModel();
+
+
+        void                SetAtmosphereModelType(AtmosphereModelType modelType);
+        AtmosphereModelType GetAtmosphereModelType();
 
 
 
@@ -82,7 +86,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return Temperature         K
         //********************************************************************
-        double      GetAtmosphereTemperature(double Mjd_TT, double altitude, double latitude = 0, double longitude = 0,
+        double      GetAtmosphereTemperature(double Mjd_UT1, double altitude, double latitude = 0, double longitude = 0,
                                              double f107A = 150, double f107 = 150, double ap[] = NULL, bool useDailyAp = true);
 
         //********************************************************************
@@ -94,7 +98,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return Pressure         Pa
         //********************************************************************
-        double      GetAtmospherePressure(double Mjd_TT, double altitude, double latitude = 0, double longitude = 0,
+        double      GetAtmospherePressure(double Mjd_UT1, double altitude, double latitude = 0, double longitude = 0,
                                           double f107A = 150, double f107 = 150, double ap[] = NULL, bool useDailyAp = true);
 
         //********************************************************************
@@ -106,7 +110,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return Density         kg/m^3
         //********************************************************************
-        double      GetAtmosphereDensity(double Mjd_TT, double altitude, double latitude = 0, double longitude = 0,
+        double      GetAtmosphereDensity(double Mjd_UT1, double altitude, double latitude = 0, double longitude = 0,
                                          double f107A = 150, double f107 = 150, double ap[] = NULL, bool useDailyAp = true);
 
     protected:
@@ -168,7 +172,7 @@ namespace SpaceDSL {
         /// @Author	Niu Zhiyong
         /// @Date	2018-06-05
         /// @Input
-        /// @Param	Mjd_UTC
+        /// @Param	Mjd_UT1
         /// @Param	altitude	altitude (km)
         /// @Param	latitude	geodetic latitude (rad)
         /// @Param	longitude	geodetic longitude (rad)
@@ -190,10 +194,10 @@ namespace SpaceDSL {
         /// @Output
         /// @Return				density (kg/m^3)
         //********************************************************************
-        double	 GetNRLMSISE2000Density(double Mjd_TT, double altitude, double latitude, double longitude,
+        double	 GetNRLMSISE2000Density(double Mjd_UT1, double altitude, double latitude, double longitude,
                                         double f107A, double f107, double ap[7], bool useDailyAp);
 
-        double	 GetNRLMSISE2000Temperature(double Mjd_TT, double altitude, double latitude, double longitude,
+        double	 GetNRLMSISE2000Temperature(double Mjd_UT1, double altitude, double latitude, double longitude,
                                             double f107A, double f107, double ap[7], bool useDailyAp);
 
     protected:

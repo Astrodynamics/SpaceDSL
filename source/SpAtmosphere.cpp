@@ -66,7 +66,20 @@ namespace SpaceDSL {
 
     }
 
-    double AtmosphereModel::GetAtmosphereTemperature(double Mjd_TT, double altitude, double latitude, double longitude,
+    void AtmosphereModel::SetAtmosphereModelType(AtmosphereModel::AtmosphereModelType modelType)
+    {
+        m_AtmosphericModelType = modelType;
+    }
+
+    AtmosphereModel::AtmosphereModelType AtmosphereModel::GetAtmosphereModelType()
+    {
+        if (m_AtmosphericModelType == E_NotDefinedAtmosphereModel)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphereModel:E_NotDefinedAtmosphereModel!");
+
+        return m_AtmosphericModelType;
+    }
+
+    double AtmosphereModel::GetAtmosphereTemperature(double Mjd_UT1, double altitude, double latitude, double longitude,
                                                      double f107A, double f107, double ap[], bool useDailyAp)
     {
         switch (m_AtmosphericModelType) {
@@ -82,16 +95,17 @@ namespace SpaceDSL {
             break;
         case E_NRLMSISE00Atmosphere:
             altitude /= 1000;//m to km
-            return GetNRLMSISE2000Temperature(Mjd_TT, altitude, latitude, longitude,
+            return GetNRLMSISE2000Temperature(Mjd_UT1, altitude, latitude, longitude,
                                               f107A, f107, ap, useDailyAp);
             break;
         default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphereModel:E_NotDefinedAtmosphereModel!");
             break;
         }
         return 0;
     }
 
-    double AtmosphereModel::GetAtmospherePressure(double Mjd_TT, double altitude, double latitude, double longitude,
+    double AtmosphereModel::GetAtmospherePressure(double Mjd_UT1, double altitude, double latitude, double longitude,
                                                   double f107A, double f107, double ap[], bool useDailyAp)
     {
         switch (m_AtmosphericModelType) {
@@ -109,12 +123,13 @@ namespace SpaceDSL {
             return 0;
             break;
         default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphereModel:E_NotDefinedAtmosphereModel!");
             break;
         }
         return 0;
     }
 
-    double AtmosphereModel::GetAtmosphereDensity(double Mjd_TT, double altitude, double latitude, double longitude,
+    double AtmosphereModel::GetAtmosphereDensity(double Mjd_UT1, double altitude, double latitude, double longitude,
                                                  double f107A, double f107, double ap[], bool useDailyAp)
     {
         switch (m_AtmosphericModelType) {
@@ -130,10 +145,11 @@ namespace SpaceDSL {
             break;
         case E_NRLMSISE00Atmosphere:
             altitude /= 1000;//m to km
-            return GetNRLMSISE2000Density(Mjd_TT, altitude, latitude, longitude,
+            return GetNRLMSISE2000Density(Mjd_UT1, altitude, latitude, longitude,
                                           f107A, f107, ap, useDailyAp);
             break;
         default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphereModel:E_NotDefinedAtmosphereModel!");
             break;
         }
         return 0;
@@ -634,7 +650,7 @@ namespace SpaceDSL {
     /// @Author	Niu Zhiyong
     /// @Date	2018-06-05
     ///===================================================
-    double AtmosphereModel::GetNRLMSISE2000Density(double Mjd_TT, double altitude, double latitude, double longitude,
+    double AtmosphereModel::GetNRLMSISE2000Density(double Mjd_UT1, double altitude, double latitude, double longitude,
                                                    double f107A, double f107, double ap[], bool useDailyAp)
     {
         struct nrlmsise_output output;
@@ -671,21 +687,21 @@ namespace SpaceDSL {
         //Neglecting deviation between Mjd_TT and Mjd_UTC
         UTCCalTime time;
         UTCCalTime time0;
-        MjdToCalendarTime(Mjd_TT, time);
+        MjdToCalendarTime(Mjd_UT1, time);
         time0 = time;
         time0.SetMon(1);
         time0.SetDay(1);
         time0.SetHour(0);
         time0.SetMin(0);
         time0.SetSec(0);
-        double Mjd_TT0 = CalendarTimeToMjd(time0);
+        double Mjd_UT10 = CalendarTimeToMjd(time0);
 
         input.year  = time.Year();                                      // without effect
-        input.doy   = int(Mjd_TT - Mjd_TT0);
+        input.doy   = int(Mjd_UT1 - Mjd_UT10) + 1;
         input.sec   = time.Hour()*3600 + time.Min()*60 + time.Sec();
         input.alt   = altitude;                                         //km
-        input.g_lat = latitude;                                         //rad
-        input.g_long= longitude;                                        //rad
+        input.g_lat = latitude*RadToDeg;                                //degree
+        input.g_long= longitude*RadToDeg;                               //degree
         input.lst   = input.sec/3600 + input.g_long/15;                 //hour
         input.f107A = f107A;
         input.f107  = f107;
@@ -696,7 +712,7 @@ namespace SpaceDSL {
         return output.d[5];
     }
 
-    double AtmosphereModel::GetNRLMSISE2000Temperature(double Mjd_TT, double altitude, double latitude, double longitude,
+    double AtmosphereModel::GetNRLMSISE2000Temperature(double Mjd_UT1, double altitude, double latitude, double longitude,
                                                        double f107A, double f107, double ap[], bool useDailyAp)
     {
         struct nrlmsise_output output;
@@ -732,7 +748,7 @@ namespace SpaceDSL {
         //Neglecting deviation between Mjd_TT and Mjd_UTC
         UTCCalTime time;
         UTCCalTime time0;
-        MjdToCalendarTime(Mjd_TT, time);
+        MjdToCalendarTime(Mjd_UT1, time);
         time0 = time;
         time0.SetMon(1);
         time0.SetDay(1);
@@ -742,11 +758,11 @@ namespace SpaceDSL {
         double Mjd_TT0 = CalendarTimeToMjd(time0);
 
         input.year  = time.Year();                                      // without effect
-        input.doy   = int(Mjd_TT - Mjd_TT0);
+        input.doy   = int(Mjd_UT1 - Mjd_TT0);
         input.sec   = time.Hour()*3600 + time.Min()*60 + time.Sec();
         input.alt   = altitude;                                         //km
-        input.g_lat = latitude;                                         //rad
-        input.g_long= longitude;                                        //rad
+        input.g_lat = latitude*180/PI;                                  //degree
+        input.g_long= longitude*180/PI;                                 //degree
         input.lst   = input.sec/3600 + input.g_long/15;                 //hour
         input.f107A = f107A;
         input.f107  = f107;
