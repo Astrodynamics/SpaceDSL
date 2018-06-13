@@ -284,14 +284,14 @@ namespace SpaceDSL {
 
         // Nutation in longitude and obliquity
 
-        NutationAngles (Mjd_TT, dpsi,deps );
+        NutationAngles (Mjd_TT, dpsi, deps );
 
         // Equation of the equinoxes
 
-        return  dpsi * cos ( MeanObliquity(Mjd_TT) );
+        return  dpsi * cos( MeanObliquity(Mjd_TT) );
     }
 
-    Matrix3d PrecessMatrix(double Mjd_TT1, double Mjd_TT2)
+    Matrix3d PrecessMatrix(double Mjd_TT2, double Mjd_TT1)
     {
 
       // Constants
@@ -336,12 +336,198 @@ namespace SpaceDSL {
 
     Matrix3d GWHourAngMatrix(double Mjd_UT1)
     {
-        return  RotateZ ( GAST(Mjd_UT1) );
+        return  RotateZ( GAST(Mjd_UT1) );
     }
 
     Matrix3d PoleMatrix( double x_pole, double y_pole)
     {
         return  RotateY(-x_pole) * RotateX(-y_pole);
+    }
+
+    /*****************************************************************
+     * Class type: Geodetic Coordingot System
+     * Author: Niu ZhiYong
+     * Date:2018-06-08
+     * Description:
+     *  Defined Geodetic Coordingot System Parameter and Transformation
+    ******************************************************************/
+    GeodeticCoordSystem::GeodeticCoordSystem()
+    {
+        m_GeodeticCoordType = E_NotDefinedGeodeticType;
+    }
+
+    GeodeticCoordSystem::GeodeticCoordSystem(GeodeticCoordSystem::GeodeticCoordType type)
+    {
+        m_GeodeticCoordType = type;
+    }
+
+    GeodeticCoordSystem::~GeodeticCoordSystem()
+    {
+
+    }
+
+    void GeodeticCoordSystem::SetGeodeticCoordType(GeodeticCoordSystem::GeodeticCoordType type)
+    {
+        m_GeodeticCoordType = type;
+    }
+
+    GeodeticCoordSystem::GeodeticCoordType GeodeticCoordSystem::GetGeodeticCoordType()
+    {
+        if (m_GeodeticCoordType == E_NotDefinedGeodeticType)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
+
+        return m_GeodeticCoordType;
+    }
+
+    Matrix3d GeodeticCoordSystem::GetJ2000ToECFMtx(double Mjd_UTC2, double Mjd_UTC1)
+    {
+        double Mjd_UT1 = Mjd_UTC2 + m_IERSService.GetValue(Mjd_UTC2,"UT1-UTC")/DayToSec;
+        double x_pole = m_IERSService.GetValue(Mjd_UTC2,"x_pole")*PI/180/360;
+        double y_pole = m_IERSService.GetValue(Mjd_UTC2,"y_pole")*PI/180/360;
+        Matrix3d J2000toECFMtx = PoleMatrix(x_pole, y_pole) * GWHourAngMatrix(Mjd_UT1) *
+                GetJ2000ToTODMtx(Mjd_UTC2, Mjd_UTC1);
+
+        return J2000toECFMtx;
+    }
+
+    Matrix3d GeodeticCoordSystem::GetECFToJ2000Mtx(double Mjd_UTC2, double Mjd_UTC1)
+    {
+        return GetJ2000ToECFMtx(Mjd_UTC2, Mjd_UTC1).transpose();
+    }
+
+    Matrix3d GeodeticCoordSystem::GetJ2000ToTODMtx(double Mjd_UTC2, double Mjd_UTC1)
+    {
+        double Mjd_TT = Mjd_UTC2  + (IERSService::TT_TAI + m_IERSService.GetValue(Mjd_UTC2, "leapseconds"))/DayToSec;
+        Matrix3d J2000ToTODMtx = NutationMatrix(Mjd_TT) * PrecessMatrix(Mjd_TT, Mjd_UTC1);
+
+        return J2000ToTODMtx;
+    }
+
+    Matrix3d GeodeticCoordSystem::GetTODToJ2000Mtx(double Mjd_UTC2, double Mjd_UTC1)
+    {
+        return GetJ2000ToTODMtx(Mjd_UTC2, Mjd_UTC1).transpose();
+    }
+
+    GeodeticCoord GeodeticCoordSystem::GetGeodeticCoord (const Vector3d &pos)
+    {
+        GeodeticCoord lla;
+        double R_equ;                               // Equator radius [m]
+        double f;                                   // Flattening
+        switch (m_GeodeticCoordType)
+        {
+        case E_NotDefinedGeodeticType:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
+            break;
+        case E_WGS84System:
+            R_equ = WGS84RE;
+            f     = WGS84F;
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
+            break;
+        }
+        const double  eps     = 1.0e3*EPS;          // Convergence criterion
+        const double  epsRequ = eps*R_equ;
+        const double  e2      = f*(2.0-f);          // Square of eccentricity
+
+        const double  X = pos(0);            // Cartesian coordinates
+        const double  Y = pos(1);
+        const double  Z = pos(2);
+        const double  rho2 = X*X + Y*Y;             // Square of distance from z-axis
+
+        // Check validity of input data
+
+        if (pos.norm() == 0.0)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "invalid input in Geodetic constructor!");
+
+        }
+        else if (pos.norm() < EarthMinRadius)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "CartState is in Earth!");
+
+        }
+
+        // Iteration
+
+        double  dZ, dZ_new, SinPhi;
+        double  ZdZ, Nh, N;
+
+        dZ = e2*Z;
+        do
+        {
+            ZdZ    =  Z + dZ;
+            Nh     =  sqrt ( rho2 + ZdZ*ZdZ );
+            SinPhi =  ZdZ / Nh;                    // Sine of geodetic latitude
+            N      =  R_equ / sqrt(1.0-e2*SinPhi*SinPhi);
+            dZ_new =  N*e2*SinPhi;
+            if ( fabs(dZ-dZ_new) < epsRequ ) break;
+            dZ = dZ_new;
+        }while (true);
+
+        // Longitude, latitude, altitude
+
+        lla.SetAltitude( Nh - N);
+        lla.SetLatitude(atan2 ( ZdZ, sqrt(rho2) ));
+        lla.SetLongitude(atan2 ( Y, X ));
+
+        return lla;
+    }
+
+    Vector3d GeodeticCoordSystem::GetPosition(const GeodeticCoord &lla)
+    {
+        double R_equ;                               // Equator radius [m]
+        double f;                                   // Flattening
+        switch (m_GeodeticCoordType)
+        {
+        case E_NotDefinedGeodeticType:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
+            break;
+        case E_WGS84System:
+            R_equ = WGS84RE;
+            f     = WGS84F;
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
+            break;
+        }
+        double lat = lla.Latitude();
+        double lon = lla.Longitude();
+        double  h  = lla.Altitude();
+
+        const double  e2     = f*(2.0-f);                   // Square of eccentricity
+        const double  CosLat = cos(lat);                    // (Co)sine of geodetic latitude
+        const double  SinLat = sin(lat);
+
+        double      N;
+        Vector3d    r;
+
+
+        // Position vector
+
+        N = R_equ / sqrt(1.0-e2*SinLat*SinLat);
+
+        r(0) =  (         N+h)*CosLat*cos(lon);
+        r(1) =  (         N+h)*CosLat*sin(lon);
+        r(2) =  ((1.0-e2)*N+h)*SinLat;
+
+        return r;
+    }
+
+    GeodeticCoord GeodeticCoordSystem::GetGeodeticCoord(const Vector3d &pos, double Mjd_UTC2, double Mjd_UTC1)
+    {
+        Matrix3d J2000ToECFMtx = this->GetJ2000ToECFMtx(Mjd_UTC2, Mjd_UTC1);
+        Vector3d r_ECF = J2000ToECFMtx * pos;
+        GeodeticCoord lla = this->GetGeodeticCoord(r_ECF);
+        return lla;
+    }
+
+    Vector3d GeodeticCoordSystem::GetPosition(const GeodeticCoord &lla, double Mjd_UTC2, double Mjd_UTC1)
+    {
+        Matrix3d ECFToJ2000Mtx = this->GetJ2000ToECFMtx(Mjd_UTC2, Mjd_UTC1).transpose();
+        Vector3d r_ECF = this->GetPosition(lla);
+        Vector3d pos = ECFToJ2000Mtx * r_ECF;
+        return pos;
     }
 
 }

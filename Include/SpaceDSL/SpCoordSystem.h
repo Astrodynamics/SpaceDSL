@@ -39,6 +39,9 @@
 #define SPCOORDSYSTEM_H
 
 #include "SpaceDSL_Global.h"
+#include "SpTimeSystem.h"
+#include "SpOrbitParam.h"
+#include "SpConst.h"
 
 #include <Eigen/Core>
 
@@ -122,11 +125,11 @@ namespace SpaceDSL {
     /// @Author	Niu Zhiyong
     /// @Date	2018-03-20
     /// @Input
-    /// @Param	mjd_TT1     Epoch given (Modified Julian Date TT)
-    /// @Param  mjd_TT2     Epoch to precess to (Modified Julian Date TT)
+    /// @Param	mjd_TT2     Epoch given (Modified Julian Date TT)
+    /// @Param  mjd_TT1     Epoch to precess to (Modified Julian Date TT)
     /// @Return Precession Transformation Matrix
     /********************************************************************/
-    Matrix3d SPACEDSL_API PrecessMatrix (double Mjd_TT1, double Mjd_TT2);
+    Matrix3d SPACEDSL_API PrecessMatrix (double Mjd_TT2, double Mjd_TT1 = MJD_J2000);
 
     /********************************************************************/
     /// Transformation from Mean to True Equator and Equinox
@@ -159,6 +162,88 @@ namespace SpaceDSL {
     /********************************************************************/
     Matrix3d SPACEDSL_API PoleMatrix (double x_pole, double y_pole);
 
+    /*****************************************************************
+     * Class type: Geodetic Coordingot System
+     * Author: Niu ZhiYong
+     * Date:2018-06-08
+     * Description:
+     *  Defined Geodetic Coordingot System Parameter and Transformation
+    ******************************************************************/
+    class SPACEDSL_API GeodeticCoordSystem
+    {
+    public:
+        enum GeodeticCoordType
+        {
+            E_NotDefinedGeodeticType    = 0,
+            E_WGS84System               = 1,
+        };
 
+        GeodeticCoordSystem();
+        GeodeticCoordSystem(GeodeticCoordType type);
+        virtual ~GeodeticCoordSystem();
+    public:
+
+        void                SetGeodeticCoordType(GeodeticCoordType type);
+
+        GeodeticCoordType   GetGeodeticCoordType();
+
+    public:
+        //********************************************************************
+        /// Get the Transformation Matrix From the J2000 ICRS to ECF(Earth Centered Fixed)
+        /// @Author	Niu Zhiyong
+        /// @Date	2018-06-08
+        /// @Input
+        /// @Param	Mjd_UTC2			Julian date of UTC
+        /// @Param	Mjd_UTC1			Julian date of UTC
+        /// @Output
+        /// @Return                     the transformation matrix
+        //********************************************************************
+        Matrix3d        GetJ2000ToECFMtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+        Matrix3d        GetECFToJ2000Mtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+
+        //********************************************************************
+        /// Get the Transformation Matrix From the J2000 ICRS to  True-Of-Date Inertial System
+        /// @Author	Niu Zhiyong
+        /// @Date	2018-06-08
+        /// @Input
+        /// @Param	Mjd_UTC2			Julian date of UTC
+        /// @Param	Mjd_UTC1			Julian date of UTC
+        /// @Output
+        /// @Return                     the transformation matrix
+        //********************************************************************
+        Matrix3d        GetJ2000ToTODMtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+        Matrix3d        GetTODToJ2000Mtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+
+        //********************************************************************
+        /// Get the Geodetic Coordinate From the  ECF(Earth Centered Fixed) Position.
+        /// @Author	Niu Zhiyong
+        /// @Date	2018-06-08
+        /// @Input
+        /// @Param  pos/lla
+        /// @Output
+        /// @Return GeodeticCoord / Position(in ECF)
+        //********************************************************************
+        GeodeticCoord   GetGeodeticCoord (const Vector3d &pos);
+        Vector3d        GetPosition (const GeodeticCoord &lla);
+
+        //********************************************************************
+        /// Get the Geodetic Coordinate From the  J2000 Position.
+        /// @Author	Niu Zhiyong
+        /// @Date	2018-06-08
+        /// @Input
+        /// @Param  pos/lla
+        /// @Output
+        /// @Return GeodeticCoord / Position(in J2000)
+        //********************************************************************
+        GeodeticCoord   GetGeodeticCoord (const Vector3d &pos, double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+        Vector3d        GetPosition (const GeodeticCoord &lla, double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+
+    protected:
+
+        GeodeticCoordType           m_GeodeticCoordType;
+        IERSService                 m_IERSService;
+
+
+    };
 }
 #endif //SPCOORDSYSTEM_H
