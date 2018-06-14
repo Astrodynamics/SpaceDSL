@@ -426,11 +426,11 @@ namespace SpaceDSL {
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
             break;
         }
-        const double  eps     = 1.0e3*EPS;          // Convergence criterion
+        const double  eps     = 100*EPS;            // Convergence criterion
         const double  epsRequ = eps*R_equ;
         const double  e2      = f*(2.0-f);          // Square of eccentricity
 
-        const double  X = pos(0);            // Cartesian coordinates
+        const double  X = pos(0);                   // Cartesian coordinates
         const double  Y = pos(1);
         const double  Z = pos(2);
         const double  rho2 = X*X + Y*Y;             // Square of distance from z-axis
@@ -440,20 +440,21 @@ namespace SpaceDSL {
         if (pos.norm() == 0.0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "invalid input in Geodetic constructor!");
-
         }
         else if (pos.norm() < EarthMinRadius)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "CartState is in Earth!");
-
         }
 
         // Iteration
+        double  dZ = 0;
+        double  dZ_new = 0;
+        double  SinPhi = 0;
+        double  ZdZ = 0;
+        double  Nh = 0;
+        double  N = 0;
 
-        double  dZ, dZ_new, SinPhi;
-        double  ZdZ, Nh, N;
-
-        dZ = e2*Z;
+        dZ = e2 * Z;
         do
         {
             ZdZ    =  Z + dZ;

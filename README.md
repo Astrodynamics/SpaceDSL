@@ -1,6 +1,6 @@
 ![logo](https://github.com/Astrodynamics/SpaceDSL/blob/master/doc/logo.png)
 
-# SpaceDSL
+# SpaceDSL(Testing)
 
 **SpaceDSL** is a astrodynamics simulation library. This library is Written by C++.
 The purpose is to provide an open framework for astronaut dynamics enthusiasts, and more freely to achieve astrodynamics simulation. 
@@ -15,8 +15,8 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - Reference Coordinate System: including the transformation equations of commonly used spatial coordinate system. such as ECI, TOD, ECEF, VVLH...
 - JPL Ephemeris: Repackage the JPL ephemeris reading module, providing the latest `DE436` file, including data from `1950` to `2050`.
 - Earth Gravity Model: Using the spherical harmonic function to build the earth's high-precision gravitational model, with `EGM2008` data(80X80).
-- Other Perturbation Models: Atmospheric Drag(`USSA1976`), Solar Radiation Pressure, Third Body Gravity.
-- High Precision Orbit Prediction For Spacecraft.
+- Other Perturbation Models: Atmospheric Drag(`USSA1976`,`NRLMSISE2000`), Solar Radiation Pressure, Third Body Gravity.
+- Two Body Orbit Prediction And High Precision Orbit Prediction For Spacecraft.
 - Common Physical Constants
 - Support Multi Thread Log Output, And Exception Handling Based on STL.
 

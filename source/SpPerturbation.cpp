@@ -186,23 +186,27 @@ namespace SpaceDSL {
     {
         m_AtmosphericModelType = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel;
         m_pGeodeticSystem = NULL;
+        m_pAtmosphereModel = NULL;
     }
 
     AtmosphericDrag::AtmosphericDrag(AtmosphereModel::AtmosphereModelType modelType, GeodeticCoordSystem *pGeodeticSystem)
     {
         m_AtmosphericModelType = modelType;
         m_pGeodeticSystem = pGeodeticSystem;
+        m_pAtmosphereModel = new AtmosphereModel(modelType);
     }
 
     AtmosphericDrag::~AtmosphericDrag()
     {
-
+        if (m_pAtmosphereModel != NULL)
+            delete m_pAtmosphereModel;
     }
 
     Vector3d AtmosphericDrag::AccelAtmosphericDrag(double Mjd_UTC, double Mjd_UT1, const Vector3d& pos, const Vector3d& vel, double area, double dragCoef, double mass,
                                                    double f107A, double f107, double ap[])
     {
-        if (m_AtmosphericModelType == AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel)
+        if (m_pAtmosphereModel == NULL ||
+                m_AtmosphericModelType == AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel)
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphericDrag: m_AtmosphericModelType = E_NotDefinedAtmosphereModel!");
 
         // Earth angular velocity vector [rad/s]
@@ -229,17 +233,15 @@ namespace SpaceDSL {
         v_rel = v_TOD - omega.cross(r_TOD);
         v_abs = v_rel.norm();
 
-        // Atmospheric density due to AtmosphereModel::AtmosphereModelType
-        AtmosphereModel atmoModel(m_AtmosphericModelType);
         // Calculation lat lon and h
         GeodeticCoord lla = m_pGeodeticSystem->GetGeodeticCoord(r_ECF);
-
-        double density = atmoModel.GetAtmosphereDensity( Mjd_UT1, lla.Altitude(), lla.Latitude() , lla.Longitude(), f107A, f107, ap);
+        // Atmospheric density due to AtmosphereModel::AtmosphereModelType
+        double density = m_pAtmosphereModel->GetAtmosphereDensity( Mjd_UT1, lla.Altitude(), lla.Latitude() , lla.Longitude(), f107A, f107, ap);
 
         // Acceleration
-        a_TOD = -0.5 * dragCoef* (area/mass) * density * v_abs * v_rel;
+        a_TOD = -0.5 * dragCoef * (area/mass) * density * v_abs * v_rel;
 
-        return TODToJ2000Mtx * a_TOD;
+        return  TODToJ2000Mtx * a_TOD;
     }
 
     /*************************************************
@@ -267,8 +269,7 @@ namespace SpaceDSL {
         accel.fill(0);
 
         // Relative position vector of spacecraft w.r.t. Sun
-        JplEphemeris jpl;
-        jpl.GetJplEphemeris(Mjd_TT + MJDOffset, E_Sun, E_Earth,sunPos);
+        m_JPLEphemeris.GetJplEphemeris(Mjd_TT + MJDOffset, E_Sun, E_Earth,sunPos);
 
         // Calculate the fractional illumination of a spacecraft in the
         //  vicinity of the Earth assuming a cylindrical shadow model

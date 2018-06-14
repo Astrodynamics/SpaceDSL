@@ -129,7 +129,8 @@ namespace SpaceDSL {
     protected:
 
         AtmosphereModel::AtmosphereModelType     m_AtmosphericModelType;
-        GeodeticCoordSystem                     *m_pGeodeticSystem;
+        GeodeticCoordSystem                      *m_pGeodeticSystem;
+        AtmosphereModel                          *m_pAtmosphereModel;
 
     };
 
@@ -164,6 +165,7 @@ namespace SpaceDSL {
                                   double area, double solarCoef, double mass);
 
     protected:
+        JplEphemeris m_JPLEphemeris;
 
 
     };

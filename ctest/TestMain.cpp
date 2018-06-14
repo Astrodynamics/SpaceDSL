@@ -56,7 +56,7 @@ public:
         preConfig1.Initializer(Mjd_UTC0, E_Earth, false,
                               GravityModel::GravModelType::E_EGM08Model,20 , 20, thirdGravSign,
                                GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,
-                              AtmosphereModel::AtmosphereModelType::E_NRLMSISE00Atmosphere, 2.2, 20, 150,150,ap,2.2, 20, false, true);
+                              AtmosphereModel::AtmosphereModelType::E_NRLMSISE00Atmosphere, 2.2, 20, 150,150,ap,2.2, 20, true, true);
         preConfig2.Initializer(Mjd_UTC0,E_Earth,false,GravityModel::GravModelType::E_EGM08Model,20,20);
         preConfig_twoBody.Initializer(Mjd_UTC0,E_Earth,false);
         TwoBodyOrbitPredict twoBodyPre;
