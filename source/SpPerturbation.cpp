@@ -218,8 +218,8 @@ namespace SpaceDSL {
         Vector3d    r_TOD, v_TOD;
         Vector3d    v_rel, a_TOD;
         // Transformation matrix to ICRF/EME2000 system
-        Matrix3d    J2000ToECFMtx = m_pGeodeticSystem->GetJ2000ToECFMtx(Mjd_UTC);
-        Matrix3d    J2000ToTODMtx = m_pGeodeticSystem->GetJ2000ToTODMtx(Mjd_UTC);
+        Matrix3d    J2000ToECFMtx = GeodeticCoordSystem::GetJ2000ToECFMtx(Mjd_UTC);
+        Matrix3d    J2000ToTODMtx = GeodeticCoordSystem::GetJ2000ToTODMtx(Mjd_UTC);
         Matrix3d    TODToJ2000Mtx = J2000ToTODMtx.transpose();
 
         // Position and velocity in true-of-date system

@@ -351,6 +351,7 @@ namespace SpaceDSL {
      * Description:
      *  Defined Geodetic Coordingot System Parameter and Transformation
     ******************************************************************/
+    IERSService GeodeticCoordSystem::m_IERSService = IERSService();
     GeodeticCoordSystem::GeodeticCoordSystem()
     {
         m_GeodeticCoordType = E_NotDefinedGeodeticType;

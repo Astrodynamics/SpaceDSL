@@ -812,7 +812,7 @@ namespace SpaceDSL {
         Vector3d vel;
         vel(0) = x(3);  vel(1) = x(4);  vel(2) = x(5);
         double Mjd_UTC = Mjd_TT - m_pOrbitPredictConfig->GetTT_UTC()/DayToSec;
-        Matrix3d J2000toECFMtx = m_pOrbitPredictConfig->GetGeodeticCoordSystem()->GetJ2000ToECFMtx(Mjd_UTC);
+        Matrix3d J2000toECFMtx = GeodeticCoordSystem::GetJ2000ToECFMtx(Mjd_UTC);
 
         /// Harmonic Gravity
         acceleration += m_pGravityModel->AccelHarmonicGravity(pos, J2000toECFMtx,

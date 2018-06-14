@@ -198,8 +198,8 @@ namespace SpaceDSL {
         /// @Output
         /// @Return                     the transformation matrix
         //********************************************************************
-        Matrix3d        GetJ2000ToECFMtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
-        Matrix3d        GetECFToJ2000Mtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+        static Matrix3d     GetJ2000ToECFMtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+        static Matrix3d     GetECFToJ2000Mtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
 
         //********************************************************************
         /// Get the Transformation Matrix From the J2000 ICRS to  True-Of-Date Inertial System
@@ -211,8 +211,8 @@ namespace SpaceDSL {
         /// @Output
         /// @Return                     the transformation matrix
         //********************************************************************
-        Matrix3d        GetJ2000ToTODMtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
-        Matrix3d        GetTODToJ2000Mtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+        static  Matrix3d    GetJ2000ToTODMtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
+        static  Matrix3d    GetTODToJ2000Mtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
 
         //********************************************************************
         /// Get the Geodetic Coordinate From the  ECF(Earth Centered Fixed) Position.
@@ -238,10 +238,15 @@ namespace SpaceDSL {
         GeodeticCoord   GetGeodeticCoord (const Vector3d &pos, double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
         Vector3d        GetPosition (const GeodeticCoord &lla, double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
 
+
     protected:
 
         GeodeticCoordType           m_GeodeticCoordType;
-        IERSService                 m_IERSService;
+
+    private:
+        static  IERSService         m_IERSService;
+
+
 
 
     };
