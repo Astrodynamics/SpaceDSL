@@ -1,4 +1,4 @@
-![logo](https://github.com/Astrodynamics/SpaceDSL/blob/master/doc/logo.png)
+﻿![logo](https://github.com/Astrodynamics/SpaceDSL/blob/master/doc/logo.png)
 
 # SpaceDSL(Testing)
 
@@ -19,6 +19,7 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - Two Body Orbit Prediction And High Precision Orbit Prediction For Spacecraft.
 - Common Physical Constants
 - Support Multi Thread Log Output, And Exception Handling Based on STL.
+- Provide Nonlinear Optimization Library, Base on [NLopt](https://nlopt.readthedocs.io/en/latest/).
 
 ### Later support
 

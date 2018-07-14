@@ -2,7 +2,7 @@
 #                                                #
 # Copyright (C) 2017  Niu Zhiyong (China)        #
 # <tbnzhyxxx@163.com>                            #
-# Update:2018.03.20                                                #
+# Update:2018.03.20                              #
 #************************************************#
 cmake_minimum_required(VERSION 3.8.0)
 message(STATUS "#CMAKE_VERSION=${CMAKE_VERSION}")
@@ -13,11 +13,15 @@ project(SpaceDSL)
 # Set  C++ standard version
 set(CMAKE_CXX_STANDARD 14)
 #
+set(ALL_OUTPUT_PATH "${PROJECT_SOURCE_DIR}/Build" CACHE GLOBAL "ALL Project Output Path")
+message(STATUS "#ALL_OUTPUT_PATH=${ALL_OUTPUT_PATH}")
 # Set folder in project dir
 add_subdirectory(include)
 add_subdirectory(source)
 add_subdirectory(astrodata)
 add_subdirectory(doc)
+add_subdirectory(nlopt)
+
 # Set Data File path
 SET(AstroData_DIR ${PROJECT_SOURCE_DIR}/astrodata)
 # Set src file list
@@ -54,8 +58,8 @@ set(CMAKE_AUTOMOC ON)
 
 message(STATUS "#CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 # Set if build SHARED LIBS  or not
-option(BUILD_SHAREDLIBS "Build SHARED LIBS" FALSE)
-if (BUILD_SHAREDLIBS)
+set(BUILD_SHARED_LIBS OFF)
+if (BUILD_SHARED_LIBS)
     ADD_DEFINITIONS(-DSPACEDSL_SHARED_LIBRARY)
     # Set the build postfix extension according to what configuration is being built.
     IF (CMAKE_BUILD_TYPE MATCHES "Release")
@@ -122,13 +126,8 @@ if (BUILD_TESTS)
     add_subdirectory(ctest)
 endif()
 
-message(STATUS "#PROJECT_BINARY_DIR=${PROJECT_BINARY_DIR}")
-FILE(COPY ${AstroData_DIR} DESTINATION ${PROJECT_BINARY_DIR})
-#安装静态库和动态库
-#INSTALL(TARGETS SpaceDSL   SpaceDSLs
-#    LIBRARY DESTINATION lib
-#    ARCHIVE DESTINATION lib)
-#安装.h
-#INSTALL(FILES hello.h DESTINATION include/hello)
+FILE(COPY ${AstroData_DIR} DESTINATION ${ALL_OUTPUT_PATH})
+
+
 
 
