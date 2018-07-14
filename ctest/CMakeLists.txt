@@ -1,4 +1,4 @@
-#************************************************#
+﻿#************************************************#
 #                                                #
 #       this cmakelist build for  ctesting       #
 #                                                #
@@ -13,8 +13,9 @@ include(CPack)
 enable_testing()
 
 # Set Include h file path
-# Set Include h file path
 list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include)
+# Set Include h file path
+list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/nlopt/src/api)
 
 # Set if build With OpenSSL or not
 option(USE_OPENSSL "Build With OpenSSL." TRUE)
@@ -35,47 +36,81 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # Instruct CMake to run moc automatically when needed
 set(CMAKE_AUTOMOC ON)
 
-set(EXECUTABLE_OUTPUT_PATH  "${PROJECT_SOURCE_DIR}/Build")
+set(EXECUTABLE_OUTPUT_PATH  ${ALL_OUTPUT_PATH})
+message(STATUS "#ALL_OUTPUT_PATH=${ALL_OUTPUT_PATH}")
 
 LINK_DIRECTORIES("${PROJECT_SOURCE_DIR}/Build/")
 
 message(STATUS "#CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 # Set source file to make executable
 add_executable(UnitTest TestMain.cpp)
+add_executable(NLOptTest TestNLOpt.cpp)
 
-# Set if build SHARED LIBS  or not
-option(USE_SHAREDLIBS "USE SHARED LIBS" FALSE)
-if (USE_SHAREDLIBS)
-    ADD_DEFINITIONS(-DSPACEDSL_SHARED_LIBRARY)
+# UnitTest Set if build SHARED LIBS  or not
+if (BUILD_SHARED_LIBS)
     IF (CMAKE_BUILD_TYPE MATCHES "Release")
         SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELEASE_POSTFIX}")
-        TARGET_LINK_LIBRARIES(UnitTest SpaceDSL.lib)
+        TARGET_LINK_LIBRARIES(UnitTest SpaceDSL)
     ELSEIF (CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
         SET(CMAKE_BUILD_POSTFIX "${CMAKE_MINSIZEREL_POSTFIX}")
-       TARGET_LINK_LIBRARIES(UnitTest SpaceDSL.lib)
+       TARGET_LINK_LIBRARIES(UnitTest SpaceDSL)
     ELSEIF(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
         SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELWITHDEBINFO_POSTFIX}")
-        TARGET_LINK_LIBRARIES(UnitTest SpaceDSL.lib)
+        TARGET_LINK_LIBRARIES(UnitTest SpaceDSL)
     ELSEIF(CMAKE_BUILD_TYPE MATCHES "Debug")
         SET(CMAKE_BUILD_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
-       TARGET_LINK_LIBRARIES(UnitTest SpaceDSLd.lib)
+       TARGET_LINK_LIBRARIES(UnitTest SpaceDSLd)
     ELSE()
         SET(CMAKE_BUILD_POSTFIX "")
     ENDIF()
 else()
-    ADD_DEFINITIONS(-DSPACEDSL_STATIC_LIBRARY)
     IF (CMAKE_BUILD_TYPE MATCHES "Release")
         SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELEASE_POSTFIX}")
-        TARGET_LINK_LIBRARIES(UnitTest SpaceDSLs.lib)
+        TARGET_LINK_LIBRARIES(UnitTest SpaceDSLs)
     ELSEIF (CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
         SET(CMAKE_BUILD_POSTFIX "${CMAKE_MINSIZEREL_POSTFIX}")
-       TARGET_LINK_LIBRARIES(UnitTest SpaceDSLs.lib)
+       TARGET_LINK_LIBRARIES(UnitTest SpaceDSLs)
     ELSEIF(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
         SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELWITHDEBINFO_POSTFIX}")
-        TARGET_LINK_LIBRARIES(UnitTest SpaceDSLs.lib)
+        TARGET_LINK_LIBRARIES(UnitTest SpaceDSLs)
     ELSEIF(CMAKE_BUILD_TYPE MATCHES "Debug")
         SET(CMAKE_BUILD_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
-       TARGET_LINK_LIBRARIES(UnitTest SpaceDSLsd.lib)
+       TARGET_LINK_LIBRARIES(UnitTest SpaceDSLsd)
+    ELSE()
+        SET(CMAKE_BUILD_POSTFIX "")
+    ENDIF()
+endif()
+
+# NLOptTest Set if build SHARED LIBS  or not
+if (BUILD_SHARED_LIBS)
+    IF (CMAKE_BUILD_TYPE MATCHES "Release")
+        SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELEASE_POSTFIX}")
+        TARGET_LINK_LIBRARIES(NLOptTest NLOpt)
+    ELSEIF (CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
+        SET(CMAKE_BUILD_POSTFIX "${CMAKE_MINSIZEREL_POSTFIX}")
+       TARGET_LINK_LIBRARIES(NLOptTest NLOpt)
+    ELSEIF(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
+        SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELWITHDEBINFO_POSTFIX}")
+        TARGET_LINK_LIBRARIES(NLOptTest NLOpt)
+    ELSEIF(CMAKE_BUILD_TYPE MATCHES "Debug")
+        SET(CMAKE_BUILD_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
+       TARGET_LINK_LIBRARIES(NLOptTest NLOptd)
+    ELSE()
+        SET(CMAKE_BUILD_POSTFIX "")
+    ENDIF()
+else()
+    IF (CMAKE_BUILD_TYPE MATCHES "Release")
+        SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELEASE_POSTFIX}")
+        TARGET_LINK_LIBRARIES(NLOptTest NLOpts)
+    ELSEIF (CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
+        SET(CMAKE_BUILD_POSTFIX "${CMAKE_MINSIZEREL_POSTFIX}")
+       TARGET_LINK_LIBRARIES(NLOptTest NLOpts)
+    ELSEIF(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
+        SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELWITHDEBINFO_POSTFIX}")
+        TARGET_LINK_LIBRARIES(NLOptTest NLOpts)
+    ELSEIF(CMAKE_BUILD_TYPE MATCHES "Debug")
+        SET(CMAKE_BUILD_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
+       TARGET_LINK_LIBRARIES(NLOptTest NLOptsd)
     ELSE()
         SET(CMAKE_BUILD_POSTFIX "")
     ENDIF()
