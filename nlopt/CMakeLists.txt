@@ -135,51 +135,36 @@ INCLUDE_DIRECTORIES (
                     ${PROJECT_SOURCE_DIR}/src/algs/slsqp
                     ${PROJECT_SOURCE_DIR}/src/algs/esch
                     ${PROJECT_SOURCE_DIR}/src/api)
-  
+
 set (NLOpt_LIB NLOpt)
 
 set(LIBRARY_OUTPUT_PATH  ${ALL_OUTPUT_PATH})
 message(STATUS "#ALL_OUTPUT_PATH=${ALL_OUTPUT_PATH}")
 
-message(STATUS "#CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 # Set if build SHARED LIBS  or not
 set(BUILD_SHARED_LIBS OFF)
+
+set(CMAKE_DEBUG_POSTFIX "_d")
+
 if (BUILD_SHARED_LIBS)
     ADD_DEFINITIONS (-DNLOPT_DLL)
     ADD_DEFINITIONS (-DNLOPT_DLL_EXPORT)
-    # Set the build postfix extension according to what configuration is being built.
-    IF (CMAKE_BUILD_TYPE MATCHES "Release")
-        SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELEASE_POSTFIX}")
-        ADD_LIBRARY(${NLOpt_LIB} SHARED ${NLOPT_SOURCES})
-    ELSEIF (CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
-        SET(CMAKE_BUILD_POSTFIX "${CMAKE_MINSIZEREL_POSTFIX}")
-        ADD_LIBRARY(${NLOpt_LIB} SHARED ${NLOPT_SOURCES})
-    ELSEIF(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
-        SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELWITHDEBINFO_POSTFIX}")
-        ADD_LIBRARY(${NLOpt_LIB} SHARED ${NLOPT_SOURCES})
-    ELSEIF(CMAKE_BUILD_TYPE MATCHES "Debug")
-        SET(CMAKE_BUILD_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
-        ADD_LIBRARY(${NLOpt_LIB}d SHARED ${NLOPT_SOURCES})
-    ELSE()
-        SET(CMAKE_BUILD_POSTFIX "")
-    ENDIF()
+
+        SET(TargetName ${NLOpt_LIB})
+        ADD_LIBRARY(${TargetName} SHARED ${NLOPT_SOURCES})
 else()
     # Set the build postfix extension according to what configuration is being built.
-    IF (CMAKE_BUILD_TYPE MATCHES "Release")
-        SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELEASE_POSTFIX}")
-        ADD_LIBRARY(${NLOpt_LIB}s STATIC ${NLOPT_SOURCES})
-    ELSEIF (CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
-        SET(CMAKE_BUILD_POSTFIX "${CMAKE_MINSIZEREL_POSTFIX}")
-        ADD_LIBRARY(${NLOpt_LIB}s STATIC ${NLOPT_SOURCES})
-    ELSEIF(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
-        SET(CMAKE_BUILD_POSTFIX "${CMAKE_RELWITHDEBINFO_POSTFIX}")
-        ADD_LIBRARY(${NLOpt_LIB}s STATIC ${NLOPT_SOURCES})
-    ELSEIF(CMAKE_BUILD_TYPE MATCHES "Debug")
-        SET(CMAKE_BUILD_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
-        ADD_LIBRARY(${NLOpt_LIB}sd STATIC ${NLOPT_SOURCES})
-    ELSE()
-        SET(CMAKE_BUILD_POSTFIX "")
-    ENDIF()
+        SET(TargetName ${NLOpt_LIB}s)
+        ADD_LIBRARY(${TargetName} STATIC ${NLOPT_SOURCES})
 endif()
 
+# Make Install File
+
+INSTALL(TARGETS ${TargetName}
+                RUNTIME DESTINATION ${ALL_OUTPUT_PATH}/Install
+                LIBRARY DESTINATION ${ALL_OUTPUT_PATH}/Install
+                ARCHIVE DESTINATION ${ALL_OUTPUT_PATH}/Install
+                )
+INSTALL(FILES src/api/nlopt.h src/api/nlopt.hpp
+                DESTINATION ${ALL_OUTPUT_PATH}/Install/Include/NLOpt)
 
