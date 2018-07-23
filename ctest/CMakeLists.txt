@@ -13,8 +13,8 @@ set(CMAKE_CXX_STANDARD 14)
 #enable_testing()
 
 # Set Include h file path
-list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include)
-# Set Include h file path
+list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/SpaceDSL/Include)
+# Set Include h file patIh
 list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/nlopt/src/api)
 
 # Set if build With OpenSSL or not
@@ -49,7 +49,7 @@ add_executable(NLOptTest TestNLOpt.cpp)
 if (BUILD_SHARED_LIBS)
         TARGET_LINK_LIBRARIES(UnitTest SpaceDSL)
 else()
-        TARGET_LINK_LIBRARIES(UnitTest SpaceDSLs)
+        TARGET_LINK_LIBRARIES(UnitTest SpaceDSL_static)
 endif()
 
 # NLOptTest Set if build SHARED LIBS  or not
@@ -57,7 +57,7 @@ if (BUILD_SHARED_LIBS)
         TARGET_LINK_LIBRARIES(NLOptTest NLOpt)
 else()
 
-        TARGET_LINK_LIBRARIES(NLOptTest NLOpts)
+        TARGET_LINK_LIBRARIES(NLOptTest NLOpt_static)
 endif()
 
 if(OPENSSL_FOUND)

@@ -108,7 +108,6 @@ set (NLOPT_SOURCES
 list (APPEND NLOPT_SOURCES src/algs/stogo/global.cc src/algs/stogo/linalg.cc src/algs/stogo/local.cc src/algs/stogo/stogo.cc src/algs/stogo/tools.cc
       src/algs/stogo/global.h src/algs/stogo/linalg.h src/algs/stogo/local.h src/algs/stogo/stogo_config.h src/algs/stogo/stogo.h src/algs/stogo/tools.h)
 
-#install (FILES ${NLOPT_HEADERS} DESTINATION ${RELATIVE_INSTALL_INCLUDE_DIR})
 
 #==============================================================================
 # INCLUDE DIRECTORIES
@@ -142,20 +141,15 @@ set(LIBRARY_OUTPUT_PATH  ${ALL_OUTPUT_PATH})
 message(STATUS "#ALL_OUTPUT_PATH=${ALL_OUTPUT_PATH}")
 
 # Set if build SHARED LIBS  or not
-set(BUILD_SHARED_LIBS OFF)
-
-set(CMAKE_DEBUG_POSTFIX "_d")
-
 if (BUILD_SHARED_LIBS)
     ADD_DEFINITIONS (-DNLOPT_DLL)
     ADD_DEFINITIONS (-DNLOPT_DLL_EXPORT)
-
-        SET(TargetName ${NLOpt_LIB})
-        ADD_LIBRARY(${TargetName} SHARED ${NLOPT_SOURCES})
+    SET(TargetName ${NLOpt_LIB})
+    ADD_LIBRARY(${TargetName} SHARED ${NLOPT_SOURCES})
 else()
     # Set the build postfix extension according to what configuration is being built.
-        SET(TargetName ${NLOpt_LIB}s)
-        ADD_LIBRARY(${TargetName} STATIC ${NLOPT_SOURCES})
+    SET(TargetName ${NLOpt_LIB}_static)
+    ADD_LIBRARY(${TargetName} STATIC ${NLOPT_SOURCES})
 endif()
 
 # Make Install File

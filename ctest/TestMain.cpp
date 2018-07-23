@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 
 #include "SpaceDSL/SpaceDSL.h"
 #include <fstream>
@@ -57,8 +57,10 @@ public:
                               GravityModel::GravModelType::E_EGM08Model,20 , 20, thirdGravSign,
                                GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,
                               AtmosphereModel::AtmosphereModelType::E_NRLMSISE00Atmosphere, 2.2, 20, 150,150,ap,1.0, 20, false, true);
+
         preConfig2.Initializer(Mjd_UTC0,E_Earth,false,GravityModel::GravModelType::E_EGM08Model,20,20);
         preConfig_twoBody.Initializer(Mjd_UTC0,E_Earth,false);
+
         TwoBodyOrbitPredict twoBodyPre;
 
         Vector3d pos = cart0.Pos(), vel = cart0.Vel();
