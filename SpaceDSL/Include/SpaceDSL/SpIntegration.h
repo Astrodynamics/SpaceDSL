@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -69,7 +69,7 @@ namespace SpaceDSL {
         };
 
         RungeKutta();
-        RungeKutta(IntegMethodType type = E_RungeKutta4);
+        RungeKutta(IntegMethodType type);
         ~RungeKutta();
 
         void SetIntegMethodType(IntegMethodType type);

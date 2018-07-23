@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,7 +43,10 @@
 #if defined(SPACEDSL_SHARED_LIBRARY)
 #  define SPACEDSL_API __declspec(dllexport)
 #  define EXPIMP_TEMPLATE
-#elif defined(SPACEDSL_SHARED_LIBRARY)
+//#elif defined(SPACEDSL_SHARED_LIBRARY)
+//#  define SPACEDSL_API __declspec(dllimport)
+//#  define EXPIMP_TEMPLATE extern
+#else
 #  define SPACEDSL_API __declspec(dllimport)
 #  define EXPIMP_TEMPLATE extern
 #endif
