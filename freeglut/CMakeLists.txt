@@ -23,14 +23,6 @@ OPTION(FREEGLUT_PRINT_ERRORS "Lib prints errors to stderr" ON)
 OPTION(FREEGLUT_PRINT_WARNINGS "Lib prints warnings to stderr" ON)
 #MARK_AS_ADVANCED(FREEGLUT_PRINT_WARNINGS)
 
-# option to also copy .pdb files to install directory when executing
-# INSTALL target
-IF(MSVC)
-    OPTION(INSTALL_PDB "Also install .pdb files" ON)
-ELSE()
-    SET(INSTALL_PDB OFF)
-ENDIF()
-
 # OpenGL ES support
 OPTION(FREEGLUT_GLES "Use OpenGL ES (requires EGL)" OFF)
 
@@ -472,19 +464,6 @@ IF(FREEGLUT_BUILD_SHARED_LIBS)
             ARCHIVE DESTINATION ${ALL_OUTPUT_PATH}/Install
             INCLUDES DESTINATION include
     )
-    IF(INSTALL_PDB)
-        IF(CMAKE_GENERATOR MATCHES "^Visual Studio")
-            INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Debug/freeglut${CMAKE_DEBUG_POSTFIX}.pdb
-                DESTINATION ${ALL_OUTPUT_PATH}/Install
-                CONFIGURATIONS ${ALL_OUTPUT_PATH}/Install
-                COMPONENT Devel)
-        ELSE()
-            INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/freeglut${CMAKE_DEBUG_POSTFIX}.pdb
-                DESTINATION ${ALL_OUTPUT_PATH}/Install
-                CONFIGURATIONS ${ALL_OUTPUT_PATH}/Install
-                COMPONENT Devel)
-        ENDIF()
-    ENDIF()
 ENDIF()
 IF(FREEGLUT_BUILD_STATIC_LIBS)
     INSTALL(TARGETS freeglut_static EXPORT FreeGLUTTargets
