@@ -26,26 +26,29 @@ option(USE_OPENSSL "Build With OpenSSL." FALSE)
 # Set folder in project dir
 add_subdirectory(astrodata)
 add_subdirectory(doc)
+add_subdirectory(Dependence)
 add_subdirectory(SpaceDSL)
-add_subdirectory(nlopt)
-add_subdirectory(freeglut)
+add_subdirectory(NLopt)
+add_subdirectory(Freeglut)
+add_subdirectory(Visualizer)
 
 # Set Data File path
 SET(AstroData_DIR ${PROJECT_SOURCE_DIR}/astrodata)
-
+# Set Dependence path
+SET(Dependence_DIR ${PROJECT_SOURCE_DIR}/Dependence/Eigen)
 
 # Set if build test file or not
 option(BUILD_TESTS "Build Tests." TRUE)
 if (BUILD_TESTS)
     #enable_testing()
-    add_subdirectory(ctest)
+    add_subdirectory(Ctest)
 endif()
 
 FILE(COPY ${AstroData_DIR} DESTINATION ${ALL_OUTPUT_PATH})
 
 # Make Install File
 INSTALL(DIRECTORY ${AstroData_DIR} DESTINATION ${ALL_OUTPUT_PATH}/Install)
-
+INSTALL(DIRECTORY ${AstroData_DIR} DESTINATION ${ALL_OUTPUT_PATH}/Install/Include)
 
 
 
