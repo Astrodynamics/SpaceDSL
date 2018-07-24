@@ -25,7 +25,7 @@ aux_source_directory (${PROJECT_SOURCE_DIR}/source/ SRC_LIST)
 
 # Set Include h file path
 list(APPEND SpaceDSL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include)
-
+list(APPEND SpaceDSL_INCLUDE_DIRS ../Dependence)
 
 if (USE_OPENSSL)
     Add_Definitions(-DWITH_OPENSSL)

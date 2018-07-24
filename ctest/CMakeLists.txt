@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD 14)
 #enable_testing()
 
 # Set Include h file path
+list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/Dependence)
 list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/SpaceDSL/Include)
 # Set Include h file patIh
 list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/nlopt/src/api)
