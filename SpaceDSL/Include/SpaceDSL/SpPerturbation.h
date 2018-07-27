@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -59,7 +59,7 @@ namespace SpaceDSL {
     class SPACEDSL_API ThirdBodyGravity
     {
     public:
-        ThirdBodyGravity();
+        explicit ThirdBodyGravity();
         ThirdBodyGravity(SolarSysStarType thirdBodyStarType, SolarSysStarType centerStarType);
         virtual ~ThirdBodyGravity();
 
@@ -102,7 +102,7 @@ namespace SpaceDSL {
     {
     public:
 
-        AtmosphericDrag();
+        explicit AtmosphericDrag();
         AtmosphericDrag(AtmosphereModel::AtmosphereModelType modelType, GeodeticCoordSystem *pGeodeticSystem);
         virtual ~AtmosphericDrag();
 
@@ -144,7 +144,7 @@ namespace SpaceDSL {
     {
     public:
 
-        SolarRadPressure();
+        explicit SolarRadPressure();
         virtual ~SolarRadPressure();
 
     public:

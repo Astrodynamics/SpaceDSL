@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -60,7 +60,7 @@ namespace SpaceDSL {
     class SPACEDSL_API CartState
     {
     public:
-            CartState();
+            explicit CartState();
             CartState(const Vector3d& pos, const Vector3d& vel);
             CartState(double xPos, double yPos, double zPos, double xVel, double yVel, double zVel);
             virtual ~CartState();
@@ -107,7 +107,7 @@ namespace SpaceDSL {
     class SPACEDSL_API GeodeticCoord
     {
     public:
-            GeodeticCoord();
+            explicit GeodeticCoord();
             GeodeticCoord(double longitude, double latitude, double altitude);
             virtual ~GeodeticCoord();
 
@@ -142,7 +142,7 @@ namespace SpaceDSL {
     class SPACEDSL_API OrbitElem
     {
     public:
-            OrbitElem();
+            explicit OrbitElem();
             OrbitElem(double sMajAx, double ecc, double i, double raan, double argPeri, double trueA);
             virtual ~OrbitElem();
 
@@ -178,7 +178,7 @@ namespace SpaceDSL {
     class SPACEDSL_API ModOrbElem
     {
     public:
-            ModOrbElem();
+            explicit ModOrbElem();
             ModOrbElem(double periRad, double ecc, double i, double raan, double argPeri, double trueA);
             virtual ~ModOrbElem();
 

@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,6 +43,13 @@
 
 #include <time.h>
 #include <atomic>
+#include <mutex>
+#include <functional>
+#include <string>
+#include <condition_variable>
+#include <deque>
+#include <vector>
+#include <memory>
 
 #ifdef _WIN32
     #include <windows.h>
@@ -221,6 +228,74 @@ namespace SpaceDSL {
     /// @Return
     /**********************************************************************/
     size_t  SPACEDSL_API GetHardwareConcurrency();
+
+    /*************************************************
+     * Class type: Thread Pool Class of SpaceDSL
+     * Author: Niu ZhiYong
+     * Date:2018-05-20
+     * Description:
+    **************************************************/
+    class SPACEDSL_API SpThreadPool
+    {
+    public:
+        explicit SpThreadPool();
+        ~SpThreadPool();
+
+    public:
+        /********************************************************************/
+        /// Reserves a Thread and Uses it to run, unless This Thread will make
+        /// The Current Thread Count Exceed MaxThreadCount.
+        /// In That Case, Thread is Added to a Run Queue Instead.
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-05-20
+        /// @Input/Output
+        /// @Return     void
+        /**********************************************************************/
+        void	Start(SpThread *thread);
+
+        /********************************************************************/
+        /// Removes the Thread that are Not Yet Started from The Queue.
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-05-20
+        /// @Input/Output
+        /// @Return     void
+        /**********************************************************************/
+        void	Clear();
+
+        /********************************************************************/
+        /// Waits up to msecs milliseconds for all threads to exit and removes all threads from the thread pool.
+        /// Returns true if all threads were removed; otherwise it returns false.
+        /// If msecs is -1 (the default), the timeout is ignored (waits for the last thread to exit).
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-05-20
+        /// @Input/Output
+        /// @Return     bool
+        /**********************************************************************/
+        bool	WaitForDone(int msecs = -1);
+
+        /********************************************************************/
+        /// Set/Get The Maximum Number of Threads Used by The Thread Pool.
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-05-20
+        /// @Input/Output
+        /// @Return     void/int
+        /**********************************************************************/
+        void    SetMaxThreadCount(int maxCount);
+        int     GetMaxThreadCount() const;
+
+        /********************************************************************/
+        /// Get  the Number of Active Threads in the Thread Pool.
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-05-20
+        /// @Input/Output
+        /// @Return     int
+        /**********************************************************************/
+        int     GetActiveThreadCount() const;
+
+    private:
+
+
+    };
 
 }
 

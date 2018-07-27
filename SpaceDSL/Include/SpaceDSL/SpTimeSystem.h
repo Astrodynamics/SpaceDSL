@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -56,7 +56,7 @@ namespace SpaceDSL {
     class SPACEDSL_API CalendarTime
     {
     public:
-        CalendarTime();
+        explicit CalendarTime();
         virtual ~CalendarTime();
 
         inline int			Year() const {return m_Year;}
@@ -117,7 +117,7 @@ namespace SpaceDSL {
     class SPACEDSL_API UTCCalTime : public CalendarTime
     {
     public:
-        UTCCalTime();
+        explicit UTCCalTime();
         UTCCalTime(int year, int mon, int day, int hour, int min, double sec);
         virtual ~UTCCalTime();
 
@@ -133,7 +133,7 @@ namespace SpaceDSL {
     class SPACEDSL_API UT1CalTime : public CalendarTime
     {
     public:
-        UT1CalTime();
+        explicit UT1CalTime();
         UT1CalTime(int year, int mon, int day, int hour, int min, double sec);
         virtual ~UT1CalTime();
 
@@ -212,7 +212,7 @@ namespace SpaceDSL {
     class SPACEDSL_API IERSService
     {
     public:
-        IERSService();
+        explicit IERSService();
         virtual ~IERSService();
 
     public:

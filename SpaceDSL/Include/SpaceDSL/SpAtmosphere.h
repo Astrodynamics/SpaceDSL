@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -65,8 +65,8 @@ namespace SpaceDSL {
             E_HarrisPriesterAtmosphere      = 3,
         };
 
-        AtmosphereModel();
-        AtmosphereModel(AtmosphereModelType modelType);
+        explicit AtmosphereModel();
+        explicit AtmosphereModel(AtmosphereModelType modelType);
         virtual ~AtmosphereModel();
 
 

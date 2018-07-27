@@ -65,7 +65,7 @@ namespace SpaceDSL {
     class SPACEDSL_API NormalizeParameter
     {
     public:
-        NormalizeParameter();
+        explicit NormalizeParameter();
         virtual ~NormalizeParameter();
     public:
         static double       GetLengthPara(SolarSysStarType centerStarType);
@@ -86,7 +86,7 @@ namespace SpaceDSL {
     class SPACEDSL_API OrbitPredictConfig
     {
     public:
-        OrbitPredictConfig();
+        explicit OrbitPredictConfig();
         virtual ~OrbitPredictConfig();
         /*************************************************
          * struct type: Third Body Gravity Sign
@@ -284,8 +284,8 @@ namespace SpaceDSL {
     class OrbitPredictRightFunc : public RightFunc
     {
     public:
-        OrbitPredictRightFunc();
-        OrbitPredictRightFunc(OrbitPredictConfig *pConfig);
+        explicit OrbitPredictRightFunc();
+        explicit OrbitPredictRightFunc(OrbitPredictConfig *pConfig);
         ~OrbitPredictRightFunc();
 
         void SetOrbitPredictConfig(OrbitPredictConfig *pConfig);
@@ -315,7 +315,7 @@ namespace SpaceDSL {
     class SPACEDSL_API OrbitPredict
     {
     public:
-        OrbitPredict();
+        explicit OrbitPredict();
         virtual ~OrbitPredict();
     public:
 
@@ -354,8 +354,8 @@ namespace SpaceDSL {
     class TwoBodyOrbitRightFunc : public RightFunc
     {
     public:
-        TwoBodyOrbitRightFunc();
-        TwoBodyOrbitRightFunc(OrbitPredictConfig *pConfig);
+        explicit TwoBodyOrbitRightFunc();
+        explicit TwoBodyOrbitRightFunc(OrbitPredictConfig *pConfig);
         ~TwoBodyOrbitRightFunc();
 
         void SetOrbitPredictConfig(OrbitPredictConfig *pConfig);

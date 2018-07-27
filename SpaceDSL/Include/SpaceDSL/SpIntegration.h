@@ -68,8 +68,8 @@ namespace SpaceDSL {
             E_RungeKutta8 = 2
         };
 
-        RungeKutta();
-        RungeKutta(IntegMethodType type);
+        explicit RungeKutta();
+        explicit RungeKutta(IntegMethodType type);
         ~RungeKutta();
 
         void SetIntegMethodType(IntegMethodType type);

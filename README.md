@@ -1,6 +1,6 @@
 ﻿![logo](https://github.com/Astrodynamics/SpaceDSL/blob/master/doc/logo.png)
 
-# SpaceDSL(Testing)
+# SpaceDSL(Testing)[![Build Status](https://travis-ci.org/Astrodynamics/SpaceDSL.svg?branch=master)](https://travis-ci.org/Astrodynamics/SpaceDSL.svg?branch=master)&nbsp;
 
 **SpaceDSL** is a astrodynamics simulation library. This library is Written by C++.
 The purpose is to provide an open framework for astronaut dynamics enthusiasts, and more freely to achieve astrodynamics simulation. 

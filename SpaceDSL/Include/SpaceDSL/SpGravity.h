@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -63,8 +63,8 @@ namespace SpaceDSL {
             E_EGM08Model            = 1,
         };
 
-        GravityModel();
-        GravityModel(GravModelType modelType);
+        explicit GravityModel();
+        explicit GravityModel(GravModelType modelType);
         virtual ~GravityModel();
 
     public:

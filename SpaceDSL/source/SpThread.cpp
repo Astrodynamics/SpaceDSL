@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -303,7 +303,53 @@ namespace SpaceDSL {
 
     size_t GetHardwareConcurrency()
     {
-       return thread::hardware_concurrency();
+        return thread::hardware_concurrency();
+    }
+
+    /*************************************************
+     * Class type: Thread Pool Class of SpaceDSL
+     * Author: Niu ZhiYong
+     * Date:2018-05-20
+     * Description:
+    **************************************************/
+    SpThreadPool::SpThreadPool()
+    {
+
+    }
+
+    SpThreadPool::~SpThreadPool()
+    {
+
+    }
+
+    void SpThreadPool::Start(SpThread *thread)
+    {
+
+    }
+
+    void SpThreadPool::Clear()
+    {
+
+    }
+
+    bool SpThreadPool::WaitForDone(int msecs)
+    {
+        return true;
+    }
+
+    void SpThreadPool::SetMaxThreadCount(int maxCount)
+    {
+
+    }
+
+    int SpThreadPool::GetMaxThreadCount() const
+    {
+        return 0;
+    }
+
+    int SpThreadPool::GetActiveThreadCount() const
+    {
+        return 0;
     }
 
 }

@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,9 +38,42 @@
 #ifndef SPCZMLSCRIPT_H
 #define SPCZMLSCRIPT_H
 
+#include "SpaceDSL_Global.h"
 #include <Jsoncpp/json.hpp>
+#include <string>
+#include <fstream>
+
+using namespace std;
+using namespace nlohmann;
+/// All the functions are in the namespace SpaceDSL
+///
+namespace SpaceDSL {
 
 
+    /*************************************************
+     * Class type: The class of SpaceDSL Moderator
+     * Author: Niu ZhiYong
+     * Date:2018-07-27
+     * Description:
+    **************************************************/
+    class SPACEDSL_API CZMLScript
+    {
+    public:
+        explicit CZMLScript();
+        ~CZMLScript();
+
+    public:
+
+    private:
+        json        m_Json;
+
+
+
+
+    };
+
+
+}
 
 
 #endif //SPCZMLSCRIPT_H

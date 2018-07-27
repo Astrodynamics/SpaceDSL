@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -38,4 +38,22 @@
 #include <SpaceDSL/SpCZMLScript.h>
 
 
+namespace SpaceDSL {
 
+
+    /*************************************************
+     * Class type: The class of SpaceDSL Moderator
+     * Author: Niu ZhiYong
+     * Date:2018-07-27
+     * Description:
+    **************************************************/
+    CZMLScript::CZMLScript()
+    {
+
+    }
+
+    CZMLScript::~CZMLScript()
+    {
+
+    }
+}

@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,6 +39,7 @@
 #ifndef SPMODERATOR_H
 #define SPMODERATOR_H
 
+#include "SpaceDSL_Global.h"
 #include "SpOrbitParam.h"
 #include "SpTimeSystem.h"
 #include "SpJplEph.h"
@@ -55,4 +56,33 @@
 #include "SpConst.h"
 #include "SpUtils.h"
 
+
+/// All the functions are in the namespace SpaceDSL
+///
+namespace SpaceDSL {
+
+
+    /*************************************************
+     * Class type: The class of SpaceDSL Moderator
+     * Author: Niu ZhiYong
+     * Date:2018-07-27
+     * Description:
+    **************************************************/
+    class SPACEDSL_API Moderator
+    {
+    public:
+        static Moderator*   Instance();
+        void                Initialize();
+
+    private:
+        explicit Moderator();
+        ~Moderator();
+
+    private:
+        static Moderator    *instance;
+        bool                bIsInitialized;
+    };
+
+
+}
 #endif //SPMODERATOR_H
