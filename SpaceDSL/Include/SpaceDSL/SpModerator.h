@@ -20,33 +20,25 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2018-03-20
+* Date:2018-07-27
 * Description:
-*   SpaceDSL.h
+*   SpModerator.h
 *
 *   Purpose:
 *
-*       Including all the header files
+*        Implements operations of the GMAT executive.  
+*        It is a singleton class only one instance of this class can be created
 *
 *
 *   Last modified:
 *
-*   2018-03-20  Niu Zhiyong (1st edition)
+*   2018-07-27  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 
-#ifndef SPACEDSL_H
-#define SPACEDSL_H
+#ifndef SPMODERATOR_H
+#define SPMODERATOR_H
 
-//
-//Version declaration.
-//
-#define SpaceDSL_Version   "Version 0.0"
-#define SpaceDSL_Copyright "Copyright (C) 2018 Niu ZhiYong"
-
-//
-//Include file.
-//
 #include "SpOrbitParam.h"
 #include "SpTimeSystem.h"
 #include "SpJplEph.h"
@@ -62,7 +54,5 @@
 #include "SpMath.h"
 #include "SpConst.h"
 #include "SpUtils.h"
-#include "SpCZMLScript.h"
-#include "SpModerator.h"
 
-#endif //SPACEDSL_H
+#endif //SPMODERATOR_H

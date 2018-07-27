@@ -20,49 +20,27 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2018-03-20
+* Date:2018-07-27
 * Description:
-*   SpaceDSL.h
+*   SpCZMLScript.h
 *
 *   Purpose:
 *
-*       Including all the header files
+*        Read and Write CZML File by Jsoncpp
 *
 *
 *   Last modified:
 *
-*   2018-03-20  Niu Zhiyong (1st edition)
+*   2018-07-27  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 
-#ifndef SPACEDSL_H
-#define SPACEDSL_H
+#ifndef SPCZMLSCRIPT_H
+#define SPCZMLSCRIPT_H
 
-//
-//Version declaration.
-//
-#define SpaceDSL_Version   "Version 0.0"
-#define SpaceDSL_Copyright "Copyright (C) 2018 Niu ZhiYong"
+#include <Jsoncpp/json.hpp>
 
-//
-//Include file.
-//
-#include "SpOrbitParam.h"
-#include "SpTimeSystem.h"
-#include "SpJplEph.h"
-#include "SpCoordSystem.h"
-#include "SpGravity.h"
-#include "SpAtmosphere.h"
-#include "SpPerturbation.h"
-#include "SpInterpolation.h"
-#include "SpRightFunction.h"
-#include "SpIntegration.h"
-#include "SpOrbitPredict.h"
-#include "SpThread.h"
-#include "SpMath.h"
-#include "SpConst.h"
-#include "SpUtils.h"
-#include "SpCZMLScript.h"
-#include "SpModerator.h"
 
-#endif //SPACEDSL_H
+
+
+#endif //SPCZMLSCRIPT_H
