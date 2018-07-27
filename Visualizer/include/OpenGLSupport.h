@@ -5,6 +5,7 @@
 
 // windows specific functions
 void InitGL();
+void SetDrawingMode(int width, int height );
 bool SetPixelFormatDescriptor();
 void SetDefaultGLFont();
 void ScreenShotSave(char* ImagePath);

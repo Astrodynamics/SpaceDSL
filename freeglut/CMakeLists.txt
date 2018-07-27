@@ -16,7 +16,7 @@ set(SO_MAJOR 3)		# increment on backwards incompatible API/ABI changes
 set(SO_MINOR 10)	# increment on backwards compatible or internal changes
 set(SO_REV 0)		# if nothing else changed increment this
 
-
+message(STATUS "freeglut VERSION = ${VERSION}")
 # option for whether warnings and errors should be printed
 OPTION(FREEGLUT_PRINT_ERRORS "Lib prints errors to stderr" ON)
 #MARK_AS_ADVANCED(FREEGLUT_PRINT_ERRORS)

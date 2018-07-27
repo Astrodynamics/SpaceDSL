@@ -10,11 +10,8 @@ set(CMAKE_CXX_STANDARD 14)
 project(Visualizer)
 
 # Set src file list
-#aux_source_directory (${PROJECT_SOURCE_DIR}/source/ SRC_LIST)
-list(APPEND SRC_LIST    source/main.cpp
-                        source/GLStars.cpp
-                        source/Rendering.cpp
-                        source/OpenGLSupport.cpp)
+aux_source_directory (${PROJECT_SOURCE_DIR}/source/ SRC_LIST)
+
 # Set Include h file path
 list(APPEND VISUALIZER_INCLUDE_DIRS ../Dependence)
 list(APPEND VISUALIZER_INCLUDE_DIRS ../freeglut/include)

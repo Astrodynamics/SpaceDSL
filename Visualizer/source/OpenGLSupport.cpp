@@ -68,7 +68,42 @@ void InitGL()
 
 }
 
+void SetDrawingMode(int width, int height)
+{
+   // Set OpenGL to recognize the counter clockwise defined side of a polygon
+   // as its 'front' for lighting and culling purposes
+   glFrontFace(GL_CCW);
 
+   // Disable face culling so that backwards models (like Mir) will work
+   glDisable (GL_CULL_FACE);
+
+   // Enable OpenGL to use glColorMaterial() to get material properties
+   glEnable(GL_COLOR_MATERIAL);
+
+   // Set the front face's ambient and diffuse components
+   glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+   // Set the ambient lighting
+   GLfloat ambient[4] = {0.4f, 0.4f, 0.4f, 1.0f};
+   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
+
+   // Set viewport size
+   glViewport(0, 0, width, height);
+
+   // Set plygon drawng mode
+   /*
+   if (mDrawWireFrame)
+   {
+      glPolygonMode(GL_FRONT, GL_LINE);
+      glPolygonMode(GL_BACK, GL_LINE);
+   }
+   else
+   {
+      glPolygonMode(GL_FRONT, GL_FILL);
+      glPolygonMode(GL_BACK, GL_FILL);
+   }
+   */
+}
 //------------------------------------------------------------------------------
 // void ScreenShotSave(char* ImagePath)
 //------------------------------------------------------------------------------
