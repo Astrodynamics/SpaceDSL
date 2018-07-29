@@ -1,0 +1,12 @@
+{
+    "name": "ElectronVisualizer",
+    "version": "0.1.0",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "devDependencies": {
+        "cesium": "^1.47.0",
+        "electron": "^2.0.5"
+    }
+}
