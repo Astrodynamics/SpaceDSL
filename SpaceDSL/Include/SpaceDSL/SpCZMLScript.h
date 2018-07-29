@@ -39,6 +39,7 @@
 #define SPCZMLSCRIPT_H
 
 #include "SpaceDSL_Global.h"
+
 #include <Jsoncpp/json.hpp>
 #include <string>
 #include <fstream>
@@ -49,7 +50,7 @@ using namespace nlohmann;
 ///
 namespace SpaceDSL {
 
-
+    class Mission;
     /*************************************************
      * Class type: The class of SpaceDSL Moderator
      * Author: Niu ZhiYong
@@ -63,9 +64,19 @@ namespace SpaceDSL {
         ~CZMLScript();
 
     public:
+        /********************************************************************/
+        /// Writing CZML Content For Use With Cesium.
+        /// @Author	Niu Zhiyong
+        /// @Date	2018-07-29
+        /// @Input
+        /// @Param	filePath
+        /// @Return void
+        /********************************************************************/
+        void        WirteCZML(const string &filePath);
 
     private:
         json        m_Json;
+        Mission   	*m_pMission;
 
 
 

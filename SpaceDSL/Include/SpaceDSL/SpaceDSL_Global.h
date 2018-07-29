@@ -39,26 +39,25 @@
 
 #include <exception>
 
-
-#if defined(SPACEDSL_SHARED_LIBRARY)
-#  define SPACEDSL_API __declspec(dllexport)
-#  define EXPIMP_TEMPLATE
-//#elif defined(SPACEDSL_SHARED_LIBRARY)
-//#  define SPACEDSL_API __declspec(dllimport)
-//#  define EXPIMP_TEMPLATE extern
+#ifdef SPACEDSL_SHARED_LIBRARY
+    #define SPACEDSL_API __declspec(dllexport)
+    #define EXPIMP_TEMPLATE
 #else
-#  define SPACEDSL_API __declspec(dllimport)
-#  define EXPIMP_TEMPLATE extern
+    #define SPACEDSL_API __declspec(dllimport)
+    #define EXPIMP_TEMPLATE extern
 #endif
+
+
+
+#ifdef SPACEDSL_STATIC_LIBRARY
+    #define SPACEDSL_API
+    #define EXPIMP_TEMPLATE
+#endif
+
+namespace std {
+    EXPIMP_TEMPLATE class SPACEDSL_API exception;
+}
 
 //#pragma warning(disable: 4251)
-
-#if defined(SPACEDSL_STATIC_LIBRARY)
-#  define SPACEDSL_API
-#  define EXPIMP_TEMPLATE
-#endif
-
-EXPIMP_TEMPLATE class SPACEDSL_API std::exception;
-
 
 #endif // SPACEDSL_GLOBAL_H

@@ -31,6 +31,7 @@ add_subdirectory(SpaceDSL)
 add_subdirectory(NLopt)
 add_subdirectory(Freeglut)
 add_subdirectory(Visualizer)
+add_subdirectory(ElectronVisualizer)
 
 # Set Data File path
 SET(AstroData_DIR ${PROJECT_SOURCE_DIR}/astrodata)

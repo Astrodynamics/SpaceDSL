@@ -22,12 +22,11 @@
 * Author: Niu ZhiYong
 * Date:2018-07-27
 * Description:
-*   SpModerator.cpp
+*   SpMission.h
 *
 *   Purpose:
 *
-*        Implements operations of the GMAT executive.  
-*        It is a singleton class only one instance of this class can be created
+*           Mission Management Class
 *
 *
 *   Last modified:
@@ -36,42 +35,54 @@
 *
 *************************************************************************/
 
-#include "SpaceDSL/SpModerator.h"
+#ifndef SPMISSION_H
+#define SPMISSION_H
+
+#include "SpaceDSL_Global.h"
+#include "SpCZMLScript.h"
+#include "SpOrbitParam.h"
+#include "SpTimeSystem.h"
+#include "SpJplEph.h"
+#include "SpCoordSystem.h"
+#include "SpGravity.h"
+#include "SpAtmosphere.h"
+#include "SpPerturbation.h"
+#include "SpInterpolation.h"
+#include "SpRightFunction.h"
+#include "SpIntegration.h"
+#include "SpOrbitPredict.h"
+#include "SpThread.h"
+#include "SpMath.h"
+#include "SpConst.h"
+#include "SpUtils.h"
 
 
+/// All the functions are in the namespace SpaceDSL
+///
 namespace SpaceDSL {
 
+
     /*************************************************
-     * Class type: The class of SpaceDSL Moderator
+     * Class type: The class of SpaceDSL Mission
      * Author: Niu ZhiYong
      * Date:2018-07-27
      * Description:
     **************************************************/
-    Moderator *Moderator::instance = NULL;
-
-    Moderator::Moderator()
+    class SPACEDSL_API Mission
     {
-        bIsInitialized = false;
-    }
+    public:
+		explicit Mission();
+        ~Mission();
+		
+	public:
+        void                Initialize();
 
-    Moderator::~Moderator()
-    {
 
-    }
+    private:
+        bool                bIsInitialized;
 
-    Moderator *Moderator::Instance()
-    {
-        if (instance == NULL)
-        {
-            instance = new Moderator();
-        }
+    };
 
-        return instance;
-    }
-
-    void Moderator::Initialize()
-    {
-        bIsInitialized = true;
-    }
 
 }
+#endif //SPMISSION_H

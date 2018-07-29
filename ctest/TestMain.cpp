@@ -8,7 +8,7 @@ class MyTread : public SpThread
 {
 public:
     MyTread(){}
-    ~MyTread(){}
+    ~MyTread() override {}
 
 public:
 

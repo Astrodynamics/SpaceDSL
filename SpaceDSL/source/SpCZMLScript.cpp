@@ -36,7 +36,7 @@
 *************************************************************************/
 
 #include <SpaceDSL/SpCZMLScript.h>
-
+#include <SpaceDSL/SpMission.h>
 
 namespace SpaceDSL {
 
@@ -49,10 +49,15 @@ namespace SpaceDSL {
     **************************************************/
     CZMLScript::CZMLScript()
     {
-
+        m_pMission = NULL;
     }
 
     CZMLScript::~CZMLScript()
+    {
+
+    }
+
+    void CZMLScript::WirteCZML(const string &filePath)
     {
 
     }

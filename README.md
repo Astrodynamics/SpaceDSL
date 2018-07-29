@@ -20,7 +20,8 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - Common Physical Constants
 - Support Multi Thread Log Output, And Exception Handling Based on STL.
 - Provide Nonlinear Optimization Library, Base on [NLopt](https://nlopt.readthedocs.io/en/latest/).
-
+- Provide Visualizer, Base on [Freeglut](freeglut.sourceforge.net/).
+- Provide ElectronVisualizer, Base on [Electron](https://electronjs.org) and [Cesium](https://cesiumjs.org/).
 ### Later support
 
 - Perturbation Models: Earth Tide, Relativistic Effect .
@@ -33,6 +34,7 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 
 - [Eigen3 library](http://eigen.tuxfamily.org): a C++ template library for linear algebra.`Be careful！ The library must be recompiled when using SpaceDSL dynamic library`.
 All the files of the Eigen3.3.4 have been included in the project.
+- [JSON for Modern C++](https://github.com/nlohmann/json): a headonly JSON lib, Used the c++11 standard and Support STL.
 - [OpenSSL](https://www.openssl.org/):OpenSSL is a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
 If you want to use IERS Web Service, this library must be Precompiled.
 

@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -237,10 +237,10 @@ namespace SpaceDSL {
                 m_pFileChar(file), m_pFunctionChar(func), m_nLine(line_num), m_pReasonChar(reason) {}
     /// Member variables
     protected:
-        const char                *m_pFileChar;           /*The File where throw the Exception */
-        const char                *m_pFunctionChar;       /*The Function where throw the Exception */
-        const char                *m_pReasonChar;         /*The Reason defined by yourself */
-        int                 m_nLine;                /*The Line where throw the Exception */
+        const char                  *m_pFileChar;           /*The File where throw the Exception */
+        const char                  *m_pFunctionChar;       /*The Function where throw the Exception */
+        const char                  *m_pReasonChar;         /*The Reason defined by yourself */
+        int                         m_nLine;                /*The Line where throw the Exception */
     /// Member Methods
     public:
         /// @brief  Override the what() in <exception>

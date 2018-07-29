@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -63,6 +63,6 @@
 #include "SpConst.h"
 #include "SpUtils.h"
 #include "SpCZMLScript.h"
-#include "SpModerator.h"
+#include "SpMission.h"
 
 #endif //SPACEDSL_H
