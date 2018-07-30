@@ -29,8 +29,6 @@ add_subdirectory(doc)
 add_subdirectory(Dependence)
 add_subdirectory(SpaceDSL)
 add_subdirectory(NLopt)
-add_subdirectory(Freeglut)
-add_subdirectory(Visualizer)
 add_subdirectory(ElectronVisualizer)
 
 # Set Data File path
