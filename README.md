@@ -20,7 +20,6 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - Common Physical Constants
 - Support Multi Thread Log Output, And Exception Handling Based on STL.
 - Provide Nonlinear Optimization Library, Base on [NLopt](https://nlopt.readthedocs.io/en/latest/).
-- Provide Visualizer, Base on [Freeglut](http://freeglut.sourceforge.net/).
 - Provide ElectronVisualizer, Base on [Electron](https://electronjs.org) and [Cesium](https://cesiumjs.org/).
 ### Later support
 
