@@ -41,8 +41,9 @@
 #include "SpaceDSL_Global.h"
 
 #include <Jsoncpp/json.hpp>
-#include <string>
+
 #include <fstream>
+#include <string>
 
 using namespace std;
 using namespace nlohmann;
