@@ -50,15 +50,15 @@ namespace SpaceDSL {
      * Description:
      *  Reencapsulates C++11 STL:: thread Class
     **************************************************/
-    atomic<size_t> SpThread::OriginalThreadID = 10000;
+    atomic<size_t> SpThread::ThreadGlobalCounter(0);
 
     SpThread::SpThread()
     {
-        m_ThreadID = OriginalThreadID++;
+        m_ThreadID = (++ThreadGlobalCounter) + 10000; //start from 10001
         m_CreateTime = clock();
 
         #ifdef _WIN32
-            m_Handle = NULL;
+            m_Handle = nullptr;
             m_SuspendCount = 0;
         #else
             m_Thread_t = 0;
@@ -73,15 +73,16 @@ namespace SpaceDSL {
     SpThread::~SpThread()
     {
         #ifdef WIN32
-            if (NULL != m_Handle)
+            if (nullptr != m_Handle)
             {
                 CloseHandle(m_Handle);
             }
-            m_Handle = NULL;
+            m_Handle = nullptr;
         #else
             m_Thread_t = 0;
             pthread_attr_destroy(m_Thread_attr);
         #endif
+        --ThreadGlobalCounter;
     }
 
     void SpThread::SetPriority(SpThread::Priority priority)
@@ -206,13 +207,13 @@ namespace SpaceDSL {
     void SpThread::Start()
     {
        #ifdef WIN32
-           m_Handle = (HANDLE)_beginthreadex(NULL, 0, ThreadFunc, this, 0, NULL);
-           if (m_Handle == NULL)
+           m_Handle = (HANDLE)_beginthreadex(nullptr, 0, ThreadFunc, this, 0, nullptr);
+           if (m_Handle == nullptr)
            {
                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Start Thread Error!");
            }
        #else
-           if (pthread_create(&m_Thread_t, NULL, ThreadFunc, this) != 0)
+           if (pthread_create(&m_Thread_t, nullptr, ThreadFunc, this) != 0)
            {
                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Start Thread Error!");
            }
@@ -257,13 +258,13 @@ namespace SpaceDSL {
     {
         #ifdef _WIN32
             WaitForSingleObject(m_Handle, INFINITE);
-            if (NULL != m_Handle)
+            if (nullptr != m_Handle)
             {
                 CloseHandle(m_Handle);
             }
-            m_Handle = NULL;
+            m_Handle = nullptr;
         #else
-            pthread_join(m_Thread_t, NULL);
+            pthread_join(m_Thread_t, nullptr);
             m_Thread_t = 0;
         #endif // WIN32
     }
@@ -271,7 +272,7 @@ namespace SpaceDSL {
     bool SpThread::isRunning() const
     {
         #ifdef _WIN32
-            if (m_Handle == NULL)// Not Start is Not Running
+            if (m_Handle == nullptr)// Not Start is Not Running
                 return false;
             DWORD exitCode;
             GetExitCodeThread(m_Handle, &exitCode);
@@ -288,7 +289,7 @@ namespace SpaceDSL {
     bool SpThread::isFinished() const
     {
         #ifdef _WIN32
-            if (m_Handle == NULL)// Not Start is Finished
+            if (m_Handle == nullptr)// Not Start is Finished
                 return true;
             DWORD exitCode;
             GetExitCodeThread(m_Handle, &exitCode);
@@ -314,17 +315,40 @@ namespace SpaceDSL {
     **************************************************/
     SpThreadPool::SpThreadPool()
     {
-
+        m_bIsStarted = false;
+        m_MaxThreadCount = 0;
+        m_ActiveThreadCount = 0;
+        m_pMonitor = new MonitorThread();
+        m_pMonitor->Initializer(&m_bIsStarted, &m_ThreadPool, &m_ThreadBuffer, &m_ActiveThreadCount);
+        m_pMonitor->Start();
     }
 
     SpThreadPool::~SpThreadPool()
     {
-
+        m_ThreadPool.clear();
+        m_ThreadBuffer.clear();
+        m_pMonitor->Wait();
+        delete m_pMonitor;
     }
 
     void SpThreadPool::Start(SpThread *thread)
     {
+        if (m_MaxThreadCount <= 0)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThreadPool: m_MaxThreadCount <= 0");
 
+        if ( m_ActiveThreadCount < m_MaxThreadCount)
+        {
+            m_ThreadPool.push_back(thread);
+            ++m_ActiveThreadCount;
+            if (m_ActiveThreadCount != int(m_ThreadPool.size()))
+                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThreadPool: m_ActiveThreadCount != m_ThreadPool.size()");
+            thread->Start();
+        }
+        else
+        {
+            m_ThreadBuffer.push_back(thread);
+        }
+        m_bIsStarted = true;
     }
 
     void SpThreadPool::Clear()
@@ -334,22 +358,102 @@ namespace SpaceDSL {
 
     bool SpThreadPool::WaitForDone(int msecs)
     {
+        while (m_ActiveThreadCount > 0)
+        {
+            if (m_ActiveThreadCount == 0)
+                break;
+        }
         return true;
     }
 
     void SpThreadPool::SetMaxThreadCount(int maxCount)
     {
-
+        m_MaxThreadCount = maxCount;
     }
 
     int SpThreadPool::GetMaxThreadCount() const
     {
-        return 0;
+        return m_MaxThreadCount;
     }
 
     int SpThreadPool::GetActiveThreadCount() const
     {
-        return 0;
+        return m_ActiveThreadCount;
     }
+    /*************************************************
+     * Class type: Thread Pool Monitor Thread
+     * Author: Niu ZhiYong
+     * Date:2018-05-20
+     * Description:
+    **************************************************/
+    MonitorThread::MonitorThread()
+    {
+        m_pIsStarted = nullptr;
+        m_pActiveThreadCount = nullptr;
+        m_pThreadPool = nullptr;
+        m_pThreadBuffer = nullptr;
+        m_bIsInitialized = false;
+    }
+
+    MonitorThread::~MonitorThread()
+    {
+
+    }
+
+    void MonitorThread::Initializer(bool *pIsStarted, vector<SpThread *> *pPool,
+                                    deque<SpThread *> *pBuffer, int *pActiveThreadCount)
+    {
+        m_pIsStarted = pIsStarted;
+        m_pActiveThreadCount = pActiveThreadCount;
+        m_pThreadPool = pPool;
+        m_pThreadBuffer = pBuffer;
+        m_bIsInitialized = true;
+    }
+
+    void MonitorThread::Run()
+    {
+        if (m_bIsInitialized == false)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "MonitorThread Uninitialized!");
+        }
+
+        while ( *m_pIsStarted == false )
+        {
+            if(*m_pIsStarted == true )
+                break;
+        }
+
+        vector<SpThread *>::iterator pool_iter;
+        while ( *m_pIsStarted == true )
+        {
+            if (m_pThreadPool->size() == 0 &&
+                 m_pThreadBuffer->size() == 0)
+                break;
+
+            for(pool_iter = m_pThreadPool->begin(); pool_iter != m_pThreadPool->end();)
+            {
+                if ((*pool_iter)->isFinished())
+                {
+                    m_CheckLock.lock();
+                    pool_iter = m_pThreadPool->erase(pool_iter);
+                    if(m_pThreadBuffer->size() > 0)
+                    {
+                        m_pThreadPool->push_back(m_pThreadBuffer->front());
+                        m_pThreadBuffer->front()->Start();
+                        m_pThreadBuffer->pop_front();
+                    }
+                    else
+                        --(*m_pActiveThreadCount);
+                    m_CheckLock.unlock();
+                }
+                else
+                    ++pool_iter;
+
+            }
+        }
+
+
+    }
+
 
 }
