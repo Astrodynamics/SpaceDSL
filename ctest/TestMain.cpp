@@ -4,19 +4,19 @@
 #include <fstream>
 using namespace std;
 using namespace SpaceDSL;
-class MyTread : public SpThread
+class MyTreadFast : public SpThread
 {
 public:
-    MyTread(){}
-    ~MyTread() override {}
+    MyTreadFast(){}
+    ~MyTreadFast() override {}
 
 public:
 
     void Run() override
     {
-        ofstream fileStream,fileLLA;
-        fileStream.open("CartState.txt",ios::ate);
-        fileLLA.open("LLAState.txt",ios::ate);
+        //ofstream fileStream,fileLLA;
+        //fileStream.open("CartState.txt",ios::ate);
+        //fileLLA.open("LLAState.txt",ios::ate);
         UTCCalTime time(2018,1,4,16,58,11.1);
 
         GeodeticCoordSystem GEO(GeodeticCoordSystem::GeodeticCoordType::E_WGS84System);
@@ -41,10 +41,10 @@ public:
 
         double Mjd_UTC0 = CalendarTimeToMjd(time);
 
-        double step = 10.0;
+        double step = 60.0;
         double Mjd_UTC = Mjd_UTC0;
 
-        OrbitPredictConfig::ThirdBodyGravitySign thirdGravSign;
+        ThirdBodyGravitySign thirdGravSign;
         thirdGravSign.bIsUseSunGrav = true;
         thirdGravSign.bIsUseMoonGrav = true;
 
@@ -84,52 +84,136 @@ public:
 
         */
         OrbitPredict orbit;
-
+        cout << "Fast Thread" <<endl;
         cout << "Time (ModJDate)      x (km)         y (km)        z (km)   vx (km/sec)   vy (km/sec)   vz (km/sec)" <<endl;
         cout << "---------------    ---------       -------        -------   -----------   -----------  -----------" <<endl;
         cout.precision(15);
-        fileStream.precision(15);
-        fileLLA.precision(15);
-        fileStream<< Mjd_UTC << "  " <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 <<  "  "  <<
-                    vel(0)/1000<< "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
+        //fileStream.precision(15);
+        //fileLLA.precision(15);
+        //fileStream<< Mjd_UTC << "  " <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 <<  "  "  <<
+        //            vel(0)/1000<< "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
         cout << Mjd_UTC << "  " <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 <<  "  " <<
                 vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
         LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
-        fileLLA << Mjd_UTC <<  "  "  <<LLA.Altitude()/1000<<  "  "  <<LLA.Latitude()*RadToDeg<<  "  "  <<LLA.Longitude()*RadToDeg
-             <<  "  "  <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 <<endl;
-        for (int i = 0; i < 31*DayToSec/step; ++i)
+        //fileLLA << Mjd_UTC <<  "  "  <<LLA.Altitude()/1000<<  "  "  <<LLA.Latitude()*RadToDeg<<  "  "  <<LLA.Longitude()*RadToDeg
+        //    <<  "  "  <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 <<endl;
+        for (int i = 0; i < 0.5*DayToSec/step; ++i)
         {
             preConfig1.SetMJD_UTC(Mjd_UTC);
-            orbit.OrbitStep(preConfig1, step, RungeKutta::E_RungeKutta4, mass0, pos, vel);
+            orbit.OrbitStep(preConfig1, step, E_RungeKutta4, mass0, pos, vel);
             Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
             LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
-            fileLLA << Mjd_UTC <<  "  "  <<LLA.Altitude()/1000<<  "  "  <<LLA.Latitude()*RadToDeg<<  "  "  <<LLA.Longitude()*RadToDeg
-                 <<  "  "  <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 <<endl;
-            fileStream<< Mjd_UTC <<  "  "  <<pos(0)/1000 <<  "  "  <<pos(1)/1000 << "  "  <<pos(2)/1000 <<  "  " <<
-                        vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
+            //fileLLA << Mjd_UTC <<  "  "  <<LLA.Altitude()/1000<<  "  "  <<LLA.Latitude()*RadToDeg<<  "  "  <<LLA.Longitude()*RadToDeg
+            //     <<  "  "  <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 <<endl;
+            //fileStream<< Mjd_UTC <<  "  "  <<pos(0)/1000 <<  "  "  <<pos(1)/1000 << "  "  <<pos(2)/1000 <<  "  " <<
+            //            vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
         }
 
         cout << Mjd_UTC <<  "  "  <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 << "  "  <<
                 vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
-        fileStream.close();
-        fileLLA.close();
+        //fileStream.close();
+        //fileLLA.close();
 
     }
 };
+class MyTreadLow : public SpThread
+{
+public:
+    MyTreadLow(){}
+    ~MyTreadLow() override {}
 
+public:
+
+    void Run() override
+    {
+        //ofstream fileStream,fileLLA;
+        //fileStream.open("CartState.txt",ios::ate);
+        //fileLLA.open("LLAState.txt",ios::ate);
+        UTCCalTime time(2018,1,4,16,58,11.1);
+
+        GeodeticCoordSystem GEO(GeodeticCoordSystem::GeodeticCoordType::E_WGS84System);
+        GeodeticCoord LLA;
+
+        double mass0 = 1000.0;
+
+        /// h = 566km
+        CartState cart0(-5.27462e+06 , -3.69952e+06, -2.55861e+06,
+                       4846.34 , -3921.18, -4321.14 );
+
+        double Mjd_UTC0 = CalendarTimeToMjd(time);
+
+        double step = 10.0;
+        double Mjd_UTC = Mjd_UTC0;
+
+        ThirdBodyGravitySign thirdGravSign;
+        thirdGravSign.bIsUseSunGrav = true;
+        thirdGravSign.bIsUseMoonGrav = true;
+
+        OrbitPredictConfig preConfig1;
+        double ap[7];
+        for (int i = 0; i < 7; ++i)
+            ap[i] = 0;
+        ap[0] = 14.9186481659685;
+        preConfig1.Initializer(Mjd_UTC0, E_Earth, false,
+                              GravityModel::GravModelType::E_EGM08Model,20 , 20, thirdGravSign,
+                               GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,
+                              AtmosphereModel::AtmosphereModelType::E_NRLMSISE00Atmosphere, 2.2, 20, 150,150,ap,1.0, 20, false, true);
+
+        Vector3d pos = cart0.Pos(), vel = cart0.Vel();
+
+        OrbitPredict orbit;
+        cout << "Low Thread" <<endl;
+        cout << "Time (ModJDate)      x (km)         y (km)        z (km)   vx (km/sec)   vy (km/sec)   vz (km/sec)" <<endl;
+        cout << "---------------    ---------       -------        -------   -----------   -----------  -----------" <<endl;
+        cout.precision(15);
+        cout << Mjd_UTC << "  " <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 <<  "  " <<
+                vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
+        LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
+
+        for (int i = 0; i < 0.5*DayToSec/step; ++i)
+        {
+            preConfig1.SetMJD_UTC(Mjd_UTC);
+            orbit.OrbitStep(preConfig1, step, E_RungeKutta4, mass0, pos, vel);
+            Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
+            LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
+        }
+        cout << Mjd_UTC <<  "  "  <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 << "  "  <<
+                vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
+    }
+};
 int main(int argc, char *argv[])
 {
     cout<<"SpaceDSL Test Run!"<<endl;
     try
     {
-        MyTread t;
-        t.Start();
-        t.SetPriority(SpThread::Priority::HighestPriority);
+        MyTreadFast testThread1;
+        MyTreadLow testThread2;
+        MyTreadFast testThread3;
+        MyTreadLow testThread4;
+        MyTreadFast testThread5;
+        MyTreadLow testThread6;
+
+        testThread1.SetPriority(SpThread::Priority::HighestPriority);
+
+        SpThreadPool testPool;
+        testPool.SetMaxThreadCount(4);
+
+        testPool.Start(&testThread1);
+        testPool.Start(&testThread2);
+        testPool.Start(&testThread3);
+        testPool.Start(&testThread4);
+        testPool.Start(&testThread5);
+        testPool.Start(&testThread6);
+
+        testPool.WaitForDone();
+        /*
+        testThread.Start();
         cout<<"Before Suspend!"<<endl;
-        t.Suspend();
+        testThread.Suspend();
         cout<<"After Suspend!"<<endl;
-        t.Resume();
-        t.Wait();
+        testThread.Resume();
+        testThread.Wait();
+        */
     }
     catch (SPException &e)
     {
