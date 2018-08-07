@@ -39,28 +39,41 @@
 #define SPMISSION_H
 
 #include "SpaceDSL_Global.h"
+#include "SpSpaceVehicle.h"
+#include "SpEnvironment.h"
+#include "SpPropagator.h"
+#include "SpOptimize.h"
 #include "SpCZMLScript.h"
-#include "SpOrbitParam.h"
-#include "SpTimeSystem.h"
-#include "SpJplEph.h"
-#include "SpCoordSystem.h"
-#include "SpGravity.h"
-#include "SpAtmosphere.h"
-#include "SpPerturbation.h"
-#include "SpInterpolation.h"
-#include "SpRightFunction.h"
-#include "SpIntegration.h"
-#include "SpOrbitPredict.h"
 #include "SpThread.h"
-#include "SpMath.h"
-#include "SpConst.h"
 #include "SpUtils.h"
 
+#include <map>
+#include <vector>
 
 /// All the functions are in the namespace SpaceDSL
 ///
 namespace SpaceDSL {
 
+    /*************************************************
+     * Class type: Mission Thread Run in Mission Class
+     * Author: Niu ZhiYong
+     * Date:2018-07-27
+     * Description:
+    **************************************************/
+    class SPACEDSL_API MissionThread : public SpThread
+    {
+    public:
+        MissionThread();
+        ~MissionThread() override;
+
+    public:
+
+        void Run() override;
+
+    private:
+        int         m_SpaceVehicleID;
+
+    };
 
     /*************************************************
      * Class type: The class of SpaceDSL Mission
@@ -72,14 +85,53 @@ namespace SpaceDSL {
     {
     public:
 		explicit Mission();
-        ~Mission();
+        virtual ~Mission();
+        friend class MissionThread;
 		
 	public:
-        void                Initialize();
+        void                InsertSpaceVehicle(SpaceVehicle *pVehicle);
 
+        void                SetEnvironment(const SolarSysStarType centerStarType, const GravityModel::GravModelType gravModelType ,
+                                           const int maxDegree , const int maxOrder , const ThirdBodyGravitySign thirdBodyGravSign,
+                                           const GeodeticCoordSystem::GeodeticCoordType geodeticType ,
+                                           const AtmosphereModel::AtmosphereModelType atmModelType ,
+                                           const double f107A , const double f107, double ap[]);
+
+        void                SetPropagator(const IntegMethodType  const integMethodType, const double initialStep, const double accuracy,
+                                          const double  minStep, const double  maxStep, const double   maxStepAttempts,
+                                          const bool bStopIfAccuracyIsViolated, const bool isUseNormalize);
+
+        void                SetOptimization();
+
+        void                SetMissionSequence(double durationDay);
+
+        Environment         *GetEnvironment() const;
+
+        Propagator          *GetPropagator() const;
+
+        void                Start(bool bIsMultThread);
+
+        void                Reset();
 
     private:
-        bool                bIsInitialized;
+
+        bool                                    m_bIsEnvironmentInitialized;
+        bool                                    m_bIsPropagatorInitialized;
+        bool                                    m_bIsOptimizeInitialized;
+        bool                                    m_bIsMultThread;
+
+        int                                     m_SpaceVehicleNumber;
+        vector<SpaceVehicle *>                  m_SpaceVehicleList;
+        Environment                             *m_pEnvironment;
+        Propagator                              *m_pPropagator;
+
+        double                                  m_DurationDay;
+
+        SpThreadPool                            m_MissionThreadPool;
+
+        map<string, vector<double *> *>         m_ProcessDataMap;
+
+
 
     };
 

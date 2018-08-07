@@ -136,33 +136,32 @@ namespace SpaceDSL {
      * Description:
      *  Orbit Prediction Algorithm and Function
     **************************************************/
-    OrbitPredictConfig::ThirdBodyGravitySign
-    OrbitPredictConfig::DefaultThirdBodySign = OrbitPredictConfig::ThirdBodyGravitySign();
+    ThirdBodyGravitySign OrbitPredictConfig::DefaultThirdBodySign = ThirdBodyGravitySign();
 
     OrbitPredictConfig::OrbitPredictConfig()
     {
-        m_pGravityModel     = NULL;
-        m_pGeodeticSystem   = NULL;
-        m_pThirdBodyGrva    = NULL;
-        m_pAtmosphericDrag  = NULL;
-        m_pSolarRadPressure = NULL;
+        m_pGravityModel     = nullptr;
+        m_pGeodeticSystem   = nullptr;
+        m_pThirdBodyGrva    = nullptr;
+        m_pAtmosphericDrag  = nullptr;
+        m_pSolarRadPressure = nullptr;
     }
 
     OrbitPredictConfig::~OrbitPredictConfig()
     {
-        if (m_pGravityModel != NULL)
+        if (m_pGravityModel != nullptr)
             delete m_pGravityModel;
 
-        if (m_pGeodeticSystem != NULL)
+        if (m_pGeodeticSystem != nullptr)
             delete m_pGeodeticSystem;
 
-        if (m_pThirdBodyGrva != NULL)
+        if (m_pThirdBodyGrva != nullptr)
             delete m_pThirdBodyGrva;
 
-        if (m_pAtmosphericDrag != NULL)
+        if (m_pAtmosphericDrag != nullptr)
             delete m_pAtmosphericDrag;
 
-        if (m_pSolarRadPressure != NULL)
+        if (m_pSolarRadPressure != nullptr)
             delete m_pSolarRadPressure;
     }
 
@@ -204,6 +203,7 @@ namespace SpaceDSL {
         m_bIsUseDrag        = isUseDrag;
         m_bIsUseSRP         = isUseSRP;
         m_ThirdBodySign     = thirdBodyGravSign;
+        m_GeodeticCoordType = geodeticType;
         m_bIsUseNormalize   = isUseNormalize;
 
         //Data Cheak
@@ -270,17 +270,17 @@ namespace SpaceDSL {
             m_pSolarRadPressure = new SolarRadPressure();
         }
 
-        bIsInitialized = true;
+        m_bIsInitialized = true;
     }
 
     bool OrbitPredictConfig::IsInitialized()
     {
-        return bIsInitialized;
+        return m_bIsInitialized;
     }
 
     void OrbitPredictConfig::SetCenterStarType(SolarSysStarType type)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_CenterStarType = type;
@@ -288,7 +288,7 @@ namespace SpaceDSL {
 
     SolarSysStarType OrbitPredictConfig::GetCenterStarType() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_CenterStarType;
@@ -339,7 +339,7 @@ namespace SpaceDSL {
 
     void OrbitPredictConfig::SetMJD_UTC(double Mjd_UTC)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_MJD_UTC           = Mjd_UTC;
@@ -355,7 +355,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetMJD_UTC() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MJD_UTC;
@@ -363,7 +363,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetMJD_UT1() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MJD_UT1;
@@ -371,7 +371,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetMJD_TT() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MJD_TT;
@@ -379,7 +379,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetMJD_TAI() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MJD_TAI;
@@ -387,7 +387,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetTAI_UTC() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_TAI_UTC;
@@ -395,7 +395,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetUT1_UTC() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_UT1_UTC;
@@ -403,7 +403,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetTT_UTC() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_TT_UTC;
@@ -411,7 +411,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetX_Pole() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_X_Pole;
@@ -419,7 +419,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetY_Pole() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_Y_Pole;
@@ -427,7 +427,7 @@ namespace SpaceDSL {
 
     void OrbitPredictConfig::SetGravModelType(GravityModel::GravModelType type)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_GravModelType = type;
@@ -435,7 +435,7 @@ namespace SpaceDSL {
 
     GravityModel::GravModelType OrbitPredictConfig::GetGravModelType() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
@@ -444,7 +444,7 @@ namespace SpaceDSL {
 
     void OrbitPredictConfig::SetGravMaxDegree(int maxDegree)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_MaxDegree = maxDegree;
@@ -452,7 +452,7 @@ namespace SpaceDSL {
 
     int OrbitPredictConfig::GetGravMaxDegree() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MaxDegree;
@@ -460,7 +460,7 @@ namespace SpaceDSL {
 
     void OrbitPredictConfig::SetGravMaxOrder(int maxOrder)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_MaxOrder = maxOrder;
@@ -468,7 +468,7 @@ namespace SpaceDSL {
 
     int OrbitPredictConfig::GetGravMaxOrder() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_MaxOrder;
@@ -476,7 +476,7 @@ namespace SpaceDSL {
 
     void OrbitPredictConfig::SetAtmosphereModelType(AtmosphereModel::AtmosphereModelType type)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_AtmModelType = type;
@@ -484,7 +484,7 @@ namespace SpaceDSL {
 
     AtmosphereModel::AtmosphereModelType OrbitPredictConfig::GetAtmosphereModelType() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_AtmModelType;
@@ -492,7 +492,7 @@ namespace SpaceDSL {
 
     void OrbitPredictConfig::SetDragCoef(double coef)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_DragCoef = coef;
@@ -500,7 +500,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetDragCoef() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_DragCoef;
@@ -508,7 +508,7 @@ namespace SpaceDSL {
 
     void OrbitPredictConfig::SetDragArea(double area)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_DragArea = area;
@@ -516,7 +516,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetDragArea() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_DragArea;
@@ -529,7 +529,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetAverageF107() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_F107A;
@@ -542,7 +542,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetDailyF107() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_F107;
@@ -555,7 +555,7 @@ namespace SpaceDSL {
 
     double *OrbitPredictConfig::GetGeomagneticIndex() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_Ap;
@@ -563,7 +563,7 @@ namespace SpaceDSL {
 
     void OrbitPredictConfig::SetSRPCoef(double coef)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_SRPCoef = coef;
@@ -571,7 +571,7 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetSRPCoef() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_SRPCoef;
@@ -579,7 +579,7 @@ namespace SpaceDSL {
 
     void OrbitPredictConfig::SetSRPArea(double area)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_SRPArea = area;
@@ -587,15 +587,15 @@ namespace SpaceDSL {
 
     double OrbitPredictConfig::GetSRPArea() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_SRPArea;
     }
 
-    void OrbitPredictConfig::SetThirdBodySign(OrbitPredictConfig::ThirdBodyGravitySign sign)
+    void OrbitPredictConfig::SetThirdBodySign(ThirdBodyGravitySign sign)
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         m_ThirdBodySign = sign;
@@ -643,13 +643,27 @@ namespace SpaceDSL {
 
     }
 
-    OrbitPredictConfig::ThirdBodyGravitySign OrbitPredictConfig::GetThirdBodySign() const
+    ThirdBodyGravitySign OrbitPredictConfig::GetThirdBodySign() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
         return m_ThirdBodySign;
+    }
+
+    void OrbitPredictConfig::SetGeodeticCoordType(GeodeticCoordSystem::GeodeticCoordType geodeticType)
+    {
+        m_GeodeticCoordType = geodeticType;
+    }
+
+    GeodeticCoordSystem::GeodeticCoordType OrbitPredictConfig::GetGeodeticCoordType() const
+    {
+        if ( m_bIsInitialized == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
+
+        return m_GeodeticCoordType;
     }
 
     bool OrbitPredictConfig::IsUseThirdBodyGravity() const
@@ -673,7 +687,7 @@ namespace SpaceDSL {
 
     bool OrbitPredictConfig::IsUseSRP() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
@@ -682,7 +696,7 @@ namespace SpaceDSL {
 
     bool OrbitPredictConfig::IsUseDrag() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
@@ -691,7 +705,7 @@ namespace SpaceDSL {
 
     bool OrbitPredictConfig::IsUseNormalize() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
@@ -701,7 +715,7 @@ namespace SpaceDSL {
 
     GravityModel *OrbitPredictConfig::GetGravityModel() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_pGravityModel;
@@ -709,7 +723,7 @@ namespace SpaceDSL {
 
     GeodeticCoordSystem *OrbitPredictConfig::GetGeodeticCoordSystem() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
 
@@ -718,7 +732,7 @@ namespace SpaceDSL {
 
     ThirdBodyGravity *OrbitPredictConfig::GetThirdBodyGravity() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_pThirdBodyGrva;
@@ -726,7 +740,7 @@ namespace SpaceDSL {
 
     AtmosphericDrag *OrbitPredictConfig::GetAtmosphericDrag() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_pAtmosphericDrag;
@@ -734,7 +748,7 @@ namespace SpaceDSL {
 
     SolarRadPressure *OrbitPredictConfig::GetSolarRadPressure() const
     {
-        if ( bIsInitialized == false)
+        if ( m_bIsInitialized == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: m_OrbitPredictConfig UnInitialized! ");
         return m_pSolarRadPressure;
@@ -748,12 +762,12 @@ namespace SpaceDSL {
     **************************************************/
     OrbitPredictRightFunc::OrbitPredictRightFunc()
     {
-        m_pOrbitPredictConfig   = NULL;
-        m_pGravityModel         = NULL;
-        m_pGeodeticSystem       = NULL;
-        m_pThirdBodyGrva        = NULL;
-        m_pAtmosphericDrag      = NULL;
-        m_pSolarRadPressure     = NULL;
+        m_pOrbitPredictConfig   = nullptr;
+        m_pGravityModel         = nullptr;
+        m_pGeodeticSystem       = nullptr;
+        m_pThirdBodyGrva        = nullptr;
+        m_pAtmosphericDrag      = nullptr;
+        m_pSolarRadPressure     = nullptr;
     }
 
     OrbitPredictRightFunc::OrbitPredictRightFunc(OrbitPredictConfig *pConfig)
@@ -761,14 +775,14 @@ namespace SpaceDSL {
         m_pOrbitPredictConfig = pConfig;
 
         m_pGravityModel = m_pOrbitPredictConfig->GetGravityModel();
-        if (m_pGravityModel == NULL)
+        if (m_pGravityModel == nullptr)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredictRightFunc: GravityModel == NULL! ");
+                              "OrbitPredictRightFunc: GravityModel == nullptr! ");
 
         m_pGeodeticSystem = m_pOrbitPredictConfig->GetGeodeticCoordSystem();
-        if (m_pGeodeticSystem == NULL)
+        if (m_pGeodeticSystem == nullptr)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredictRightFunc: GeodeticSystem == NULL! ");
+                              "OrbitPredictRightFunc: GeodeticSystem == nullptr! ");
 
         m_pThirdBodyGrva = m_pOrbitPredictConfig->GetThirdBodyGravity();
 
@@ -787,14 +801,14 @@ namespace SpaceDSL {
         m_pOrbitPredictConfig = pConfig;
 
         m_pGravityModel = m_pOrbitPredictConfig->GetGravityModel();
-        if (m_pGravityModel == NULL)
+        if (m_pGravityModel == nullptr)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredictRightFunc: GravityModel == NULL! ");
+                              "OrbitPredictRightFunc: GravityModel == nullptr! ");
 
         m_pGeodeticSystem = m_pOrbitPredictConfig->GetGeodeticCoordSystem();
-        if (m_pGeodeticSystem == NULL)
+        if (m_pGeodeticSystem == nullptr)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                              "OrbitPredictRightFunc: GeodeticSystem == NULL! ");
+                              "OrbitPredictRightFunc: GeodeticSystem == nullptr! ");
 
         m_pThirdBodyGrva = m_pOrbitPredictConfig->GetThirdBodyGravity();
 
@@ -937,20 +951,20 @@ namespace SpaceDSL {
     **************************************************/
     OrbitPredict::OrbitPredict()
     {
-        m_pRightFunc = NULL;
-        m_pRungeKutta = NULL;
+        m_pRightFunc = nullptr;
+        m_pRungeKutta = nullptr;
     }
 
     OrbitPredict::~OrbitPredict()
     {
-        if (m_pRightFunc != NULL)
+        if (m_pRightFunc != nullptr)
             delete m_pRightFunc;
 
-        if (m_pRungeKutta != NULL)
+        if (m_pRungeKutta != nullptr)
             delete m_pRungeKutta;
     }
 
-    void OrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, double step, RungeKutta::IntegMethodType integType,
+    void OrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, double step, IntegMethodType integType,
                                  double &mass, Vector3d &pos, Vector3d &vel)
     {
         if (predictConfig.IsInitialized() == false)
@@ -963,12 +977,12 @@ namespace SpaceDSL {
         x(0) = pos(0);  x(1) = pos(1);  x(2) = pos(2);
         x(3) = vel(0);  x(4) = vel(1);  x(5) = vel(2);  x(6) = mass;
 
-        if (m_pRightFunc == NULL)
+        if (m_pRightFunc == nullptr)
             m_pRightFunc = new OrbitPredictRightFunc(&predictConfig);
         else
             m_pRightFunc->SetOrbitPredictConfig(&predictConfig);
 
-        if (m_pRungeKutta == NULL)
+        if (m_pRungeKutta == nullptr)
             m_pRungeKutta = new RungeKutta(integType);
         else
             m_pRungeKutta->SetIntegMethodType(integType);
@@ -992,20 +1006,20 @@ namespace SpaceDSL {
     **************************************************/
     TwoBodyOrbitPredict::TwoBodyOrbitPredict()
     {
-        m_pRightFunc = NULL;
-        m_pRungeKutta = NULL;
+        m_pRightFunc = nullptr;
+        m_pRungeKutta = nullptr;
     }
 
     TwoBodyOrbitPredict::~TwoBodyOrbitPredict()
     {
-        if (m_pRightFunc != NULL)
+        if (m_pRightFunc != nullptr)
             delete m_pRightFunc;
 
-        if (m_pRungeKutta != NULL)
+        if (m_pRungeKutta != nullptr)
             delete m_pRungeKutta;
     }
 
-    void TwoBodyOrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, double step, RungeKutta::IntegMethodType integType,
+    void TwoBodyOrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, double step, IntegMethodType integType,
                                                   double &mass, Vector3d &pos, Vector3d &vel)
     {
         if (predictConfig.IsInitialized() == false)
@@ -1028,12 +1042,12 @@ namespace SpaceDSL {
 
             x(6) = mass;
 
-            if (m_pRightFunc == NULL)
+            if (m_pRightFunc == nullptr)
                 m_pRightFunc = new TwoBodyOrbitRightFunc(&predictConfig);
             else
                 m_pRightFunc->SetOrbitPredictConfig(&predictConfig);
 
-            if (m_pRungeKutta == NULL)
+            if (m_pRungeKutta == nullptr)
                 m_pRungeKutta = new RungeKutta(integType);
             else
                 m_pRungeKutta->SetIntegMethodType(integType);
@@ -1077,7 +1091,7 @@ namespace SpaceDSL {
     **************************************************/
     TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc()
     {
-        m_pOrbitPredictConfig = NULL;
+        m_pOrbitPredictConfig = nullptr;
     }
 
     TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc(OrbitPredictConfig *pConfig)

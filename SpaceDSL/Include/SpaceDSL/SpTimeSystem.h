@@ -242,7 +242,7 @@ namespace SpaceDSL {
         ///     "EOP 14 C04 (IAU1980)","EOP 14 C04 (IAU2000)","GPS Rapid","GPS Rapid Daily",
         ///     "Bulletin A","Bulletin B","EOP C01"
         /**********************************************************************/
-        double                      GetValue(double Mjd_UTC, char *param, char *series = NULL);
+        double                      GetValue(double Mjd_UTC, char *param, char *series = nullptr);
 
     public:
         static double               TT_TAI;         // TT-TAI time difference [s]

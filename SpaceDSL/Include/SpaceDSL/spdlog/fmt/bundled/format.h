@@ -220,7 +220,7 @@ typedef __int64          intmax_t;
    FMT_MSC_VER >= 1600
 #  define FMT_NULL nullptr
 # else
-#  define FMT_NULL NULL
+#  define FMT_NULL nullptr
 # endif
 #endif
 

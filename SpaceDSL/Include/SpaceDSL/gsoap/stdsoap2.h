@@ -730,14 +730,14 @@ extern intmax_t __strtoull(const char*, char**, int);
 # if defined(WIN32) && !defined(CYGWIN)
 #  define SOAP_LOCALE_T _locale_t
 #  define SOAP_LOCALE(soap) ((soap)->c_locale ? (soap)->c_locale : ((soap)->c_locale = _create_locale(LC_ALL, "C")))
-#  define SOAP_FREELOCALE(soap) (void)((soap)->c_locale && (_free_locale((soap)->c_locale), ((soap)->c_locale = NULL)))
+#  define SOAP_FREELOCALE(soap) (void)((soap)->c_locale && (_free_locale((soap)->c_locale), ((soap)->c_locale = nullptr)))
 # else
 #  if defined(HAVE_XLOCALE_H)
 #   include <xlocale.h>
 #  endif
 #  define SOAP_LOCALE_T locale_t
-#  define SOAP_LOCALE(soap) ((soap)->c_locale ? (soap)->c_locale : ((soap)->c_locale = newlocale(LC_ALL_MASK, "C", NULL)))
-#  define SOAP_FREELOCALE(soap) (void)((soap)->c_locale && (freelocale((soap)->c_locale), ((soap)->c_locale = NULL)))
+#  define SOAP_LOCALE(soap) ((soap)->c_locale ? (soap)->c_locale : ((soap)->c_locale = newlocale(LC_ALL_MASK, "C", nullptr)))
+#  define SOAP_FREELOCALE(soap) (void)((soap)->c_locale && (freelocale((soap)->c_locale), ((soap)->c_locale = nullptr)))
 #  if defined(CYGWIN)
 #   undef HAVE_STRTOF_L /* Cygwin does not support strtof_l strtod_l */
 #   undef HAVE_STRTOD_L
@@ -1027,7 +1027,7 @@ extern "C" {
 #ifdef _AIX32_THREADS
 # define SOAP_FUNC_R_ERR (-1)
 #elif !defined(SOAP_FUNC_R_ERR)
-# define SOAP_FUNC_R_ERR (NULL)
+# define SOAP_FUNC_R_ERR (nullptr)
 #endif
 
 #ifndef SOAP_SOCKET
@@ -1544,21 +1544,21 @@ extern const char soap_base64o[], soap_base64i[];
 #elif defined(HAVE_STRLCPY)
 # define soap_strcpy(buf, len, src) (void)strlcpy((buf), (src), (len))
 #else
-# define soap_strcpy(buf, len, src) (void)((buf) == NULL || (len) <= 0 || (strncpy((buf), (src), (len) - 1), (buf)[(len) - 1] = '\0') || 1)
+# define soap_strcpy(buf, len, src) (void)((buf) == nullptr || (len) <= 0 || (strncpy((buf), (src), (len) - 1), (buf)[(len) - 1] = '\0') || 1)
 #endif
 
 /* copy string up to n chars (sets string to empty on overrun and returns nonzero, zero if OK) */
 #if _MSC_VER >= 1400
-# define soap_strncpy(buf, len, src, num) ((buf) == NULL || ((size_t)(len) > (size_t)(num) ? strncpy_s((buf), (len), (src), (num)) : ((buf)[0] = '\0', 1)))
+# define soap_strncpy(buf, len, src, num) ((buf) == nullptr || ((size_t)(len) > (size_t)(num) ? strncpy_s((buf), (len), (src), (num)) : ((buf)[0] = '\0', 1)))
 #else
-# define soap_strncpy(buf, len, src, num) ((buf) == NULL || ((size_t)(len) > (size_t)(num) ? (strncpy((buf), (src), (num)), (buf)[(size_t)(num)] = '\0') : ((buf)[0] = '\0', 1)))
+# define soap_strncpy(buf, len, src, num) ((buf) == nullptr || ((size_t)(len) > (size_t)(num) ? (strncpy((buf), (src), (num)), (buf)[(size_t)(num)] = '\0') : ((buf)[0] = '\0', 1)))
 #endif
 
 /* concat string up to n chars (truncates on overrun and returns nonzero, zero if OK) */
 #if _MSC_VER >= 1400
-# define soap_strncat(buf, len, src, num) ((buf) == NULL || ((size_t)(len) > strlen((buf)) + (size_t)(num) ? strncat_s((buf), (len), (src), (num)) : 1))
+# define soap_strncat(buf, len, src, num) ((buf) == nullptr || ((size_t)(len) > strlen((buf)) + (size_t)(num) ? strncat_s((buf), (len), (src), (num)) : 1))
 #else
-# define soap_strncat(buf, len, src, num) ((buf) == NULL || ((size_t)(len) > strlen((buf)) + (size_t)(num) ? (strncat((buf), (src), (num)), (buf)[(size_t)(len) - 1] = '\0') : 1))
+# define soap_strncat(buf, len, src, num) ((buf) == nullptr || ((size_t)(len) > strlen((buf)) + (size_t)(num) ? (strncat((buf), (src), (num)), (buf)[(size_t)(len) - 1] = '\0') : 1))
 #endif
 
 /* copy memory (returns SOAP_ERANGE on overrun, zero if OK) */
@@ -1855,7 +1855,7 @@ typedef soap_int32 soap_mode;
 #  define SOAP_PLACEMENT_NEW(soap, buf, type) new (buf) (type)
 # endif
 #elif (defined(__GNUC__) && (__GNUC__ <= 2)) || defined(__clang__) || defined(_AIX) || defined(AIX)
-/* old form w/o parenthesis, soap context may be NULL */
+/* old form w/o parenthesis, soap context may be nullptr */
 # ifndef SOAP_NEW
 #  define SOAP_NEW(soap, type) new SOAP_NOTHROW type
 # endif
@@ -1866,7 +1866,7 @@ typedef soap_int32 soap_mode;
 #  define SOAP_PLACEMENT_NEW(soap, buf, type) new (buf) type
 # endif
 #else
-/* new form with parenthesis for (type) but not type[n], soap context may be NULL */
+/* new form with parenthesis for (type) but not type[n], soap context may be nullptr */
 # ifndef SOAP_NEW
 #  define SOAP_NEW(soap, type) new SOAP_NOTHROW (type)
 # endif
@@ -1878,11 +1878,11 @@ typedef soap_int32 soap_mode;
 # endif
 #endif
 
-#ifndef SOAP_DELETE                     /* use C++ delete operator, soap context may be NULL */
+#ifndef SOAP_DELETE                     /* use C++ delete operator, soap context may be nullptr */
 # define SOAP_DELETE(soap, obj, type) delete obj
 #endif
 
-#ifndef SOAP_DELETE_ARRAY               /* use C++ delete[] operator, soap context may be NULL */
+#ifndef SOAP_DELETE_ARRAY               /* use C++ delete[] operator, soap context may be nullptr */
 # define SOAP_DELETE_ARRAY(soap, obj, type) delete[] obj
 #endif
 
@@ -1924,7 +1924,7 @@ typedef soap_int32 soap_mode;
     { FILE *fdebug = soap->fdebug[SOAP_INDEX_##DBGFILE];\
       struct timeval _tv;\
       struct tm _tm;\
-      gettimeofday(&_tv, NULL);\
+      gettimeofday(&_tv, nullptr);\
       localtime_r(&_tv.tv_sec, &_tm);\
       fprintf(fdebug, "%02d%02d%02d %02d:%02d:%02d.%06ld|", (int)_tm.tm_year%100, (int)_tm.tm_mon+1, (int)_tm.tm_mday, (int)_tm.tm_hour, (int)_tm.tm_min, (int)_tm.tm_sec, (long)_tv.tv_usec);\
       CMD;\
@@ -2115,7 +2115,7 @@ class soap_multipart_iterator
     { content = soap_next_multipart(content); return *this; }
   soap_multipart_iterator operator++(int)
     { soap_multipart_iterator iter(*this); content = soap_next_multipart(content); return iter; }
-  soap_multipart_iterator() : content(NULL)
+  soap_multipart_iterator() : content(nullptr)
     { }
   soap_multipart_iterator(struct soap_multipart *p) : content(p)
     { }
@@ -2140,7 +2140,7 @@ struct soap_dime
   soap_multipart_iterator begin()
     { soap_multipart_iterator iter(list); return iter; };
   soap_multipart_iterator end()
-    { soap_multipart_iterator iter(NULL); return iter; };
+    { soap_multipart_iterator iter(nullptr); return iter; };
 #endif
 };
 #endif
@@ -2155,7 +2155,7 @@ struct soap_mime
   soap_multipart_iterator begin()
     { soap_multipart_iterator iter(list); return iter; };
   soap_multipart_iterator end()
-    { soap_multipart_iterator iter(NULL); return iter; };
+    { soap_multipart_iterator iter(nullptr); return iter; };
 #endif
 };
 #endif
@@ -2371,7 +2371,7 @@ struct SOAP_CMAC soap_dom_attribute
   struct soap *soap;
 #ifdef __cplusplus
   typedef soap_dom_attribute_iterator iterator;
-  soap_dom_attribute(struct soap *soap = NULL);
+  soap_dom_attribute(struct soap *soap = nullptr);
   soap_dom_attribute(const soap_dom_attribute& att);
   soap_dom_attribute(struct soap *soap, const char *tag);
   soap_dom_attribute(struct soap *soap, const wchar_t *tag);
@@ -2409,12 +2409,12 @@ struct SOAP_CMAC soap_dom_attribute
   soap_dom_attribute& operator=(const std::wstring& text)       { return *soap_att_text_w(this, text.c_str()); }
 #endif
   soap_dom_attribute& operator=(const soap_dom_attribute& att)  { return *soap_att_copy(this, &att); }
-  soap_dom_attribute& att(const char *tag)                      { return *soap_att_add(this, NULL, tag); }
-  soap_dom_attribute& att(const wchar_t *tag)                   { return *soap_att_add_w(this, NULL, tag); }
+  soap_dom_attribute& att(const char *tag)                      { return *soap_att_add(this, nullptr, tag); }
+  soap_dom_attribute& att(const wchar_t *tag)                   { return *soap_att_add_w(this, nullptr, tag); }
   soap_dom_attribute& att(const char *ns, const char *tag)      { return *soap_att_add(this, ns, tag); }
   soap_dom_attribute& att(const char *ns, const wchar_t *tag)   { return *soap_att_add_w(this, ns, tag); }
-  bool match(const char *patt) const                            { return soap_att_match(this, NULL, patt) != 0; }
-  bool match(const wchar_t *patt) const                         { return soap_att_match_w(this, NULL, patt) != 0; }
+  bool match(const char *patt) const                            { return soap_att_match(this, nullptr, patt) != 0; }
+  bool match(const wchar_t *patt) const                         { return soap_att_match_w(this, nullptr, patt) != 0; }
   bool match(const char *ns, const char *patt) const            { return soap_att_match(this, ns, patt) != 0; }
   bool match(const char *ns, const wchar_t *patt) const         { return soap_att_match_w(this, ns, patt) != 0; }
   const char *ns() const                                        { return this->nstr; }
@@ -2430,9 +2430,9 @@ struct SOAP_CMAC soap_dom_attribute
   operator double() const                                       { return soap_att_get_double(this); }
   operator const char*() const                                  { return this->text; }
   soap_dom_attribute_iterator att_begin()                       { return soap_dom_attribute_iterator(this); }
-  soap_dom_attribute_iterator att_end()                         { return soap_dom_attribute_iterator(NULL); }
-  soap_dom_attribute_iterator att_find(const char *patt)        { return att_find(NULL, patt); }
-  soap_dom_attribute_iterator att_find(const wchar_t *patt)     { return att_find(NULL, patt); }
+  soap_dom_attribute_iterator att_end()                         { return soap_dom_attribute_iterator(nullptr); }
+  soap_dom_attribute_iterator att_find(const char *patt)        { return att_find(nullptr, patt); }
+  soap_dom_attribute_iterator att_find(const wchar_t *patt)     { return att_find(nullptr, patt); }
   soap_dom_attribute_iterator att_find(const char *ns, const char *patt);
   soap_dom_attribute_iterator att_find(const char *ns, const wchar_t *patt);
   void unlink();
@@ -2481,7 +2481,7 @@ struct SOAP_CMAC soap_dom_element
   struct soap *soap;
 #ifdef __cplusplus
   typedef soap_dom_element_iterator iterator;
-  soap_dom_element(struct soap *soap = NULL);
+  soap_dom_element(struct soap *soap = nullptr);
   soap_dom_element(const soap_dom_element& elt);
   soap_dom_element(struct soap *soap, const char *tag);
   soap_dom_element(struct soap *soap, const wchar_t *tag);
@@ -2537,31 +2537,31 @@ struct SOAP_CMAC soap_dom_element
   template<class T> soap_dom_element& operator=(const T& node)          { return this->set(&node, node.soap_type()); }
   template<class T> soap_dom_element& operator=(const T *node)          { return this->set(node, node->soap_type()); }
   template<class T> soap_dom_element& operator=(T *node)                { return this->set(node, node->soap_type()); }
-  soap_dom_attribute& att(const char *tag)                              { return *soap_att(this, NULL, tag); }
-  soap_dom_attribute& att(const wchar_t *tag)                           { return *soap_att_w(this, NULL, tag); }
+  soap_dom_attribute& att(const char *tag)                              { return *soap_att(this, nullptr, tag); }
+  soap_dom_attribute& att(const wchar_t *tag)                           { return *soap_att_w(this, nullptr, tag); }
   soap_dom_attribute& att(const char *ns, const char *tag)              { return *soap_att(this, ns, tag); }
   soap_dom_attribute& att(const char *ns, const wchar_t *tag)           { return *soap_att_w(this, ns, tag); }
-  soap_dom_element& elt()                                               { return *soap_elt(this, NULL, NULL); }
-  soap_dom_element& elt(const char *tag)                                { return *soap_elt(this, NULL, tag); }
-  soap_dom_element& elt(const wchar_t *tag)                             { return *soap_elt_w(this, NULL, tag); }
+  soap_dom_element& elt()                                               { return *soap_elt(this, nullptr, nullptr); }
+  soap_dom_element& elt(const char *tag)                                { return *soap_elt(this, nullptr, tag); }
+  soap_dom_element& elt(const wchar_t *tag)                             { return *soap_elt_w(this, nullptr, tag); }
   soap_dom_element& elt(const char *ns, const char *tag)                { return *soap_elt(this, ns, tag); }
   soap_dom_element& elt(const char *ns, const wchar_t *tag)             { return *soap_elt_w(this, ns, tag); }
-  soap_dom_element& operator[](const char *tag)                         { return *soap_elt(this, NULL, tag); }
-  soap_dom_element& operator[](const wchar_t *tag)                      { return *soap_elt_w(this, NULL, tag); }
+  soap_dom_element& operator[](const char *tag)                         { return *soap_elt(this, nullptr, tag); }
+  soap_dom_element& operator[](const wchar_t *tag)                      { return *soap_elt_w(this, nullptr, tag); }
   soap_dom_element& operator[](size_t n)                                { return *soap_nth(this, n); }
-  soap_dom_attribute *att_get(const char *tag) const                    { return soap_att_get(this, NULL, tag); }
-  soap_dom_attribute *att_get(const wchar_t *tag) const                 { return soap_att_get_w(this, NULL, tag); }
+  soap_dom_attribute *att_get(const char *tag) const                    { return soap_att_get(this, nullptr, tag); }
+  soap_dom_attribute *att_get(const wchar_t *tag) const                 { return soap_att_get_w(this, nullptr, tag); }
   soap_dom_attribute *att_get(const char *ns, const char *tag) const    { return soap_att_get(this, ns, tag); }
   soap_dom_attribute *att_get(const char *ns, const wchar_t *tag) const { return soap_att_get_w(this, ns, tag); }
-  soap_dom_element *elt_get() const                                     { return soap_elt_get(this, NULL, NULL); }
-  soap_dom_element *elt_get(const char *tag) const                      { return soap_elt_get(this, NULL, tag); }
-  soap_dom_element *elt_get(const wchar_t *tag) const                   { return soap_elt_get_w(this, NULL, tag); }
+  soap_dom_element *elt_get() const                                     { return soap_elt_get(this, nullptr, nullptr); }
+  soap_dom_element *elt_get(const char *tag) const                      { return soap_elt_get(this, nullptr, tag); }
+  soap_dom_element *elt_get(const wchar_t *tag) const                   { return soap_elt_get_w(this, nullptr, tag); }
   soap_dom_element *elt_get(const char *ns, const char *tag) const      { return soap_elt_get(this, ns, tag); }
   soap_dom_element *elt_get(const char *ns, const wchar_t *tag) const   { return soap_elt_get_w(this, ns, tag); }
   soap_dom_element *get_next() const                                    { return soap_elt_get_next(this); }
   soap_dom_element *get_nth(size_t n)                                   { return soap_elt_get_nth(this, n); }
-  bool match(const char *patt) const                                    { return soap_elt_match(this, NULL, patt) != 0; }
-  bool match(const wchar_t *patt) const                                 { return soap_elt_match_w(this, NULL, patt) != 0; }
+  bool match(const char *patt) const                                    { return soap_elt_match(this, nullptr, patt) != 0; }
+  bool match(const wchar_t *patt) const                                 { return soap_elt_match_w(this, nullptr, patt) != 0; }
   bool match(const char *ns, const char *patt) const                    { return soap_elt_match(this, ns, patt) != 0; }
   bool match(const char *ns, const wchar_t *patt) const                 { return soap_elt_match_w(this, ns, patt) != 0; }
   const char *ns() const                                                { return this->nstr; }
@@ -2571,13 +2571,13 @@ struct SOAP_CMAC soap_dom_element
   size_t index() const                                                  { return soap_elt_index(this); }
   size_t len() const                                                    { return soap_elt_len(this); }
   size_t nth() const                                                    { return soap_elt_nth(this); }
-  size_t elt_size()                                                     { return soap_elt_size(this, NULL, NULL); }
-  size_t elt_size(const char *patt, int type = 0)                       { return elt_size(NULL, patt, type); }
+  size_t elt_size()                                                     { return soap_elt_size(this, nullptr, nullptr); }
+  size_t elt_size(const char *patt, int type = 0)                       { return elt_size(nullptr, patt, type); }
   size_t elt_size(const char *ns, const char *patt, int type = 0)       { return soap_elt_size_type(this, ns, patt, type); }
-  size_t att_size()                                                     { return soap_att_size(this, NULL, NULL); }
-  size_t att_size(const char *patt)                                     { return att_size(NULL, patt); }
+  size_t att_size()                                                     { return soap_att_size(this, nullptr, nullptr); }
+  size_t att_size(const char *patt)                                     { return att_size(nullptr, patt); }
 #ifndef WITH_COMPAT
-  size_t att_size(const std::string& patt)                              { return att_size(NULL, patt); }
+  size_t att_size(const std::string& patt)                              { return att_size(nullptr, patt); }
 #endif
   size_t att_size(const char *ns, const char *patt)                     { return soap_att_size(this, ns, patt); }
 #ifndef WITH_COMPAT
@@ -2596,23 +2596,23 @@ struct SOAP_CMAC soap_dom_element
   operator double() const                                               { return soap_elt_get_double(this); }
   operator const char*() const                                          { return this->text; }
   soap_dom_element_iterator begin();
-  soap_dom_element_iterator end()                                       { return soap_dom_element_iterator(NULL); }
+  soap_dom_element_iterator end()                                       { return soap_dom_element_iterator(nullptr); }
   soap_dom_element_iterator elt_begin()                                 { return soap_dom_element_iterator(this->elts); }
-  soap_dom_element_iterator elt_end()                                   { return soap_dom_element_iterator(NULL); }
+  soap_dom_element_iterator elt_end()                                   { return soap_dom_element_iterator(nullptr); }
   soap_dom_attribute_iterator att_begin()                               { return soap_dom_attribute_iterator(this->atts); }
-  soap_dom_attribute_iterator att_end()                                 { return soap_dom_attribute_iterator(NULL); }
-  soap_dom_element_iterator find(const char *patt, int type = 0)        { return find(NULL, patt, type); }
-  soap_dom_element_iterator find(const wchar_t *patt, int type = 0)     { return find(NULL, patt, type); }
+  soap_dom_attribute_iterator att_end()                                 { return soap_dom_attribute_iterator(nullptr); }
+  soap_dom_element_iterator find(const char *patt, int type = 0)        { return find(nullptr, patt, type); }
+  soap_dom_element_iterator find(const wchar_t *patt, int type = 0)     { return find(nullptr, patt, type); }
   soap_dom_element_iterator find(const char *ns, const char *patt, int type = 0);
   soap_dom_element_iterator find(const char *ns, const wchar_t *patt, int type = 0);
   soap_dom_element_iterator find(int type);
-  soap_dom_element_iterator elt_find(const char *patt, int type = 0)    { return elt_find(NULL, patt, type); }
-  soap_dom_element_iterator elt_find(const wchar_t *patt, int type = 0) { return elt_find(NULL, patt, type); }
+  soap_dom_element_iterator elt_find(const char *patt, int type = 0)    { return elt_find(nullptr, patt, type); }
+  soap_dom_element_iterator elt_find(const wchar_t *patt, int type = 0) { return elt_find(nullptr, patt, type); }
   soap_dom_element_iterator elt_find(const char *ns, const char *patt, int type = 0);
   soap_dom_element_iterator elt_find(const char *ns, const wchar_t *patt, int type = 0);
   soap_dom_element_iterator elt_find(int type);
-  soap_dom_attribute_iterator att_find(const char *patt)                { return att_find(NULL, patt); }
-  soap_dom_attribute_iterator att_find(const wchar_t *patt)             { return att_find(NULL, patt); }
+  soap_dom_attribute_iterator att_find(const char *patt)                { return att_find(nullptr, patt); }
+  soap_dom_attribute_iterator att_find(const wchar_t *patt)             { return att_find(nullptr, patt); }
   soap_dom_attribute_iterator att_find(const char *ns, const char *patt);
   soap_dom_attribute_iterator att_find(const char *ns, const wchar_t *patt);
   void unlink();
@@ -2880,7 +2880,7 @@ struct SOAP_CMAC soap
   char* ipv4_multicast_if; /* IP_MULTICAST_IF IPv4 setsockopt interface_addr */
   unsigned char ipv4_multicast_ttl; /* IP_MULTICAST_TTL value 0..255 */
   int client_port; /* when nonnegative, client binds to this port before connect */
-  const char *client_interface; /* when non-NULL, use this client address */
+  const char *client_interface; /* when non-nullptr, use this client address */
   union
   { struct sockaddr addr;
     struct sockaddr_in in;
@@ -3033,7 +3033,7 @@ soap_wchar soap_get1(struct soap*);
 #define soap_revget1(soap) ((soap)->bufidx--)
 #define soap_unget(soap, c) ((soap)->ahead = c)
 #define soap_peek(soap) ((soap)->ahead = soap_get(soap))
-#define soap_register_plugin(soap, plugin) soap_register_plugin_arg(soap, plugin, NULL)
+#define soap_register_plugin(soap, plugin) soap_register_plugin_arg(soap, plugin, nullptr)
 #define soap_mode(soap, n) ((soap)->mode = (soap)->imode = (soap)->omode = (n))
 #define soap_imode(soap, n) ((soap)->imode = (n))
 #define soap_omode(soap, n) ((soap)->omode = (n))
@@ -3043,7 +3043,7 @@ soap_wchar soap_get1(struct soap*);
 #define soap_clr_omode(soap, n) ((soap)->omode &= ~(n))
 #define soap_set_mode(soap, n) ((soap)->mode |= (n), (soap)->imode |= (n), (soap)->omode |= (n))
 #define soap_clr_mode(soap, n) ((soap)->mode &= ~(n), (soap)->imode &= ~(n), (soap)->omode &= ~(n))
-#define soap_destroy(soap) soap_delete((soap), NULL)
+#define soap_destroy(soap) soap_delete((soap), nullptr)
 
 #define SOAP_NO_LINK_TO_DELETE (-2) /* pass to soap_link() as size n: do not manage, smart pointers are self-managing */
 
@@ -3595,7 +3595,7 @@ struct soap_block
   { if (!b)
       b = soap->blist;
     if (!b)
-      return NULL;
+      return nullptr;
     T *p = (T*)soap_push_block_max(soap, b, sizeof(T));
     if (p)
       SOAP_PLACEMENT_NEW(soap, p, T);

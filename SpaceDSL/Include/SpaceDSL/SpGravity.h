@@ -99,7 +99,26 @@ namespace SpaceDSL {
         MatrixXd        m_MatrixCS;
 
     };
-
+    /*************************************************
+     * struct type: Third Body Gravity Sign
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+    **************************************************/
+    struct SPACEDSL_API ThirdBodyGravitySign
+    {
+        bool                bIsUseMercuryGrav = false;
+        bool                bIsUseVenusGrav   = false;
+        bool                bIsUseEarthGrav   = false;
+        bool                bIsUseMarsGrav    = false;
+        bool                bIsUseJupiterGrav = false;
+        bool                bIsUseSaturnGrav  = false;
+        bool                bIsUseUranusGrav  = false;
+        bool                bIsUseNeptuneGrav = false;
+        bool                bIsUsePlutoGrav   = false;
+        bool                bIsUseMoonGrav    = false;
+        bool                bIsUseSunGrav     = false;
+    };
 
 }
 #endif //SPGRAVITY_H

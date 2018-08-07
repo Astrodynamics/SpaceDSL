@@ -687,11 +687,11 @@ int DLL_FUNC jpl_init_error_code( void)
  **          ephemeris (on the Willmann-Bell CDs,  this is UNIX.200, 405,   **
  **          or 406)                                                        **
  **      char nam[][6] = array of constant names (max 6 characters each)    **
- **          You can pass nam=NULL if you don't care about the names        **
+ **          You can pass nam=nullptr if you don't care about the names        **
  **      double *val = array of values of constants                         **
- **          You can pass val=NULL if you don't care about the constants    **
+ **          You can pass val=nullptr if you don't care about the constants    **
  **      Return value is a pointer to the jpl_eph_data structure            **
- **      NULL is returned if the file isn't opened or memory isn't alloced  **
+ **      nullptr is returned if the file isn't opened or memory isn't alloced  **
  **      Errors can be determined with the above jpl_init_error_code( )     **
  ****************************************************************************/
 
@@ -726,7 +726,7 @@ void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
     {
         if( ifile)
             fclose( ifile);
-        return( NULL);
+        return( nullptr);
     }
 
     de_version = atoi( title + 26);
@@ -797,7 +797,7 @@ void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
     if( init_err_code)
     {
         fclose( ifile);
-        return( NULL);
+        return( nullptr);
     }
 
     /* Once upon a time,  the kernel size was determined from the */
@@ -826,7 +826,7 @@ void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
     {
         init_err_code = JPL_INIT_MEMORY_FAILURE;
         fclose( ifile);
-        return( NULL);
+        return( nullptr);
     }
     memcpy( rval, &temp_data, sizeof( struct jpl_eph_data));
     rval->iinfo.posn_coeff[0] = 1.0;

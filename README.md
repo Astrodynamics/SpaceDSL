@@ -18,6 +18,7 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - Other Perturbation Models: Atmospheric Drag(`USSA1976`,`NRLMSISE2000`), Solar Radiation Pressure, Third Body Gravity.
 - Two Body Orbit Prediction And High Precision Orbit Prediction For Spacecraft.
 - Common Physical Constants
+- Multi Thread Parallel Support: Similar to Qt API, including Thread and Thread Pool.
 - Support Multi Thread Log Output, And Exception Handling Based on STL.
 - Provide Nonlinear Optimization Library, Base on [NLopt](https://nlopt.readthedocs.io/en/latest/).
 - Provide ElectronVisualizer, Base on [Electron](https://electronjs.org) and [Cesium](https://cesiumjs.org/).

@@ -51,6 +51,12 @@ using namespace Eigen;
 ///
 namespace SpaceDSL {
 
+    enum SPACEDSL_API IntegMethodType
+    {
+        E_NotDefindIntegMethodType = 0,
+        E_RungeKutta4 = 1,
+        E_RungeKutta8 = 2
+    };
 	/*************************************************
      * Class type: The class of the N th-order Runge-Kutta method
      * Author: Niu ZhiYong
@@ -61,13 +67,6 @@ namespace SpaceDSL {
 	class SPACEDSL_API RungeKutta
 	{
 	public:
-        enum IntegMethodType
-        {
-            E_NotDefindIntegMethodType = 0,
-            E_RungeKutta4 = 1,
-            E_RungeKutta8 = 2
-        };
-
         explicit RungeKutta();
         explicit RungeKutta(IntegMethodType type);
         ~RungeKutta();

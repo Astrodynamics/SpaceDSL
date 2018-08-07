@@ -43,6 +43,7 @@
 #include "SpTimeSystem.h"
 
 #include <string>
+#include <atomic>
 
 using namespace std;
 /// All the functions are in the namespace SpaceDSL
@@ -58,42 +59,82 @@ namespace SpaceDSL {
     class SPACEDSL_API SpaceVehicle
 	{
 	public:
-		SpaceVehicle();
+        explicit SpaceVehicle();
+        SpaceVehicle(const string &name, const CalendarTime& initialEpoch,
+                     const CartState& initialState, const double initialMass,
+                     const double dragCoef, const double dragArea,
+                     const double SRPCoef, const double SRPArea);
 		virtual ~SpaceVehicle();
 		
 	public:
         inline void		SetName (const string &name)                    { m_Name = name; }
 
         inline void		SetInitialCartState (const CartState& state)    { m_InitialCartState = state; }
+
         inline void		SetInitialEpoch (const CalendarTime& time)      { m_InitialEpoch = time; }
-        inline void		SetInitialMass (double mass)                    { m_InitialMass = mass; }
+
+        inline void		SetInitialMass (const double mass)                    { m_InitialMass = mass; }
 
         inline void		SetCartState (const CartState& state)           { m_CartState = state; }
-        inline void		SetTime (const CalendarTime& time)              { m_Epoch = time; }
-        inline void		SetMass (double mass)                           { m_Mass = mass; }
 
+        inline void		SetTime (const CalendarTime& time)              { m_Epoch = time; }
+
+        inline void		SetMass (const double mass)                           { m_Mass = mass; }
+
+        inline void     SetDragCoef(const double dragCoef)                    { m_DragCoef = dragCoef; }
+
+        inline void     SetDragArea(const double dragArea)                    { m_DragArea = dragArea; }
+
+        inline void     SetSRPCoef(const double SRPCoef)                      { m_SRPCoef = SRPCoef; }
+
+        inline void     SetSRPArea(const double SRPArea)                      { m_SRPArea = SRPArea; }
+
+        inline int                  GetID() const                       { return VehicleID; }
 
         inline const string&        GetName() const                     { return m_Name; }
+
         inline const CartState&		GetInitialCartState() const         { return m_InitialCartState; }
+
         inline const CalendarTime&	GetInitialEpoch() const             { return m_InitialEpoch; }
+
         inline double				GetInitialMass() const              { return m_InitialMass; }
 
         inline const CartState&		GetCartState() const                { return m_CartState; }
+
         inline const CalendarTime&	GetEpoch() const                    { return m_Epoch; }
+
         inline double				GetMass() const                     { return m_Mass; }
+
+        inline double               GetDragCoef() const                 { return m_DragCoef; }
+
+        inline double               GetDragArea() const                 { return m_DragArea; }
+
+        inline double               GetSRPCoef()  const                 { return m_SRPCoef; }
+
+        inline double               GetSRPArea()  const                 { return m_SRPArea; }
 
 	//
 	// Attribute.
 	//
 	protected:
-        string          m_Name;				///< Aircraft ame
-        CalendarTime    m_InitialEpoch;		///< Initial Epoch of Aircraft
-        double			m_InitialMass;		///< Initial Mass of Aircraft
-        CartState		m_InitialCartState;	///< Initial State of Aircraft
+        static atomic<int>      VehicleID;          ///< Aircraft ID
+        string                  m_Name;				///< Aircraft name
+        CalendarTime            m_InitialEpoch;		///< Initial Epoch of Aircraft
+        double                  m_InitialMass;		///< Initial Mass of Aircraft
+        CartState               m_InitialCartState;	///< Initial State of Aircraft
 
-        CalendarTime    m_Epoch;			///< Epoch of Aircraft
-        double			m_Mass;				///< Mass of Aircraft at the Epoch
-        CartState		m_CartState;		///< State of Aircraft at the Epoch
+        CalendarTime            m_Epoch;			///< Epoch of Aircraft
+        double                  m_Mass;				///< Mass of Aircraft at the Epoch
+        CartState               m_CartState;		///< State of Aircraft at the Epoch
+
+        //Atmosphere Drag Parameters
+        double                  m_DragCoef;			///< drag coefficient
+        double                  m_DragArea;         ///< drag term m2/kg
+
+        //Solar Radiation Parameters
+        double                  m_SRPCoef;          ///< Solar Radiation Pressure Coeff
+        double                  m_SRPArea;          ///< Area for SRP
+
 
     };
 	

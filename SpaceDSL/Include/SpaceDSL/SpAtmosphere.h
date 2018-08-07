@@ -87,7 +87,7 @@ namespace SpaceDSL {
         /// @Return Temperature         K
         //********************************************************************
         double      GetAtmosphereTemperature(double Mjd_UT1, double altitude, double latitude = 0, double longitude = 0,
-                                             double f107A = 150, double f107 = 150, double ap[] = NULL, bool useDailyAp = true);
+                                             double f107A = 150, double f107 = 150, double ap[] = nullptr, bool useDailyAp = true);
 
         //********************************************************************
         /// Get Atmosphere Pressure at Altitude
@@ -99,7 +99,7 @@ namespace SpaceDSL {
         /// @Return Pressure         Pa
         //********************************************************************
         double      GetAtmospherePressure(double Mjd_UT1, double altitude, double latitude = 0, double longitude = 0,
-                                          double f107A = 150, double f107 = 150, double ap[] = NULL, bool useDailyAp = true);
+                                          double f107A = 150, double f107 = 150, double ap[] = nullptr, bool useDailyAp = true);
 
         //********************************************************************
         /// Get Atmosphere Pressure at Altitude
@@ -111,7 +111,7 @@ namespace SpaceDSL {
         /// @Return Density         kg/m^3
         //********************************************************************
         double      GetAtmosphereDensity(double Mjd_UT1, double altitude, double latitude = 0, double longitude = 0,
-                                         double f107A = 150, double f107 = 150, double ap[] = NULL, bool useDailyAp = true);
+                                         double f107A = 150, double f107 = 150, double ap[] = nullptr, bool useDailyAp = true);
 
     protected:
         ///=============================================

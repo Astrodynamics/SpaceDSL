@@ -659,7 +659,7 @@ namespace SpaceDSL {
         struct ap_array aph;
 
         /* input values */
-        if (ap == NULL)
+        if (ap == nullptr)
         {
             aph.a[0] = 14.9186481659685;
             for (int i=1;i<7;i++)
@@ -721,7 +721,7 @@ namespace SpaceDSL {
         struct ap_array aph;
 
         /* input values */
-        if (ap == NULL)
+        if (ap == nullptr)
         {
             aph.a[0] = 14.9186481659685;
             for (int i=1;i<7;i++)

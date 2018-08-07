@@ -64,5 +64,9 @@
 #include "SpUtils.h"
 #include "SpCZMLScript.h"
 #include "SpMission.h"
+#include "SpSpaceVehicle.h"
+#include "SpEnvironment.h"
+#include "SpPropagator.h"
+#include "SpOptimize.h"
 
 #endif //SPACEDSL_H

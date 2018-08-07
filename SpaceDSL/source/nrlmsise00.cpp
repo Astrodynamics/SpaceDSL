@@ -312,7 +312,7 @@ void spline (double *x, double *y, int n, double yp1, double ypn, double *y2) {
 	double sig, p, qn, un;
 	int i, k;
     u = (double *)malloc(sizeof(double)*(unsigned int)n);
-	if (u==NULL) {
+	if (u==nullptr) {
         throw SpaceDSL::SPException(__FILE__, __FUNCTION__, __LINE__,
                                     "NRLMSISE-00:Out Of Memory in spline - ERROR");
         //printf("Out Of Memory in spline - ERROR");

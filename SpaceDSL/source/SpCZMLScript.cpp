@@ -49,7 +49,7 @@ namespace SpaceDSL {
     **************************************************/
     CZMLScript::CZMLScript()
     {
-        m_pMission = NULL;
+        m_pMission = nullptr;
     }
 
     CZMLScript::~CZMLScript()

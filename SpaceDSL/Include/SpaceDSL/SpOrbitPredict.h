@@ -88,26 +88,7 @@ namespace SpaceDSL {
     public:
         explicit OrbitPredictConfig();
         virtual ~OrbitPredictConfig();
-        /*************************************************
-         * struct type: Third Body Gravity Sign
-         * Author: Niu ZhiYong
-         * Date:2018-03-20
-         * Description:
-        **************************************************/
-        struct ThirdBodyGravitySign
-        {
-            bool                bIsUseMercuryGrav = false;
-            bool                bIsUseVenusGrav   = false;
-            bool                bIsUseEarthGrav   = false;
-            bool                bIsUseMarsGrav    = false;
-            bool                bIsUseJupiterGrav = false;
-            bool                bIsUseSaturnGrav  = false;
-            bool                bIsUseUranusGrav  = false;
-            bool                bIsUseNeptuneGrav = false;
-            bool                bIsUsePlutoGrav   = false;
-            bool                bIsUseMoonGrav    = false;
-            bool                bIsUseSunGrav     = false;
-        };
+
         static ThirdBodyGravitySign DefaultThirdBodySign;
 
     public:
@@ -118,7 +99,7 @@ namespace SpaceDSL {
                                 ThirdBodyGravitySign thirdBodyGravSign = DefaultThirdBodySign,
                                 GeodeticCoordSystem::GeodeticCoordType geodeticType = GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,
                                 AtmosphereModel::AtmosphereModelType atmModelType = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel,
-                                double dragCoef = 0, double dragArea = 0, double f107A = 150, double f107 = 150, double ap[] = NULL,
+                                double dragCoef = 0, double dragArea = 0, double f107A = 150, double f107 = 150, double ap[] = nullptr,
                                 double SRPCoef = 0, double SRPArea = 0, bool isUseDrag = false, bool isUseSRP = false);
 
         bool                        IsInitialized();
@@ -195,12 +176,14 @@ namespace SpaceDSL {
 
         double                      GetSRPArea() const;
 
-        void                        SetThirdBodySign(OrbitPredictConfig::ThirdBodyGravitySign sign);
+        void                        SetThirdBodySign(ThirdBodyGravitySign sign);
 
-        OrbitPredictConfig::ThirdBodyGravitySign
-                                    GetThirdBodySign() const;
+        ThirdBodyGravitySign        GetThirdBodySign() const;
 
+        void                        SetGeodeticCoordType(GeodeticCoordSystem::GeodeticCoordType geodeticType);
 
+        GeodeticCoordSystem::GeodeticCoordType
+                                    GetGeodeticCoordType() const;
 
         bool                        IsUseThirdBodyGravity() const;
 
@@ -221,12 +204,14 @@ namespace SpaceDSL {
         SolarRadPressure            *GetSolarRadPressure() const;
 
     protected:
-        bool                        bIsInitialized = false;
+        bool                        m_bIsInitialized = false;
 
         SolarSysStarType            m_CenterStarType;
         //Third Body Gravity Sign
-        OrbitPredictConfig::ThirdBodyGravitySign
-                                    m_ThirdBodySign;
+        ThirdBodyGravitySign        m_ThirdBodySign;
+
+        GeodeticCoordSystem::GeodeticCoordType
+                                    m_GeodeticCoordType;
         //Time Parameters
         IERSService                 m_IERSService;
 
@@ -334,7 +319,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return
         //********************************************************************
-        void OrbitStep (OrbitPredictConfig &predictConfig, double step, RungeKutta::IntegMethodType integType,
+        void OrbitStep (OrbitPredictConfig &predictConfig, double step, IntegMethodType integType,
                         double &mass, Vector3d &pos, Vector3d &vel);
 
 
@@ -401,7 +386,7 @@ namespace SpaceDSL {
         /// @Param	accel               m/s^2
         /// @Return
         //********************************************************************
-        void OrbitStep (OrbitPredictConfig &predictConfig, double step, RungeKutta::IntegMethodType integType,
+        void OrbitStep (OrbitPredictConfig &predictConfig, double step, IntegMethodType integType,
                         double &mass, Vector3d &pos, Vector3d &vel);
 
 

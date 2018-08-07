@@ -64,12 +64,12 @@ namespace SpaceDSL{
         this->m_Hour = 0;
         this->m_Min = 0;
         this->m_Sec = 0;
-        this->m_pTimeStr = NULL;
+        this->m_pTimeStr = nullptr;
     }
 
     CalendarTime::~CalendarTime()
     {
-        if (m_pTimeStr != NULL)
+        if (m_pTimeStr != nullptr)
             free (m_pTimeStr);
     }
 
@@ -276,7 +276,7 @@ namespace SpaceDSL{
         tempStr += ( to_string(this->m_Hour) + ":" );
         tempStr += ( to_string(this->m_Min) + ":" );
         tempStr += ( to_string(this->m_Sec));
-        if (m_pTimeStr != NULL)
+        if (m_pTimeStr != nullptr)
             free (m_pTimeStr);
         int len = int(tempStr.size()) + 1;
         m_pTimeStr = (char *)malloc(len * sizeof(m_pTimeStr[0]));
@@ -503,8 +503,8 @@ namespace SpaceDSL{
     {
         #ifdef WITH_OPENSSL
             m_bIsUseWebService = true;
-            m_EOPData = NULL;
-            m_LeapsecondData = NULL;
+            m_EOPData = nullptr;
+            m_LeapsecondData = nullptr;
             m_EOPDataLine = 0;
             m_LeapsecondDataLine = 0;
         #else
@@ -592,7 +592,7 @@ namespace SpaceDSL{
 
     IERSService::~IERSService()
     {
-        if (m_EOPData != NULL)
+        if (m_EOPData != nullptr)
         {
             for (int i = 0; i < m_EOPDataLine; ++i)
             {
@@ -602,7 +602,7 @@ namespace SpaceDSL{
         }
 
 
-        if (m_LeapsecondData != NULL)
+        if (m_LeapsecondData != nullptr)
         {
             for (int i = 0; i < m_LeapsecondDataLine; ++i)
             {
@@ -632,11 +632,11 @@ namespace SpaceDSL{
     {
         if (m_bIsUseWebService == true) //Use IERS Web Service
         {
-            char *result = NULL;
+            char *result = nullptr;
 
             UTCCalTime caltime;
             MjdToCalendarTime(Mjd_UTC, caltime);
-            char *datetime = NULL;
+            char *datetime = nullptr;
             caltime.ToCharArray(datetime);
 
             string tempStr;
@@ -649,12 +649,12 @@ namespace SpaceDSL{
                 soap_ssl_init();
                 if (soap_ssl_client_context(&readIERS,
                     SOAP_SSL_NO_AUTHENTICATION, /* use SOAP_SSL_DEFAULT in production code */
-                    NULL,       /* keyfile: required only when client must authenticate to
+                    nullptr,       /* keyfile: required only when client must authenticate to
                                 server (see SSL docs on how to obtain this file) */
-                    NULL,       /* password to read the keyfile */
-                    NULL,      /* optional cacert file to store trusted certificates */
-                    NULL,      /* optional capath to directory with trusted certificates */
-                    NULL      /* if randfile!=NULL: use a file with random data to seed randomness */
+                    nullptr,       /* password to read the keyfile */
+                    nullptr,      /* optional cacert file to store trusted certificates */
+                    nullptr,      /* optional capath to directory with trusted certificates */
+                    nullptr      /* if randfile!=nullptr: use a file with random data to seed randomness */
                 ))
                 {
                     throw SPException(__FILE__, __FUNCTION__, __LINE__, "soap_ssl_client_context() Running error");
@@ -662,14 +662,14 @@ namespace SpaceDSL{
             #endif
             soap_set_namespaces(&readIERS, namespaces);
 
-            if (series == NULL)
+            if (series == nullptr)
             {
-                soap_call_ns2__getTimescale(&readIERS, NULL, NULL, param, datetime, result);
+                soap_call_ns2__getTimescale(&readIERS, nullptr, nullptr, param, datetime, result);
             }
             else
-                soap_call_ns1__readEOP(&readIERS, NULL, NULL, param, series, mjd, result);
+                soap_call_ns1__readEOP(&readIERS, nullptr, nullptr, param, series, mjd, result);
 
-            if (result == NULL)
+            if (result == nullptr)
             {
                 return 0;
             }

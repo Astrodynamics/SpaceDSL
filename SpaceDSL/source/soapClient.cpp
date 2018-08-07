@@ -23,9 +23,9 @@ SOAP_SOURCE_STAMP("@(#) soapClient.cpp ver 2.8.66 2018-04-20 02:12:53 GMT")
 SOAP_FMAC5 int SOAP_FMAC6 soap_call_ns1__readEOP(struct soap *soap, const char *soap_endpoint, const char *soap_action, char *param, char *series, char *mjd, char *&return_)
 {	struct ns1__readEOP soap_tmp_ns1__readEOP;
 	struct ns1__readEOPResponse *soap_tmp_ns1__readEOPResponse;
-	if (soap_endpoint == NULL)
+	if (soap_endpoint == nullptr)
 		soap_endpoint = "https://data.iers.org/eris/webservice/eop/eopServer.php";
-	if (soap_action == NULL)
+	if (soap_action == nullptr)
 		soap_action = "urn:org.iers.data.eop#readEOP";
 	soap_tmp_ns1__readEOP.param = param;
 	soap_tmp_ns1__readEOP.series = series;
@@ -56,7 +56,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call_ns1__readEOP(struct soap *soap, const char *
 	 || soap_envelope_end_out(soap)
 	 || soap_end_send(soap))
 		return soap_closesock(soap);
-	return_ = NULL;
+	return_ = nullptr;
 	if (soap_begin_recv(soap)
 	 || soap_envelope_begin_in(soap)
 	 || soap_recv_header(soap)
@@ -64,7 +64,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call_ns1__readEOP(struct soap *soap, const char *
 		return soap_closesock(soap);
 	if (soap_recv_fault(soap, 1))
 		return soap->error;
-	soap_tmp_ns1__readEOPResponse = soap_get_ns1__readEOPResponse(soap, NULL, "", NULL);
+	soap_tmp_ns1__readEOPResponse = soap_get_ns1__readEOPResponse(soap, nullptr, "", nullptr);
 	if (!soap_tmp_ns1__readEOPResponse || soap->error)
 		return soap_recv_fault(soap, 0);
 	if (soap_body_end_in(soap)
@@ -78,9 +78,9 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call_ns1__readEOP(struct soap *soap, const char *
 SOAP_FMAC5 int SOAP_FMAC6 soap_call_ns2__getTimescale(struct soap *soap, const char *soap_endpoint, const char *soap_action, char *param, char *datetime, char *&return_)
 {	struct ns2__getTimescale soap_tmp_ns2__getTimescale;
 	struct ns2__getTimescaleResponse *soap_tmp_ns2__getTimescaleResponse;
-	if (soap_endpoint == NULL)
+	if (soap_endpoint == nullptr)
 		soap_endpoint = "https://data.iers.org/eris/webservice/timescales/timescalesServer.php";
-	if (soap_action == NULL)
+	if (soap_action == nullptr)
 		soap_action = "urn:org.iers.data.timescales#getTimescale";
 	soap_tmp_ns2__getTimescale.param = param;
 	soap_tmp_ns2__getTimescale.datetime = datetime;
@@ -110,7 +110,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call_ns2__getTimescale(struct soap *soap, const c
 	 || soap_envelope_end_out(soap)
 	 || soap_end_send(soap))
 		return soap_closesock(soap);
-	return_ = NULL;
+	return_ = nullptr;
 	if (soap_begin_recv(soap)
 	 || soap_envelope_begin_in(soap)
 	 || soap_recv_header(soap)
@@ -118,7 +118,7 @@ SOAP_FMAC5 int SOAP_FMAC6 soap_call_ns2__getTimescale(struct soap *soap, const c
 		return soap_closesock(soap);
 	if (soap_recv_fault(soap, 1))
 		return soap->error;
-	soap_tmp_ns2__getTimescaleResponse = soap_get_ns2__getTimescaleResponse(soap, NULL, "", NULL);
+	soap_tmp_ns2__getTimescaleResponse = soap_get_ns2__getTimescaleResponse(soap, nullptr, "", nullptr);
 	if (!soap_tmp_ns2__getTimescaleResponse || soap->error)
 		return soap_recv_fault(soap, 0);
 	if (soap_body_end_in(soap)

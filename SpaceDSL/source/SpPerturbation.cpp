@@ -185,8 +185,8 @@ namespace SpaceDSL {
     AtmosphericDrag::AtmosphericDrag()
     {
         m_AtmosphericModelType = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel;
-        m_pGeodeticSystem = NULL;
-        m_pAtmosphereModel = NULL;
+        m_pGeodeticSystem = nullptr;
+        m_pAtmosphereModel = nullptr;
     }
 
     AtmosphericDrag::AtmosphericDrag(AtmosphereModel::AtmosphereModelType modelType, GeodeticCoordSystem *pGeodeticSystem)
@@ -198,14 +198,14 @@ namespace SpaceDSL {
 
     AtmosphericDrag::~AtmosphericDrag()
     {
-        if (m_pAtmosphereModel != NULL)
+        if (m_pAtmosphereModel != nullptr)
             delete m_pAtmosphereModel;
     }
 
     Vector3d AtmosphericDrag::AccelAtmosphericDrag(double Mjd_UTC, double Mjd_UT1, const Vector3d& pos, const Vector3d& vel, double area, double dragCoef, double mass,
                                                    double f107A, double f107, double ap[])
     {
-        if (m_pAtmosphereModel == NULL ||
+        if (m_pAtmosphereModel == nullptr ||
                 m_AtmosphericModelType == AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel)
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphericDrag: m_AtmosphericModelType = E_NotDefinedAtmosphereModel!");
 

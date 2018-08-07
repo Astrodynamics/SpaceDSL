@@ -44,15 +44,13 @@
 #include <time.h>
 #include <atomic>
 #include <mutex>
-#include <functional>
 #include <string>
-#include <condition_variable>
 #include <deque>
 #include <vector>
-#include <memory>
+
 
 #ifdef _WIN32
-    #include <windows.h>
+    #include <Windows.h>
     #include <process.h>
 #else
     #include <pthread.h>
@@ -207,7 +205,7 @@ namespace SpaceDSL {
 
     private:
 
-        static atomic<size_t>   OriginalThreadID;
+        static atomic<size_t>   ThreadGlobalCounter;
         #ifdef _WIN32
             HANDLE              m_Handle;
             int                 m_SuspendCount;
@@ -240,6 +238,7 @@ namespace SpaceDSL {
     public:
         explicit SpThreadPool();
         ~SpThreadPool();
+        friend class MonitorThread;
 
     public:
         /********************************************************************/
@@ -293,8 +292,43 @@ namespace SpaceDSL {
         int     GetActiveThreadCount() const;
 
     private:
+        MonitorThread           *m_pMonitor;
+        bool                    m_bIsStarted;
+        int                     m_MaxThreadCount;
+        int                     m_ActiveThreadCount;
 
+        vector<SpThread *>      m_ThreadPool;
+        deque<SpThread *>       m_ThreadBuffer;
 
+    };
+
+    /*************************************************
+     * Class type: Thread Pool Monitor Thread
+     * Author: Niu ZhiYong
+     * Date:2018-05-20
+     * Description:
+    **************************************************/
+    class MonitorThread : public SpThread
+    {
+    public:
+        explicit MonitorThread();
+        ~MonitorThread() override;
+
+    public:
+
+        void Initializer(bool *pIsStarted, vector<SpThread *> *pPool,
+                         deque<SpThread *> *pBuffer, int *pActiveThreadCount);
+
+        void Run() override;
+
+    private:
+        bool                m_bIsInitialized;
+        mutex               m_CheckLock;
+
+        bool                *m_pIsStarted;
+        int                 *m_pActiveThreadCount;
+        vector<SpThread *>  *m_pThreadPool;
+        deque<SpThread *>   *m_pThreadBuffer;
     };
 
 }
