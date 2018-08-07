@@ -22,11 +22,11 @@
 * Author: Niu ZhiYong
 * Date:2018-07-30
 * Description:
-*   SpSpaceVehicle.cpp
+*   SpEnvironment.cpp
 *
 *   Purpose:
 *
-*       The Base Class of All Kinds of Space Vehicle.
+*       Space Environment Configuration Class
 *
 *
 *   Last modified:
@@ -35,56 +35,57 @@
 *
 *************************************************************************/
 
-#include "SpaceDSL/SpSpaceVehicle.h"
+
+#include "SpaceDSL/SpEnvironment.h"
 
 
 
 namespace SpaceDSL {
 
     /*************************************************
-     * Class type: The Base Class of All Kinds of Space Vehicle
+     * Class type: Space Environment Configuration Class
      * Author: Niu ZhiYong
      * Date:2018-07-30
      * Description:
     **************************************************/
-    atomic<int> SpaceVehicle::VehicleID(0);
-    SpaceVehicle::SpaceVehicle()
+    Environment::Environment()
     {
-        ++VehicleID;
-        m_Name = "Default";
-        m_InitialCartState = CartState();
-        m_InitialEpoch = CalendarTime();
-        m_InitialMass = 0.0;
-
-        m_DragCoef = 0.0;
-        m_DragArea = 0.0;
-        m_SRPCoef = 0.0;
-        m_SRPArea = 0.0;
+        m_CenterStarType = E_Earth;
+        m_GravModelType = GravityModel::GravModelType::E_NotDefinedGravModel;
+        m_MaxDegree = 0;
+        m_MaxOrder = 0;
+        m_ThirdBodySign = ThirdBodyGravitySign();
+        m_GeodeticCoordType = GeodeticCoordSystem::GeodeticCoordType::E_WGS84System;
+        m_AtmModelType =  AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel;
+        m_F107A = 150;
+        m_F107 = 150;
+        m_Ap = nullptr;
     }
 
-    SpaceVehicle::SpaceVehicle(const string &name, const CalendarTime &initialEpoch,
-                               const CartState &initialState, const double initialMass,
-                               const double dragCoef, const double dragArea,
-                               const double SRPCoef, const double SRPArea)
+    Environment::Environment(const SolarSysStarType centerStarType, const GravityModel::GravModelType gravModelType,
+                             const int maxDegree, const int maxOrder, const ThirdBodyGravitySign thirdBodyGravSign,
+                             const GeodeticCoordSystem::GeodeticCoordType geodeticType,
+                             const AtmosphereModel::AtmosphereModelType atmModelType,
+                             const double f107A, const double f107, double *ap)
     {
-        ++VehicleID;
-        m_Name = name;
-        m_InitialCartState = initialState;
-        m_InitialEpoch = initialEpoch;
-        m_InitialMass = initialMass;
-
-        m_DragCoef = dragCoef;
-        m_DragArea = dragArea;
-        m_SRPCoef = SRPCoef;
-        m_SRPArea = SRPArea;
+        m_CenterStarType = centerStarType;
+        m_GravModelType = gravModelType;
+        m_MaxDegree = maxDegree;
+        m_MaxOrder = maxOrder;
+        m_ThirdBodySign = thirdBodyGravSign;
+        m_GeodeticCoordType = geodeticType;
+        m_AtmModelType = atmModelType;
+        m_F107A = f107A;
+        m_F107 = f107;
+        m_Ap = ap;
     }
 
-    SpaceVehicle::~SpaceVehicle()
+    Environment::~Environment()
     {
 
     }
 
 	
-	
+
 }
 

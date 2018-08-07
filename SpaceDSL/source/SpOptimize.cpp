@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,11 +22,11 @@
 * Author: Niu ZhiYong
 * Date:2018-07-30
 * Description:
-*   SpSpaceVehicle.cpp
+*   SpOptimize.cpp
 *
 *   Purpose:
 *
-*       The Base Class of All Kinds of Space Vehicle.
+*       Space Mission Optimization Configuration Class
 *
 *
 *   Last modified:
@@ -35,56 +35,19 @@
 *
 *************************************************************************/
 
-#include "SpaceDSL/SpSpaceVehicle.h"
+#include "SpaceDSL/SpOptimize.h"
 
 
 
 namespace SpaceDSL {
-
+	
     /*************************************************
-     * Class type: The Base Class of All Kinds of Space Vehicle
+     * Class type: Space Mission Optimization Configuration Class
      * Author: Niu ZhiYong
      * Date:2018-07-30
      * Description:
     **************************************************/
-    atomic<int> SpaceVehicle::VehicleID(0);
-    SpaceVehicle::SpaceVehicle()
-    {
-        ++VehicleID;
-        m_Name = "Default";
-        m_InitialCartState = CartState();
-        m_InitialEpoch = CalendarTime();
-        m_InitialMass = 0.0;
-
-        m_DragCoef = 0.0;
-        m_DragArea = 0.0;
-        m_SRPCoef = 0.0;
-        m_SRPArea = 0.0;
-    }
-
-    SpaceVehicle::SpaceVehicle(const string &name, const CalendarTime &initialEpoch,
-                               const CartState &initialState, const double initialMass,
-                               const double dragCoef, const double dragArea,
-                               const double SRPCoef, const double SRPArea)
-    {
-        ++VehicleID;
-        m_Name = name;
-        m_InitialCartState = initialState;
-        m_InitialEpoch = initialEpoch;
-        m_InitialMass = initialMass;
-
-        m_DragCoef = dragCoef;
-        m_DragArea = dragArea;
-        m_SRPCoef = SRPCoef;
-        m_SRPArea = SRPArea;
-    }
-
-    SpaceVehicle::~SpaceVehicle()
-    {
-
-    }
-
-	
-	
 }
+
+
 
