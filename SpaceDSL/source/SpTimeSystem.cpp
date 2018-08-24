@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -261,6 +261,14 @@ namespace SpaceDSL{
             return true;
     }
 
+    double CalendarTime::operator -(const CalendarTime &time) const
+    {
+        double Mjd0 = CalendarTimeToMjd(*this);
+        double Mjd1 = CalendarTimeToMjd(time);
+
+        return (Mjd0 - Mjd1)*DayToSec;
+    }
+
     void CalendarTime::ToCharArray(char *&pTimeStr)
     {
         this->FillTimeStr();
@@ -378,7 +386,7 @@ namespace SpaceDSL{
         return MjdMidnight + FracOfDay;
     }
 
-    double CalendarTimeToMjd(CalendarTime &time)
+    double CalendarTimeToMjd(const CalendarTime &time)
     {
         int year = time.Year();
         int month = time.Mon();

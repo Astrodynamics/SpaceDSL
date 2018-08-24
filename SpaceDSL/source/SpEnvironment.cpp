@@ -60,13 +60,17 @@ namespace SpaceDSL {
         m_F107A = 150;
         m_F107 = 150;
         m_Ap = nullptr;
+
+        m_bIsUseDrag = false;
+        m_bIsUseSRP = false;
     }
 
     Environment::Environment(const SolarSysStarType centerStarType, const GravityModel::GravModelType gravModelType,
                              const int maxDegree, const int maxOrder, const ThirdBodyGravitySign thirdBodyGravSign,
                              const GeodeticCoordSystem::GeodeticCoordType geodeticType,
                              const AtmosphereModel::AtmosphereModelType atmModelType,
-                             const double f107A, const double f107, double *ap)
+                             const double f107A, const double f107, double *ap,
+                             const bool isUseDrag, const bool isUseSRP)
     {
         m_CenterStarType = centerStarType;
         m_GravModelType = gravModelType;
@@ -78,6 +82,9 @@ namespace SpaceDSL {
         m_F107A = f107A;
         m_F107 = f107;
         m_Ap = ap;
+
+        m_bIsUseDrag = isUseDrag;
+        m_bIsUseSRP = isUseSRP;
     }
 
     Environment::~Environment()

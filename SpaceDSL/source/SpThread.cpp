@@ -40,7 +40,8 @@
 
 #include <functional>
 #include <mutex>
-#include <thread>
+#include <chrono>
+using namespace std::chrono;
 
 namespace SpaceDSL {
     /*************************************************
@@ -353,15 +354,33 @@ namespace SpaceDSL {
 
     void SpThreadPool::Clear()
     {
+        m_ClearLock.lock();
 
+        m_ThreadBuffer.clear();
+
+        m_ClearLock.unlock();
     }
 
     bool SpThreadPool::WaitForDone(int msecs)
     {
+        auto startT = steady_clock::now();
+        int  dT = 0;
         while (m_ActiveThreadCount > 0)
         {
             if (m_ActiveThreadCount == 0)
                 break;
+            if (msecs != -1)
+            {
+                auto endT = steady_clock::now();
+                auto deltaT = duration_cast<milliseconds> (endT - startT);
+                dT = int(deltaT.count());
+                if (dT > msecs)
+                {
+                    return false;
+                }
+            }
+
+
         }
         return true;
     }

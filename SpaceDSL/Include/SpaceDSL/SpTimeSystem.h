@@ -81,6 +81,8 @@ namespace SpaceDSL {
         bool				operator< (const CalendarTime& time) const;
         bool				operator<=(const CalendarTime& time) const;
 
+        double              operator -(const CalendarTime& time) const;
+
     public:
         /********************************************************************/
         /// Transform from Calendar Date to Char Array
@@ -169,7 +171,7 @@ namespace SpaceDSL {
     /// @Param      time                  UTCCalTime
     /// @Return     Modified Julian Date
     /**********************************************************************/
-    double SPACEDSL_API CalendarTimeToMjd (CalendarTime &time);
+    double SPACEDSL_API CalendarTimeToMjd (const CalendarTime &time);
 
     /********************************************************************/
     /// Calendar date and time from Modified Julian Date
@@ -186,9 +188,9 @@ namespace SpaceDSL {
     /// @Param      Sec
     /// @Return     void
     /**********************************************************************/
-    void SPACEDSL_API MjdToCalendarTime (double Mjd,
-                                        int& year, int& month, int& day,
-                                        int& hour, int& min, double& sec);
+    void SPACEDSL_API MjdToCalendarTime ( double Mjd,
+                                         int& year,  int& month,  int& day,
+                                         int& hour,  int& min,  double& sec);
 
     /********************************************************************/
     /// Calendar date and time from Modified Julian Date
@@ -200,7 +202,7 @@ namespace SpaceDSL {
     /// @Param      time        UTCCalTime
     /// @Return     void
     /**********************************************************************/
-    void SPACEDSL_API MjdToCalendarTime ( double Mjd, CalendarTime &time);
+    void SPACEDSL_API MjdToCalendarTime (double Mjd, CalendarTime &time);
 
     /*************************************************
      * Class type: IERS

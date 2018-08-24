@@ -64,6 +64,10 @@ namespace SpaceDSL {
                      const CartState& initialState, const double initialMass,
                      const double dragCoef, const double dragArea,
                      const double SRPCoef, const double SRPArea);
+        SpaceVehicle(const string &name, const double initialEpoch,
+                     const CartState& initialState, const double initialMass,
+                     const double dragCoef, const double dragArea,
+                     const double SRPCoef, const double SRPArea);
 		virtual ~SpaceVehicle();
 		
 	public:
@@ -71,47 +75,51 @@ namespace SpaceDSL {
 
         inline void		SetInitialCartState (const CartState& state)    { m_InitialCartState = state; }
 
-        inline void		SetInitialEpoch (const CalendarTime& time)      { m_InitialEpoch = time; }
+        inline void		SetInitialEpoch (const CalendarTime& time)      { m_InitialEpoch = CalendarTimeToMjd(time); }
 
-        inline void		SetInitialMass (const double mass)                    { m_InitialMass = mass; }
+        inline void		SetInitialEpoch (const double Mjd)              { m_InitialEpoch = Mjd; }
+
+        inline void		SetInitialMass (const double mass)              { m_InitialMass = mass; }
 
         inline void		SetCartState (const CartState& state)           { m_CartState = state; }
 
-        inline void		SetTime (const CalendarTime& time)              { m_Epoch = time; }
+        inline void		SetTime (const CalendarTime& time)              { m_Epoch = CalendarTimeToMjd(time); }
 
-        inline void		SetMass (const double mass)                           { m_Mass = mass; }
+        inline void		SetTime (const double Mjd)                      { m_Epoch = Mjd; }
 
-        inline void     SetDragCoef(const double dragCoef)                    { m_DragCoef = dragCoef; }
+        inline void		SetMass (const double mass)                     { m_Mass = mass; }
 
-        inline void     SetDragArea(const double dragArea)                    { m_DragArea = dragArea; }
+        inline void     SetDragCoef(const double dragCoef)              { m_DragCoef = dragCoef; }
 
-        inline void     SetSRPCoef(const double SRPCoef)                      { m_SRPCoef = SRPCoef; }
+        inline void     SetDragArea(const double dragArea)              { m_DragArea = dragArea; }
 
-        inline void     SetSRPArea(const double SRPArea)                      { m_SRPArea = SRPArea; }
+        inline void     SetSRPCoef(const double SRPCoef)                { m_SRPCoef = SRPCoef; }
 
-        inline int                  GetID() const                       { return VehicleID; }
+        inline void     SetSRPArea(const double SRPArea)                { m_SRPArea = SRPArea; }
 
-        inline const string&        GetName() const                     { return m_Name; }
+        inline int              GetID() const                       { return VehicleID; }
 
-        inline const CartState&		GetInitialCartState() const         { return m_InitialCartState; }
+        inline const string&    GetName() const                     { return m_Name; }
 
-        inline const CalendarTime&	GetInitialEpoch() const             { return m_InitialEpoch; }
+        inline const CartState& GetInitialCartState() const         { return m_InitialCartState; }
 
-        inline double				GetInitialMass() const              { return m_InitialMass; }
+        inline double           GetInitialEpoch() const             { return m_InitialEpoch; }
 
-        inline const CartState&		GetCartState() const                { return m_CartState; }
+        inline double           GetInitialMass() const              { return m_InitialMass; }
 
-        inline const CalendarTime&	GetEpoch() const                    { return m_Epoch; }
+        inline const CartState& GetCartState() const                { return m_CartState; }
 
-        inline double				GetMass() const                     { return m_Mass; }
+        inline double           GetEpoch() const                    { return m_Epoch; }
 
-        inline double               GetDragCoef() const                 { return m_DragCoef; }
+        inline double           GetMass() const                     { return m_Mass; }
 
-        inline double               GetDragArea() const                 { return m_DragArea; }
+        inline double           GetDragCoef() const                 { return m_DragCoef; }
 
-        inline double               GetSRPCoef()  const                 { return m_SRPCoef; }
+        inline double           GetDragArea() const                 { return m_DragArea; }
 
-        inline double               GetSRPArea()  const                 { return m_SRPArea; }
+        inline double           GetSRPCoef()  const                 { return m_SRPCoef; }
+
+        inline double           GetSRPArea()  const                 { return m_SRPArea; }
 
 	//
 	// Attribute.
@@ -119,11 +127,11 @@ namespace SpaceDSL {
 	protected:
         static atomic<int>      VehicleID;          ///< Aircraft ID
         string                  m_Name;				///< Aircraft name
-        CalendarTime            m_InitialEpoch;		///< Initial Epoch of Aircraft
+        double                  m_InitialEpoch;		///< Initial MJD Epoch of Aircraft
         double                  m_InitialMass;		///< Initial Mass of Aircraft
         CartState               m_InitialCartState;	///< Initial State of Aircraft
 
-        CalendarTime            m_Epoch;			///< Epoch of Aircraft
+        double                  m_Epoch;			///< MJD Epoch of Aircraft
         double                  m_Mass;				///< Mass of Aircraft at the Epoch
         CartState               m_CartState;		///< State of Aircraft at the Epoch
 

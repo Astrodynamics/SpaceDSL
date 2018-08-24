@@ -42,8 +42,8 @@
 
 #include <Jsoncpp/json.hpp>
 
-#include <fstream>
 #include <string>
+#include <vector>
 
 using namespace std;
 using namespace nlohmann;
@@ -65,6 +65,9 @@ namespace SpaceDSL {
         ~CZMLScript();
 
     public:
+
+         void Initializer(const string &filePath, const Mission *pMission, const double step = 300);
+
         /********************************************************************/
         /// Writing CZML Content For Use With Cesium.
         /// @Author	Niu Zhiyong
@@ -73,11 +76,22 @@ namespace SpaceDSL {
         /// @Param	filePath
         /// @Return void
         /********************************************************************/
-        void        WirteCZML(const string &filePath);
+        void        WirteCZML();
 
     private:
-        json        m_Json;
-        Mission   	*m_pMission;
+
+        string      FormTimeStr(int year, int month, int day, int hour, int min, double sec);
+
+        string      FormTimeIntervalStr(int year0, int month0, int day0, int hour0, int min0, double sec0,
+                                           int year1, int month1, int day1, int hour1, int min1, double sec1);
+
+    private:
+        bool                m_bIsInitialized;
+        vector<json>        *m_pJsonList;
+        json                *m_pJsonToWirte;
+        string              m_FilePath;
+        const Mission   	*m_pMission;
+        double              m_Step;
 
 
 

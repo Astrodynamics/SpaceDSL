@@ -86,7 +86,7 @@ namespace SpaceDSL {
 
             const CartState		operator -() const;
             const CartState		operator +(const CartState& state) const;
-            const CartState		operator -(const CartState& state) const;
+            const CartState     operator -(const CartState& state) const;
             const CartState&	operator+=(const CartState& state);
             const CartState&	operator-=(const CartState& state);
 

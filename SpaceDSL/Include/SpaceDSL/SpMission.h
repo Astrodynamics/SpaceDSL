@@ -43,9 +43,7 @@
 #include "SpEnvironment.h"
 #include "SpPropagator.h"
 #include "SpOptimize.h"
-#include "SpCZMLScript.h"
 #include "SpThread.h"
-#include "SpUtils.h"
 
 #include <map>
 #include <vector>
@@ -53,27 +51,6 @@
 /// All the functions are in the namespace SpaceDSL
 ///
 namespace SpaceDSL {
-
-    /*************************************************
-     * Class type: Mission Thread Run in Mission Class
-     * Author: Niu ZhiYong
-     * Date:2018-07-27
-     * Description:
-    **************************************************/
-    class SPACEDSL_API MissionThread : public SpThread
-    {
-    public:
-        MissionThread();
-        ~MissionThread() override;
-
-    public:
-
-        void Run() override;
-
-    private:
-        int         m_SpaceVehicleID;
-
-    };
 
     /*************************************************
      * Class type: The class of SpaceDSL Mission
@@ -84,57 +61,112 @@ namespace SpaceDSL {
     class SPACEDSL_API Mission
     {
     public:
-		explicit Mission();
-        virtual ~Mission();
-        friend class MissionThread;
+        explicit         Mission();
+        friend class    MissionThread;
+
+    private:
+        virtual         ~Mission();
 		
 	public:
-        void                InsertSpaceVehicle(SpaceVehicle *pVehicle);
+        void            InsertSpaceVehicle(const string &name, const CalendarTime& initialEpoch,
+                                           const CartState& initialState, const double initialMass,
+                                           const double dragCoef, const double dragArea,
+                                           const double SRPCoef, const double SRPArea);
 
-        void                SetEnvironment(const SolarSysStarType centerStarType, const GravityModel::GravModelType gravModelType ,
-                                           const int maxDegree , const int maxOrder , const ThirdBodyGravitySign thirdBodyGravSign,
-                                           const GeodeticCoordSystem::GeodeticCoordType geodeticType ,
-                                           const AtmosphereModel::AtmosphereModelType atmModelType ,
-                                           const double f107A , const double f107, double ap[]);
+        void            SetEnvironment(const SolarSysStarType centerStarType, const GravityModel::GravModelType gravModelType ,
+                                       const int maxDegree , const int maxOrder , const ThirdBodyGravitySign thirdBodyGravSign,
+                                       const GeodeticCoordSystem::GeodeticCoordType geodeticType ,
+                                       const AtmosphereModel::AtmosphereModelType atmModelType ,
+                                       const double f107A , const double f107, double ap[],
+                                       bool isUseDrag, bool isUseSRP);
 
-        void                SetPropagator(const IntegMethodType  const integMethodType, const double initialStep, const double accuracy,
-                                          const double  minStep, const double  maxStep, const double   maxStepAttempts,
-                                          const bool bStopIfAccuracyIsViolated, const bool isUseNormalize);
+        void            SetPropagator(const IntegMethodType integMethodType, const double initialStep, const double accuracy,
+                                      const double  minStep, const double  maxStep, const double   maxStepAttempts,
+                                      const bool bStopIfAccuracyIsViolated, const bool isUseNormalize);
 
-        void                SetOptimization();
+        void            SetOptimization();
 
-        void                SetMissionSequence(double durationDay);
+        void            SetMissionSequence(const CalendarTime& initialEpoch, const CalendarTime& terminationEpoch);
 
-        Environment         *GetEnvironment() const;
+        const vector<SpaceVehicle *>            &GetSpaceVehicleList() const;
 
-        Propagator          *GetPropagator() const;
+        int                                     GetSpaceVehicleNumber() const;
 
-        void                Start(bool bIsMultThread);
+        Environment                             *GetEnvironment() const;
 
-        void                Reset();
+        Propagator                              *GetPropagator() const;
+
+        const CalendarTime                      &GetInitialEpoch() const;
+
+        const CalendarTime                      &GetTerminationEpoch() const;
+
+        double                                  GetDurationTime() const;
+
+        const map<string, vector<double *> *>   *GetProcessDataMap() const;
+
+        void                                    Start(bool bIsMultThread);
+
+        void                                    Reset();
 
     private:
 
-        bool                                    m_bIsEnvironmentInitialized;
-        bool                                    m_bIsPropagatorInitialized;
-        bool                                    m_bIsOptimizeInitialized;
-        bool                                    m_bIsMultThread;
+        bool                            m_bIsEnvironmentInitialized;
+        bool                            m_bIsPropagatorInitialized;
+        bool                            m_bIsOptimizeInitialized;
+        bool                            m_bIsMissionSequenceInitialized;
+        bool                            m_bIsMultThread;
 
-        int                                     m_SpaceVehicleNumber;
-        vector<SpaceVehicle *>                  m_SpaceVehicleList;
-        Environment                             *m_pEnvironment;
-        Propagator                              *m_pPropagator;
+        int                             m_SpaceVehicleNumber;
+        vector<SpaceVehicle *>          m_SpaceVehicleList;
+        Environment                     *m_pEnvironment;
+        Propagator                      *m_pPropagator;
 
-        double                                  m_DurationDay;
+        CalendarTime                    m_InitialEpoch;
+        CalendarTime                    m_TerminationEpoch;
+        double                          m_DurationSec;
 
-        SpThreadPool                            m_MissionThreadPool;
+        vector<MissionThread *>         m_MissionThreadList;
+        SpThreadPool                    *m_pMissionThreadPool;
 
-        map<string, vector<double *> *>         m_ProcessDataMap;
-
-
+        map<string, vector<double *> *> m_ProcessDataMap;
 
     };
 
+    /*************************************************
+     * Class type: Mission Thread Run in Mission Class
+     * Author: Niu ZhiYong
+     * Date:2018-07-27
+     * Description:
+    **************************************************/
+    class MissionThread : public SpThread
+    {
+    public:
+        MissionThread();
+        ~MissionThread() override;
+
+    public:
+        void    Initializer(Mission *pMission, vector<SpaceVehicle *> *spaceVehicleList,
+                            Environment *pEnvironment, Propagator *pPropagator,
+                            map<string, vector<double *> *> *pProcessDataMap,
+                            int spaceVehicleID = -1);
+    protected:
+
+        void    SaveProcessDataLine(SpaceVehicle *pVehicle, const double Mjd,
+                                    const Vector3d &pos, const Vector3d &vel,
+                                    const GeodeticCoord &LLA, const double mass);
+
+        void    Run() override;
+
+
+    private:
+        int                                 m_SpaceVehicleID;
+        Mission                             *m_pMission;
+        vector<SpaceVehicle *>              *m_pSpaceVehicleList;
+        Environment                         *m_pEnvironment;
+        Propagator                          *m_pPropagator;
+        map<string, vector<double *> *>     *m_pProcessDataMap;
+
+    };
 
 }
 #endif //SPMISSION_H
