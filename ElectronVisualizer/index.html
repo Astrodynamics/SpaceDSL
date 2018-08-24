@@ -9,6 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
   <title>Hello World!</title>
   <script src="node_modules/cesium/Build/Cesium/Cesium.js"></script>
+  <script src="renderer_process/cesium/cesium_render.js"></script>
   <style>
       @import url(node_modules/cesium/Build/Cesium/Widgets/widgets.css);
       html, body, #cesiumContainer {
@@ -19,10 +20,7 @@
 <body>
   <div id="cesiumContainer"></div>
   <script>
-    var viewer = new Cesium.Viewer('cesiumContainer');
-	viewer.dataSources.add(Cesium.CzmlDataSource.load('simple.czml'));
-
-    viewer.camera.flyHome(0);
+	InitalCesiumView()
   </script>
 </body>
 </html>
