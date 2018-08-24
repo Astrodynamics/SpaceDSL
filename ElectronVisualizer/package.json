@@ -7,6 +7,6 @@
     },
     "devDependencies": {
         "cesium": "^1.47.0",
-        "electron": "^2.0.5"
+        "electron": "^2.0.8"
     }
 }
