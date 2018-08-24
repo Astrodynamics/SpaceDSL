@@ -1,3 +1,4 @@
 /Build
 /ElectronVisualizer/node_modules
+/ElectronVisualizer/.vscode
 CMakeLists.txt.user
