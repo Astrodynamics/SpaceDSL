@@ -32,6 +32,7 @@ double myconstraint(unsigned n, const double *x, double *grad, void *data)
 
 int main ()
 {
+    cout<<"NLOpt Test Run!"<<endl;
     NLOpt::NLOptimize opt(NLOpt::LD_SLSQP, 2);
     std::vector<double> lb(2);
     lb[0] = -HUGE_VAL; lb[1] = 0;

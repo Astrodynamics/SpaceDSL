@@ -44,6 +44,7 @@ LINK_DIRECTORIES("${PROJECT_SOURCE_DIR}/Build/")
 
 # Set source file to make executable
 add_executable(UnitTest TestMain.cpp)
+add_executable(ThreadTest TestThread.cpp)
 add_executable(NLOptTest TestNLOpt.cpp)
 
 # UnitTest Set if build SHARED LIBS  or not
@@ -51,6 +52,13 @@ if (BUILD_SHARED_LIBS)
         TARGET_LINK_LIBRARIES(UnitTest SpaceDSL)
 else()
         TARGET_LINK_LIBRARIES(UnitTest SpaceDSL_static)
+endif()
+
+# ThreadTest Set if build SHARED LIBS  or not
+if (BUILD_SHARED_LIBS)
+        TARGET_LINK_LIBRARIES(ThreadTest SpaceDSL)
+else()
+        TARGET_LINK_LIBRARIES(ThreadTest SpaceDSL_static)
 endif()
 
 # NLOptTest Set if build SHARED LIBS  or not
@@ -66,11 +74,16 @@ if(OPENSSL_FOUND)
     target_link_libraries(UnitTest ${OPENSSL_LIBRARIES})
 endif()
 
+if(OPENSSL_FOUND)
+    message(STATUS "#Target Link OPENSSL_LIBRARIES_DIR = ${OPENSSL_LIBRARIES}")
+    target_link_libraries(ThreadTest ${OPENSSL_LIBRARIES})
+endif()
+
 #add_test(UnitTest UnitTest)
 
 # Make Install File
 
-INSTALL(TARGETS UnitTest NLOptTest
+INSTALL(TARGETS UnitTest ThreadTest NLOptTest
                 RUNTIME DESTINATION ${ALL_OUTPUT_PATH}/Install
                 LIBRARY DESTINATION ${ALL_OUTPUT_PATH}/Install
                 ARCHIVE DESTINATION ${ALL_OUTPUT_PATH}/Install
