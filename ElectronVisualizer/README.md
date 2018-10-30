@@ -1,4 +1,5 @@
 # ElectronVisualizer Quick Start
+Run all of the following code in the **current folder**.
 
 ## install npm first.(example in Ubuntu OS)
 sudo apt-get install npm
