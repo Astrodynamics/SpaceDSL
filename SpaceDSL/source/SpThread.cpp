@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -81,7 +81,7 @@ namespace SpaceDSL {
             m_Handle = nullptr;
         #else
             m_Thread_t = 0;
-            pthread_attr_destroy(m_Thread_attr);
+            pthread_attr_destroy(&m_Thread_attr);// add "&" by xiaogongwei
         #endif
         --ThreadGlobalCounter;
     }

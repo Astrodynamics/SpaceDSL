@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -213,7 +213,7 @@ namespace SpaceDSL {
             pthread_attr_t      m_Thread_attr;
             pthread_t           m_Thread_t;
             int                 m_MaxPriority;
-            int                 m_MinPriority
+            int                 m_MinPriority; // add ";" by xiaogongwei
         #endif
 
     };
@@ -233,6 +233,7 @@ namespace SpaceDSL {
      * Date:2018-05-20
      * Description:
     **************************************************/
+    class MonitorThread; // debug by xiaogongwei
     class SPACEDSL_API SpThreadPool
     {
     public:

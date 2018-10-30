@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -289,7 +289,11 @@ namespace SpaceDSL{
         int len = int(tempStr.size()) + 1;
         m_pTimeStr = (char *)malloc(len * sizeof(m_pTimeStr[0]));
 
+#if defined(_WIN32)
         strcpy_s(m_pTimeStr, len, tempStr.c_str());
+#else
+        strncpy(m_pTimeStr, tempStr.c_str(), len);
+#endif
     }
     /*************************************************
      * Class type: Gregorian Calendar Time
