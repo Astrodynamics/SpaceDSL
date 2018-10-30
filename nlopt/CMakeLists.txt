@@ -119,7 +119,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 INCLUDE_DIRECTORIES (
                     ${PROJECT_SOURCE_DIR}/src/algs/stogo
-					${PROJECT_SOURCE_DIR}/src/algs/ags
+                    ${PROJECT_SOURCE_DIR}/src/algs/ags
                     ${PROJECT_SOURCE_DIR}/src/util
                     ${PROJECT_SOURCE_DIR}/src/algs/direct
                     ${PROJECT_SOURCE_DIR}/src/algs/cdirect

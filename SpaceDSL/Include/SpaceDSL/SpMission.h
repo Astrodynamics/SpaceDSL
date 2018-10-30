@@ -58,11 +58,12 @@ namespace SpaceDSL {
      * Date:2018-07-27
      * Description:
     **************************************************/
-    class MissionThread;// debug by xiaogongwei
+    class MissionThread;// For gcc
+
     class SPACEDSL_API Mission
     {
     public:
-        explicit         Mission();
+        explicit        Mission();
         friend class    MissionThread;
 
     private:
