@@ -13,8 +13,6 @@ var template = [
             properties: ['openFile']
           }, (file) => {
             if (file) {
-              console.log('Send the file:')
-              console.log(file)
               global.mainWindow.webContents.send('selected_file',file)
             }
           })
