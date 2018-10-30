@@ -16,7 +16,6 @@ function ReadCZML(element, index, array) {
 }
 
 ipcRenderer.on('selected_file', (event, file) => {
-	console.log('Get the file:')
-	console.log(file)
+
 	file.forEach(ReadCZML)
 })

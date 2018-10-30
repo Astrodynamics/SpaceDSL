@@ -939,7 +939,7 @@ namespace SpaceDSL {
         result(3) = acceleration(0);
         result(4) = acceleration(1);
         result(5) = acceleration(2);
-        result(6) = 1;
+        result(6) = 0;
     }
 
     /*************************************************
@@ -1126,7 +1126,7 @@ namespace SpaceDSL {
             result(3) = -pos(0)/pow(r,3);
             result(4) = -pos(1)/pow(r,3);
             result(5) = -pos(2)/pow(r,3);
-            result(6) = 1;
+            result(6) = 0;
         }
         else
         {
