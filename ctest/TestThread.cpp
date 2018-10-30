@@ -154,11 +154,11 @@ public:
 
         OrbitPredict orbit;
         cout << "Low Thread" <<endl;
-        cout << "Time (ModJDate)      x (km)         y (km)        z (km)   vx (km/sec)   vy (km/sec)   vz (km/sec)" <<endl;
-        cout << "---------------    ---------       -------        -------   -----------   -----------  -----------" <<endl;
+        cout << "Time (ModJDate)      x (km)         y (km)        z (km)   vx (km/sec)   vy (km/sec)   vz (km/sec)    mass (kg)" <<endl;
+        cout << "---------------    ---------       -------        -------   -----------   -----------  -----------  -----------" <<endl;
         cout.precision(15);
         cout << Mjd_UTC << "  " <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 <<  "  " <<
-                vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
+                vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  << mass0 <<endl;
         LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
 
         for (int i = 0; i < 0.5*DayToSec/step; ++i)
@@ -169,7 +169,7 @@ public:
             LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
         }
         cout << Mjd_UTC <<  "  "  <<pos(0)/1000 <<  "  "  <<pos(1)/1000 <<  "  "  <<pos(2)/1000 << "  "  <<
-                vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  <<endl;
+                vel(0)/1000<<  "  "  <<vel(1)/1000<<  "  "  <<vel(2)/1000<<  "  "  << mass0 <<endl;
     }
 };
 int main(int argc, char *argv[])
