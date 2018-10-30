@@ -1,5 +1,5 @@
 ﻿#==============================================================================
-# NLOPT CMake file
+# NLOPT 2.5 (2018) CMake file
 #
 # NLopt is a free/open-source library for nonlinear optimization, providing
 # a common interface for a number of different free optimization routines
@@ -86,6 +86,8 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/nlopt_config.h.in ${CMAKE_CURRENT_SO
 set (NLOPT_HEADERS ${PROJECT_BINARY_DIR}/src/api/nlopt.h ${PROJECT_BINARY_DIR}/src/api/nlopt.hpp)
 
 set (NLOPT_SOURCES
+  src/algs/ags/data_types.hpp src/algs/ags/evolvent.hpp src/algs/ags/evolvent.cc src/algs/ags/solver.hpp src/algs/ags/solver.cc
+  src/algs/ags/local_optimizer.hpp src/algs/ags/local_optimizer.cc src/algs/ags/ags.h src/algs/ags/ags.cc
   src/algs/direct/DIRect.c src/algs/direct/direct_wrap.c src/algs/direct/DIRserial.c src/algs/direct/DIRsubrout.c src/algs/direct/direct-internal.h src/algs/direct/direct.h
   src/algs/cdirect/cdirect.c src/algs/cdirect/hybrid.c src/algs/cdirect/cdirect.h
   src/algs/praxis/praxis.c src/algs/praxis/praxis.h
@@ -117,6 +119,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 INCLUDE_DIRECTORIES (
                     ${PROJECT_SOURCE_DIR}/src/algs/stogo
+					${PROJECT_SOURCE_DIR}/src/algs/ags
                     ${PROJECT_SOURCE_DIR}/src/util
                     ${PROJECT_SOURCE_DIR}/src/algs/direct
                     ${PROJECT_SOURCE_DIR}/src/algs/cdirect

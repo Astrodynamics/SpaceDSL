@@ -103,7 +103,8 @@ namespace NLOpt
         LD_SLSQP,
         LD_CCSAQ,
         GN_ESCH,
-        NUM_ALGORITHMS /* not an algorithm, just the number of them */
+        GN_AGS,
+        NUM_ALGORITHMS        /* not an algorithm, just the number of them */
     };
     enum ResultType
     {
