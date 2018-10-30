@@ -158,13 +158,22 @@ namespace SpaceDSL{
     Description:
     Defined self Exception Class
     **************************************************/
-    const char *SPException::what() const
+    // add "throw ()" by xiaogongwei
+    const char *SPException::what() const throw ()
     {
         Log *pLog = new Log();
         pLog->set_pattern("*** [%Y-%m-%d %H:%M:%S %z] [thread %t] %v ***");
         auto exception_logger = pLog->rotating_logger_mt("Exception_Logger", "Exception.log", 1048576 * 2, 2);
         char buf[10];
+        // ****** debug xiaogongwei
+#if defined(_WIN32)
+// Windows OS
         sprintf_s(buf, "%d", m_nLine);
+#else
+// Linux OS or MAC OS
+        snprintf(buf, m_nLine, "%d");
+#endif
+        // ****** end xiaogongwei
         string sLine = buf;
         string sFile = m_pFileChar;
         string sFunc = m_pFunctionChar;

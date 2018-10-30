@@ -702,11 +702,22 @@ void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
     long de_version;
     char title[84];
     //******************** By Niu Zhiyong
+//    FILE *ifile;
+//    FILE **ppfile = &ifile;
+//    int e = fopen_s(ppfile,ephemeris_filename, "rb");
+//    ifile = *ppfile;
+    //***************
+    // ****** Debug by xiaogongwei
+#if defined(_WIN32)
     FILE *ifile;
     FILE **ppfile = &ifile;
     int e = fopen_s(ppfile,ephemeris_filename, "rb");
     ifile = *ppfile;
-    //***************
+#else
+    FILE *ifile = fopen( ephemeris_filename, "rb");
+#endif
+    // ****** End xiaogongwei
+
     //FILE *ifile = fopen( ephemeris_filename, "rb");
     struct jpl_eph_data *rval;
     struct jpl_eph_data temp_data;
