@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -58,6 +58,7 @@ namespace SpaceDSL {
      * Date:2018-07-27
      * Description:
     **************************************************/
+    class MissionThread;// debug by xiaogongwei
     class SPACEDSL_API Mission
     {
     public:
