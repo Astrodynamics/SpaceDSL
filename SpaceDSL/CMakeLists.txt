@@ -16,7 +16,7 @@ set(CMAKE_CXX_STANDARD 14)
 message(STATUS "#ALL_OUTPUT_PATH=${ALL_OUTPUT_PATH}")
 
 # Set folder in project dir
-add_subdirectory(include)
+add_subdirectory(Include)
 add_subdirectory(source)
 
 
