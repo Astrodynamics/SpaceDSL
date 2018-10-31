@@ -19,7 +19,6 @@ list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/SpaceDSL/Include)
 list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/nlopt/src/api)
 
 # Set if build With OpenSSL or not
-option(USE_OPENSSL "Build With OpenSSL." TRUE)
 if (USE_OPENSSL)
     Add_Definitions(-DWITH_OPENSSL)
     find_package(OPENSSL)

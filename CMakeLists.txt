@@ -28,7 +28,7 @@ add_subdirectory(astrodata)
 add_subdirectory(doc)
 add_subdirectory(Dependence)
 add_subdirectory(SpaceDSL)
-add_subdirectory(NLopt)
+add_subdirectory(NLOpt)
 add_subdirectory(ElectronVisualizer)
 
 # Set Data File path
@@ -40,7 +40,7 @@ SET(Dependence_DIR ${PROJECT_SOURCE_DIR}/Dependence/Eigen)
 option(BUILD_TESTS "Build Tests." TRUE)
 if (BUILD_TESTS)
     #enable_testing()
-    add_subdirectory(Ctest)
+    add_subdirectory(ctest)
 endif()
 
 FILE(COPY ${AstroData_DIR} DESTINATION ${ALL_OUTPUT_PATH})
