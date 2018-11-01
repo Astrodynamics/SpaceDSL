@@ -28,11 +28,7 @@ add_subdirectory(astrodata)
 add_subdirectory(doc)
 add_subdirectory(Dependence)
 add_subdirectory(SpaceDSL)
-<<<<<<< HEAD
-add_subdirectory(nlopt)
-=======
 add_subdirectory(NLOpt)
->>>>>>> upstream/master
 add_subdirectory(ElectronVisualizer)
 
 # Set Data File path
