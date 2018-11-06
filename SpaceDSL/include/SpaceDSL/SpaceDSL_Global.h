@@ -39,12 +39,42 @@
 
 #include <exception>
 
-#ifdef SPACEDSL_SHARED_LIBRARY
-    #define SPACEDSL_API __declspec(dllexport)
-    #define EXPIMP_TEMPLATE
+/********************************************************************/
+/// Define Linux and windows export library functions
+/// @Author	xiaogongwei
+/// @Date	2018-11-06
+/********************************************************************/
+#ifndef _WIN32
+    #define SHARELIBSHARED_EXPORT     __attribute__((visibility("default")))
+    #define SHARELIBSHARED_IMPORT     __attribute__((visibility("default")))
+    #define SHARELIBSHARED_HIDDEN     __attribute__((visibility("hidden")))
+#elif
+    #define SHARELIBSHARED_EXPORT     __declspec(dllexport)
+    #define SHARELIBSHARED_IMPORT     __declspec(dllimport)
+#endif
+
+/********************************************************************/
+/// If you build code into executable programs, you need to define EXPORT_SPACEDSL_LIB.
+/// @Author	xiaogongwei
+/// @Date	2018-11-06
+/********************************************************************/
+//#define EXPORT_SPACEDSL_LIB
+
+#ifndef EXPORT_SPACEDSL_LIB
+
+#define SPACEDSL_API
+#define EXPIMP_TEMPLATE
+
 #else
-    #define SPACEDSL_API __declspec(dllimport)
+
+#ifdef SPACEDSL_SHARED_LIBRARY
+#define SPACEDSL_API SHARELIBSHARED_EXPORT
+#define EXPIMP_TEMPLATE
+#else
+    #define SPACEDSL_API SHARELIBSHARED_IMPORT
     #define EXPIMP_TEMPLATE extern
+#endif
+
 #endif
 
 
