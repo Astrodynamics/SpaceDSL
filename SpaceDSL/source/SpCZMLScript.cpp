@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -81,6 +81,128 @@ namespace SpaceDSL {
         m_Step = step;
 
         m_bIsInitialized = true;
+    }
+
+    void CZMLScript::WirteCZML(vector<double> data_MJD_POS, vector<double> data_MJD_Vel, string vehicl_name)
+    {
+        if (m_bIsInitialized != true)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "CZMLScript Uninitialized!");
+
+        int MJD_POS_Len = data_MJD_POS.size();
+        int MJD_Vel_Len = data_MJD_Vel.size();
+        if(MJD_Vel_Len != MJD_POS_Len)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "length MJD_POS must equal MJD_Vel!");
+        if(MJD_POS_Len < 4)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "MJD_POS must great 4!");
+
+        double initialMJD = data_MJD_POS[0], terminalMJD = data_MJD_POS[MJD_POS_Len-4];
+        // get initial and terminal CalendarTime
+        CalendarTime initialEpoch, terminationEpoch;
+        MjdToCalendarTime(initialMJD, initialEpoch);
+        MjdToCalendarTime(terminalMJD, terminationEpoch);
+        string initialEpochStr = FormTimeStr(initialEpoch.Year(),initialEpoch.Mon(),initialEpoch.Day(),
+                                             initialEpoch.Hour(),initialEpoch.Min(),initialEpoch.Sec());
+        string intervalEpochStr = FormTimeIntervalStr(initialEpoch.Year(),initialEpoch.Mon(),initialEpoch.Day(),
+                                                 initialEpoch.Hour(),initialEpoch.Min(),initialEpoch.Sec(),
+                                                 terminationEpoch.Year(),terminationEpoch.Mon(),terminationEpoch.Day(),
+                                                 terminationEpoch.Hour(),terminationEpoch.Min(),terminationEpoch.Sec());
+        // Head
+        json *pJhead = new json();
+        (*pJhead)["id"] = "document";
+        (*pJhead)["name"] = "DataFile";
+        (*pJhead)["version"] = "1.0";
+        (*pJhead)["clock"]["interval"] = intervalEpochStr;
+        (*pJhead)["clock"]["currentTime"] = initialEpochStr;
+        (*pJhead)["clock"]["multiplier"] = 60;
+        (*pJhead)["clock"]["range"] = "LOOP_STOP";
+        (*pJhead)["clock"]["step"] = "SYSTEM_CLOCK_MULTIPLIER";
+        m_pJsonList->push_back(*pJhead);
+        // single Vehicle
+        int colorStep = int(255/(1+1));
+        int vehiclCount = 0;
+        ++vehiclCount;
+        int bias = colorStep * vehiclCount;
+        json *pJvehicl = new json();
+        string name = vehicl_name;
+
+        (*pJvehicl)["id"] = "Satellite/" + name;
+        (*pJvehicl)["name"] = name;
+        (*pJvehicl)["availability"] = intervalEpochStr;
+        (*pJvehicl)["description"] = "<!--HTML-->\r\n<p>  Test Satellite  </p>";
+
+        (*pJvehicl)["billboard"]["horizontalOrigin"] = "CENTER";
+        (*pJvehicl)["billboard"]["verticalOrigin"] = "CENTER";
+        (*pJvehicl)["billboard"]["image"] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADJSURBVDhPnZHRDcMgEEMZjVEYpaNklIzSEfLfD4qNnXAJSFWfhO7w2Zc0Tf9QG2rXrEzSUeZLOGm47WoH95x3Hl3jEgilvDgsOQUTqsNl68ezEwn1vae6lceSEEYvvWNT/Rxc4CXQNGadho1NXoJ+9iaqc2xi2xbt23PJCDIB6TQjOC6Bho/sDy3fBQT8PrVhibU7yBFcEPaRxOoeTwbwByCOYf9VGp1BYI1BA+EeHhmfzKbBoJEQwn1yzUZtyspIQUha85MpkNIXB7GizqDEECsAAAAASUVORK5CYII=";
+        (*pJvehicl)["billboard"]["scale"] = 1;
+        (*pJvehicl)["billboard"]["show"] = true;
+
+        (*pJvehicl)["label"]["text"] = name;
+        (*pJvehicl)["label"]["horizontalOrigin"] ="LEFT";
+        (*pJvehicl)["label"]["verticalOrigin"] ="CENTER";
+        (*pJvehicl)["label"]["fillColor"]["rgba"] = {bias , 255 - bias, 0, 255};
+        (*pJvehicl)["label"]["font"] ="11pt Lucida Console";
+        (*pJvehicl)["label"]["pixelOffset"]["cartesian2"] = {6, -4};
+        (*pJvehicl)["label"]["show"] = true;
+
+        vector<json> showTimePeriodList;
+        json showTimePeriod;
+        showTimePeriod["interval"] = intervalEpochStr;
+        showTimePeriod["boolean"] = true;
+        showTimePeriodList.push_back(showTimePeriod);
+        (*pJvehicl)["path"]["show"]= showTimePeriodList;
+        (*pJvehicl)["path"]["width"] = 1;
+        (*pJvehicl)["path"]["material"]["solidColor"]["color"]["rgba"] = {bias , 255 - bias, 0, 255};
+        (*pJvehicl)["path"]["resolution"] = 120;
+
+        OrbitElem elem;
+        CartState endState(data_MJD_POS[MJD_POS_Len-3], data_MJD_POS[MJD_POS_Len-2], data_MJD_POS[MJD_POS_Len-1],
+                data_MJD_Vel[MJD_POS_Len-3], data_MJD_Vel[MJD_POS_Len-2], data_MJD_Vel[MJD_POS_Len-1]);// last pos and speed
+        CartToOrbitElem (endState, GM_Earth, elem);
+        double T = 2*PI*sqrt(pow(elem.SMajAx(),3)/GM_Earth);
+
+        vector<json> leadTimeList;
+        json leadTimePeriod;
+        leadTimePeriod["interval"] = intervalEpochStr;
+        leadTimePeriod["epoch"] = initialEpochStr;
+        leadTimePeriod["number"] = {0, T , T, 0};
+        leadTimeList.push_back(leadTimePeriod);
+        (*pJvehicl)["path"]["leadTime"] = leadTimeList;
+
+        vector<json> trailTimeList;
+        json trailTimePeriod;
+        trailTimePeriod["interval"] = intervalEpochStr;
+        trailTimePeriod["epoch"] = initialEpochStr;
+        trailTimePeriod["number"] = {T};
+        trailTimeList.push_back(trailTimePeriod);
+        (*pJvehicl)["path"]["trailTime"] = trailTimeList;
+
+        (*pJvehicl)["position"]["interpolationAlgorithm"] = "LAGRANGE";
+        (*pJvehicl)["position"]["interpolationDegree"] = 5;
+        (*pJvehicl)["position"]["referenceFrame"] = "INERTIAL";
+        (*pJvehicl)["position"]["epoch"] = initialEpochStr;
+        //
+        vector<double> processData;
+        for (int i = 0;i < data_MJD_POS.size(); i++)
+        {
+            if(i%4 == 0)
+            {
+                processData.push_back((data_MJD_POS[i] - initialMJD)*DayToSec);
+            }
+            else
+            {
+                processData.push_back(data_MJD_POS[i]);
+
+            }
+        }
+        (*pJvehicl)["position"]["cartesian"] = processData;
+
+        m_pJsonList->push_back(*pJvehicl);
+
+        m_pJsonToWirte = new json(*m_pJsonList);
+        ofstream o(m_FilePath);
+        o << setw(4);
+        o << (*m_pJsonToWirte) << endl;
+        o.close();
     }
 
     void CZMLScript::WirteCZML()
