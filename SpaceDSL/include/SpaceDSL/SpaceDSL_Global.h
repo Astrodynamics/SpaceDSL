@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -58,6 +58,6 @@ namespace std {
     EXPIMP_TEMPLATE class SPACEDSL_API exception;
 }
 
-//#pragma warning(disable: 4251)
+#pragma warning(disable: 4251)
 
 #endif // SPACEDSL_GLOBAL_H
