@@ -39,17 +39,18 @@
 
 #include <exception>
 
-#ifdef SPACEDSL_SHARED_LIBRARY
-    #define SPACEDSL_API __declspec(dllexport)
-    #define EXPIMP_TEMPLATE
+#ifdef _WIN32
+    #ifdef SPACEDSL_SHARED_LIBRARY
+        #define SPACEDSL_API __declspec(dllexport)
+        #define EXPIMP_TEMPLATE
+    #elif SPACEDSL_STATIC_LIBRARY
+        #define SPACEDSL_API
+        #define EXPIMP_TEMPLATE
+    #else
+        #define SPACEDSL_API __declspec(dllimport)
+        #define EXPIMP_TEMPLATE extern
+    #endif
 #else
-    #define SPACEDSL_API __declspec(dllimport)
-    #define EXPIMP_TEMPLATE extern
-#endif
-
-
-
-#ifdef SPACEDSL_STATIC_LIBRARY
     #define SPACEDSL_API
     #define EXPIMP_TEMPLATE
 #endif

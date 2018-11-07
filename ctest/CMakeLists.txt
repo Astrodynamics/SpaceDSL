@@ -14,9 +14,10 @@ set(CMAKE_CXX_STANDARD 14)
 
 # Set Include h file path
 list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/Dependence)
-list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/SpaceDSL/Include)
+list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/SpaceDSL/include)
+list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/SpaceDSL/include/SpaceDSL)
 # Set Include h file patIh
-list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/nlopt/src/api)
+list(APPEND CTEST_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/NLOpt/src/api)
 
 # Set if build With OpenSSL or not
 if (USE_OPENSSL)
@@ -47,18 +48,34 @@ add_executable(ThreadTest TestThread.cpp)
 add_executable(NLOptTest TestNLOpt.cpp)
 
 # UnitTest Set if build SHARED LIBS  or not
-if (BUILD_SHARED_LIBS)
-        TARGET_LINK_LIBRARIES(UnitTest SpaceDSL)
-else()
-        TARGET_LINK_LIBRARIES(UnitTest SpaceDSL_static)
-endif()
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    if (BUILD_SHARED_LIBS)
+            TARGET_LINK_LIBRARIES(UnitTest SpaceDSL)
+    else()
+            TARGET_LINK_LIBRARIES(UnitTest SpaceDSL_static)
+    endif()
+ELSE()
+    if (BUILD_SHARED_LIBS)
+            TARGET_LINK_LIBRARIES(UnitTest SpaceDSL pthread)
+    else()
+            TARGET_LINK_LIBRARIES(UnitTest SpaceDSL_static pthread)
+    endif()
+ENDIF()
 
 # ThreadTest Set if build SHARED LIBS  or not
-if (BUILD_SHARED_LIBS)
-        TARGET_LINK_LIBRARIES(ThreadTest SpaceDSL)
-else()
-        TARGET_LINK_LIBRARIES(ThreadTest SpaceDSL_static)
-endif()
+IF (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    if (BUILD_SHARED_LIBS)
+            TARGET_LINK_LIBRARIES(ThreadTest SpaceDSL)
+    else()
+            TARGET_LINK_LIBRARIES(ThreadTest SpaceDSL_static)
+    endif()
+ELSE()
+    if (BUILD_SHARED_LIBS)
+            TARGET_LINK_LIBRARIES(ThreadTest SpaceDSL pthread)
+    else()
+            TARGET_LINK_LIBRARIES(ThreadTest SpaceDSL_static pthread)
+    endif()
+ENDIF()
 
 # NLOptTest Set if build SHARED LIBS  or not
 if (BUILD_SHARED_LIBS)
