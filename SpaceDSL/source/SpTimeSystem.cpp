@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -95,7 +95,7 @@ namespace SpaceDSL{
         {
             return false;
         }
-        else if (this->m_Sec != time.Sec())
+        else if (fabs(this->m_Sec - time.Sec()) > EPS)
         {
             return false;
         }
@@ -125,7 +125,7 @@ namespace SpaceDSL{
         {
             return true;
         }
-        else if (this->m_Sec != time.Sec())
+        else if (fabs(this->m_Sec - time.Sec()) <= EPS)
         {
             return true;
         }
@@ -287,10 +287,10 @@ namespace SpaceDSL{
         if (m_pTimeStr != nullptr)
             free (m_pTimeStr);
         int len = int(tempStr.size()) + 1;
-        m_pTimeStr = (char *)malloc(len * sizeof(m_pTimeStr[0]));
+        m_pTimeStr = static_cast<char *>(malloc(static_cast<unsigned long long>(len) * sizeof(m_pTimeStr[0])));
 
 #if defined(_WIN32)
-        strcpy_s(m_pTimeStr, len, tempStr.c_str());
+        strcpy_s(m_pTimeStr, static_cast<unsigned long long>(len), tempStr.c_str());
 #else
         strncpy(m_pTimeStr, tempStr.c_str(), len);
 #endif
@@ -537,7 +537,7 @@ namespace SpaceDSL{
                 ++line;
             }
 
-            m_EOPData = new double *[line];
+            m_EOPData = new double *[static_cast<unsigned long long>(line)];
             for (int i = 0; i < line; ++i)
             {
                 m_EOPData[i] = new double[7];
@@ -579,7 +579,7 @@ namespace SpaceDSL{
             }
 
             m_LeapsecondDataLine = line;
-            m_LeapsecondData = new double *[line];
+            m_LeapsecondData = new double *[static_cast<unsigned long long>(line)];
             for (int i = 0; i < line; ++i)
             {
                 m_LeapsecondData[i] = new double[2];
@@ -640,7 +640,7 @@ namespace SpaceDSL{
     }
     #endif
 
-    double IERSService::GetValue(double Mjd_UTC, char *param, char *series)
+    double IERSService::GetValue(double Mjd_UTC, const char *param, const char *series)
     {
         if (m_bIsUseWebService == true) //Use IERS Web Service
         {
@@ -676,10 +676,10 @@ namespace SpaceDSL{
 
             if (series == nullptr)
             {
-                soap_call_ns2__getTimescale(&readIERS, nullptr, nullptr, param, datetime, result);
+                soap_call_ns2__getTimescale(&readIERS, nullptr, nullptr, const_cast<char *>(param), datetime, result);
             }
             else
-                soap_call_ns1__readEOP(&readIERS, nullptr, nullptr, param, series, mjd, result);
+                soap_call_ns1__readEOP(&readIERS, nullptr, nullptr, const_cast<char *>(param), const_cast<char *>(series), mjd, result);
 
             if (result == nullptr)
             {
@@ -693,13 +693,13 @@ namespace SpaceDSL{
         }
         else //Read File
         {
-            char *x_poleStr = "x_pole";
-            char *sigma_x_poleStr = "sigma_x_pole";
-            char *y_poleStr = "y_pole";
-            char *sigma_y_poleStr = "sigma_y_pole";
-            char *UT1_UTCStr = "UT1-UTC";
-            char *sigma_UT1_UTCStr = "sigma_UT1-UTC";
-            char *leapsecondStr = "leapseconds";
+            const char *x_poleStr = "x_pole";
+            const char *sigma_x_poleStr = "sigma_x_pole";
+            const char *y_poleStr = "y_pole";
+            const char *sigma_y_poleStr = "sigma_y_pole";
+            const char *UT1_UTCStr = "UT1-UTC";
+            const char *sigma_UT1_UTCStr = "sigma_UT1-UTC";
+            const char *leapsecondStr = "leapseconds";
 
             if ( strcmp(param, leapsecondStr) != 0
                  && (Mjd_UTC < m_EOPData[0][0] || Mjd_UTC > m_EOPData[m_EOPDataLine-1][0]) )
