@@ -1,4 +1,4 @@
-﻿/************************************************************************
+/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -66,7 +66,7 @@ namespace SpaceDSL {
 
     public:
 
-         void Initializer(const string &filePath, const Mission *pMission, const double step = 300);
+         void Initializer(const string &filePath, const Mission *pMission = nullptr, const double step = 300);
 
         /********************************************************************/
         /// Writing CZML Content For Use With Cesium.
@@ -77,6 +77,17 @@ namespace SpaceDSL {
         /// @Return void
         /********************************************************************/
         void        WirteCZML();
+
+        /********************************************************************/
+        /// Writing CZML Content For Use With Cesium.
+        /// @Author	xiaogongwei
+        /// @Date	2018-11-06
+        /// @Input  data_MJD_POS=[mjd1,x1,y1,z1,mjd2,x2,y2,z2,......] (x1,y1,z1) is position in J2000 coordinate system
+        /// @Input  data_MJD_Vel=[mjd1,v1,v1,v1,mjd2,v2,v2,v2,......] (v1,v1,v1) is speed
+        /// @vehicl_name  this is you defined vehicl name
+        /// @Return void
+        /********************************************************************/
+        void WirteCZML(vector<double> data_MJD_POS, vector<double> data_MJD_Vel, string vehicl_name = "Vehicl Defualt Name");
 
     private:
 

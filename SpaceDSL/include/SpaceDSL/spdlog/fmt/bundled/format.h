@@ -3710,6 +3710,7 @@ FMT_END_NAMESPACE
 # include "format-inl.h"
 #else
 # define FMT_FUNC
+# include "format.cc" // this line add by xiaogongwei, right or not?
 #endif
 
 // Restore warnings.
