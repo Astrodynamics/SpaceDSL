@@ -53,7 +53,7 @@ If you want to use IERS Web Service, this library must be Precompiled.
 This project was created by `Niu Zhiyong`
 During the development process, we received the guidance and help from `Professor Wang Hua` of NUDT Aerospace College.
 Significant features and/or improvements to the code were contributed by
-`Sun Zhenjiang`
+`Sun Zhenjiang`,`Xiao Gongwei`
 
 
 ## License
