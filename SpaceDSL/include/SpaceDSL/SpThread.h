@@ -213,7 +213,7 @@ namespace SpaceDSL {
             pthread_attr_t      m_Thread_attr;
             pthread_t           m_Thread_t;
             int                 m_MaxPriority;
-            int                 m_MinPriority; // add ";" by xiaogongwei
+            int                 m_MinPriority;
         #endif
 
     };
@@ -233,7 +233,7 @@ namespace SpaceDSL {
      * Date:2018-05-20
      * Description:
     **************************************************/
-    class MonitorThread; // debug by xiaogongwei
+    class MonitorThread;
     class SPACEDSL_API SpThreadPool
     {
     public:

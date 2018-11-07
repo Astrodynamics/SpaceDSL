@@ -32,6 +32,7 @@
 *   Last modified:
 *
 *   2018-03-20  Niu Zhiyong (1st edition)
+*   2018-11-01  xiaogongwei
 *
 *************************************************************************/
 
@@ -81,7 +82,7 @@ namespace SpaceDSL {
             m_Handle = nullptr;
         #else
             m_Thread_t = 0;
-            pthread_attr_destroy(&m_Thread_attr);// add "&" by xiaogongwei
+            pthread_attr_destroy(&m_Thread_attr);
         #endif
         --ThreadGlobalCounter;
     }
@@ -113,7 +114,8 @@ namespace SpaceDSL {
                 SetThreadPriority(m_Handle, THREAD_PRIORITY_IDLE);
                 break;
             default:
-                break;
+                throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                                  "SpThread::SetPriority Unsupport Thread Priority");
             }
         #else
             struct sched_param param;
@@ -137,7 +139,7 @@ namespace SpaceDSL {
                 param.__sched_priority = 1;
                 break;
             default:
-                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Priority won't Support it!");
+                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread::SetPriority Unsupport Thread Priority");
                 break;
             }
             pthread_attr_setschedparam(&m_Thread_attr, &param);
@@ -152,27 +154,21 @@ namespace SpaceDSL {
             {
             case THREAD_PRIORITY_NORMAL:
                 return NormalPriority;
-                break;
             case THREAD_PRIORITY_ABOVE_NORMAL:
                 return HighPriority;
-                break;
             case THREAD_PRIORITY_HIGHEST:
                 return HighestPriority;
-                break;
             case THREAD_PRIORITY_BELOW_NORMAL:
                 return LowPriority;
-                break;
             case THREAD_PRIORITY_LOWEST:
                 return LowestPriority;
-                break;
             case THREAD_PRIORITY_TIME_CRITICAL:
                 return TimeCriticalPriority;
-                break;
             case THREAD_PRIORITY_IDLE:
                 return IdlePriority;
-                break;
             default:
-                break;
+                throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                                  "SpThread::Getpriority Unsupport Thread Priority");
             }
         #else
             struct sched_param param;
@@ -189,7 +185,7 @@ namespace SpaceDSL {
             else if (param.__sched_priority >= 80 && param.__sched_priority <= 99)
                 return HighestPriority;
             else
-                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Thread Sched_param Error!");
+                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread::Getpriority Unsupport Thread Priority");
         #endif
 
         return m_Priority;
@@ -228,7 +224,7 @@ namespace SpaceDSL {
     void* SpThread::ThreadFunc(void* arg)
 #endif
     {
-        SpThread *pThis = (SpThread*)arg;
+        SpThread *pThis = static_cast<SpThread*>(arg);
         pThis->Run();
         return NULL;
     }
@@ -267,7 +263,7 @@ namespace SpaceDSL {
         #else
             pthread_join(m_Thread_t, nullptr);
             m_Thread_t = 0;
-        #endif // _WIN32
+        #endif
     }
 
     bool SpThread::isRunning() const
@@ -282,7 +278,14 @@ namespace SpaceDSL {
             else
                 return false;
         #else
-
+            int exitCode;
+            exitCode = pthread_kill(m_Thread_t, 0);
+            if(exitCode == ESRCH)
+                return false;
+            else if(exitCode == EINVAL)
+                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: isFinished Pthread Illegal Signal!");
+            else
+                return true;
         #endif
 
     }
@@ -299,7 +302,14 @@ namespace SpaceDSL {
             else
                 return true;
         #else
-
+            int exitCode;
+            exitCode = pthread_kill(m_Thread_t, 0);
+            if(exitCode == ESRCH)
+                return true;
+            else if(exitCode == EINVAL)
+                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: isFinished Pthread Illegal Signal!");
+            else
+                return false;
         #endif
     }
 
@@ -379,8 +389,6 @@ namespace SpaceDSL {
                     return false;
                 }
             }
-
-
         }
         return true;
     }
