@@ -469,7 +469,7 @@ namespace SpaceDSL {
                 double step = m_pPropagator->GetInitialStep();
                 for (int i = 0; i < m_pMission->m_DurationSec/step; ++i)
                 {
-                    predictConfig.SetMJD_UTC(Mjd_UTC);
+                    predictConfig.Update(Mjd_UTC);
                     orbit.OrbitStep(predictConfig,step, E_RungeKutta4, mass, pos, vel);
                     Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
                     LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
@@ -514,7 +514,7 @@ namespace SpaceDSL {
             double step = m_pPropagator->GetInitialStep();
             for (int i = 0; i < m_pMission->m_DurationSec/step; ++i)
             {
-                predictConfig.SetMJD_UTC(Mjd_UTC);
+                predictConfig.Update(Mjd_UTC);
                 orbit.OrbitStep(predictConfig,step, E_RungeKutta4, mass, pos, vel);
                 Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
                 LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
