@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -73,7 +73,7 @@ namespace SpaceDSL {
 
     SpThread::~SpThread()
     {
-        #ifdef WIN32
+        #ifdef _WIN32
             if (nullptr != m_Handle)
             {
                 CloseHandle(m_Handle);
@@ -207,7 +207,7 @@ namespace SpaceDSL {
 
     void SpThread::Start()
     {
-       #ifdef WIN32
+       #ifdef _WIN32
            m_Handle = (HANDLE)_beginthreadex(nullptr, 0, ThreadFunc, this, 0, nullptr);
            if (m_Handle == nullptr)
            {
@@ -267,7 +267,7 @@ namespace SpaceDSL {
         #else
             pthread_join(m_Thread_t, nullptr);
             m_Thread_t = 0;
-        #endif // WIN32
+        #endif // _WIN32
     }
 
     bool SpThread::isRunning() const

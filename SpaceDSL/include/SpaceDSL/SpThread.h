@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -189,7 +189,7 @@ namespace SpaceDSL {
         virtual void Run() = 0;
 
      private:
-        #ifdef WIN32
+        #ifdef _WIN32
             static unsigned __stdcall ThreadFunc(void* arg);
         #else
             static void* ThreadFunc(void* arg);

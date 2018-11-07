@@ -10,6 +10,10 @@ int main(int argc, char *argv[])
     cout<<"SpaceDSL Test Run!"<<endl;
     try
     {   /// Initial Data
+        UTCCalTime date_time     (2018,1,4,1,0,0.0);
+        double mjd = CalendarTimeToMjd(date_time);
+        UTCCalTime date_time2;
+        MjdToCalendarTime(mjd, date_time2);
         UTCCalTime initial_time     (2018,1,4,16,58,11.1);
         UTCCalTime termination_time (2018,1,5,16,58,11.1);
 

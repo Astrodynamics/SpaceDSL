@@ -43,6 +43,14 @@
 
 #include "SpaceDSL_Global.h"
 #include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+#include "spdlog/sinks/stdout_sinks.h"
+#include "spdlog/sinks/basic_file_sink.h"
+#include "spdlog/sinks/rotating_file_sink.h"
+#include "spdlog/sinks/daily_file_sink.h"
+#include "spdlog/async.h"
+#include "spdlog/fmt/bin_to_hex.h"
+#include "spdlog/fmt/ostr.h"
 
 using namespace std;
 /// All the functions are in the namespace SpaceDSL
@@ -53,7 +61,7 @@ namespace SpaceDSL {
 	Author: Niu ZhiYong
 	Date:2018-01-29
 	Description:
-	Repackaged the spdlog From (https://github.com/gabime/spdlog)
+    Repackaged the spdlog v1.3.0 From (https://github.com/gabime/spdlog)
 	**************************************************/
     class SPACEDSL_API Log
 	{
@@ -73,7 +81,7 @@ namespace SpaceDSL {
 		// example: spdlog::set_pattern("%Y-%m-%d %H:%M:%S.%e %l : %v");
 		//
 		void set_pattern(const std::string& format_string);
-		void set_formatter(spdlog::formatter_ptr f);
+        void set_formatter(std::unique_ptr<spdlog::formatter> &formatter);
 
 		//
 		// Set global logging level
@@ -88,33 +96,7 @@ namespace SpaceDSL {
 		//
 		// Set global error handler
 		//
-		//void set_error_handler(spdlog::log_err_handler);
-
-		//
-		// Turn on async mode (off by default) and set the queue size for each async_logger.
-		// effective only for loggers created after this call.
-		// queue_size: size of queue (must be power of 2):
-		//    Each logger will pre-allocate a dedicated queue with queue_size entries upon construction.
-		//
-		// async_overflow_policy (optional, block_retry by default):
-		//    async_overflow_policy::block_retry - if queue is full, block until queue has room for the new log entry.
-		//    async_overflow_policy::discard_log_msg - never block and discard any new messages when queue  overflows.
-		//
-		// worker_warmup_cb (optional):
-		//     callback function that will be called in worker thread upon start (can be used to init stuff like thread affinity)
-		//
-		// worker_teardown_cb (optional):
-		//     callback function that will be called in worker thread upon exit
-		//
-		void set_async_mode(size_t queue_size,
-							const spdlog::async_overflow_policy overflow_policy =spdlog:: async_overflow_policy::block_retry,
-							const std::function<void()>& worker_warmup_cb = nullptr,
-							const std::chrono::milliseconds& flush_interval_ms = std::chrono::milliseconds::zero(),
-							const std::function<void()>& worker_teardown_cb = nullptr);
-
-		// Turn off async mode
-		void set_sync_mode();
-
+        void set_error_handler(spdlog::log_err_handler handler);
 
 		//
 		// Create and register multi/single threaded basic file logger.

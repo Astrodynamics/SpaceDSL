@@ -104,6 +104,8 @@ namespace SpaceDSL {
 
         bool                        IsInitialized();
 
+        void                        Update(double Mjd_UTC);
+
         void                        SetCenterStarType(SolarSysStarType type);
 
         SolarSysStarType            GetCenterStarType() const;
