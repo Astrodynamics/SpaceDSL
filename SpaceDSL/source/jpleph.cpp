@@ -1,4 +1,4 @@
-/* jpleph.cpp: JPL ephemeris functions
+﻿/* jpleph.cpp: JPL ephemeris functions
 
    Copyright (C) 2011, Project Pluto
 
@@ -707,7 +707,7 @@ void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
 //    int e = fopen_s(ppfile,ephemeris_filename, "rb");
 //    ifile = *ppfile;
     //***************
-    // ****** Debug by xiaogongwei
+
 #if defined(_WIN32)
     FILE *ifile;
     FILE **ppfile = &ifile;
@@ -716,7 +716,6 @@ void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
 #else
     FILE *ifile = fopen( ephemeris_filename, "rb");
 #endif
-    // ****** End xiaogongwei
 
     //FILE *ifile = fopen( ephemeris_filename, "rb");
     struct jpl_eph_data *rval;

@@ -32,6 +32,7 @@
 *   Last modified:
 *
 *   2018-03-20  Niu Zhiyong (1st edition)
+*   2018-11-01  xiaogongwei
 *
 *************************************************************************/
 #ifndef SPUTILS_H
@@ -228,7 +229,7 @@ namespace SpaceDSL {
         /// @brief  Override the what() in <exception>
         /// @input  <void>
         /// @return <void>
-        const char * what() const throw ();
+        const char * what() const  noexcept;
     };
 }
 
