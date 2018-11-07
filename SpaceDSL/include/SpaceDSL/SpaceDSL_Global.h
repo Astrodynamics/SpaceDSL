@@ -90,4 +90,7 @@ namespace std {
 
 //#pragma warning(disable: 4251)
 
+// if you want connect network download EOP data, please open WITH_OPENSSL
+//#define WITH_OPENSSL
+
 #endif // SPACEDSL_GLOBAL_H

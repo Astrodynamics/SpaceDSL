@@ -4654,6 +4654,7 @@ operator"" _a(const wchar_t *s, std::size_t)
 # include "format.cc"
 #else
 # define FMT_FUNC
+# include "format.cc" // this line add by xiaogongwei, right or not?
 #endif
 
 #endif  // FMT_FORMAT_H_
