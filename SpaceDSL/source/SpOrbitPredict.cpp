@@ -66,14 +66,11 @@ namespace SpaceDSL {
         {
         case E_Earth:
             return EarthRadius;
-            break;
         case E_Sun:
             return AU;
-            break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "NormalizeParameter: Center Star Type Unsupport ");
-            break;
         }
     }
 
@@ -83,14 +80,11 @@ namespace SpaceDSL {
         {
         case E_Earth:
             return sqrt(GM_Earth/EarthRadius);
-            break;
         case E_Sun:
             return sqrt(GM_Sun/AU);
-            break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "NormalizeParameter: Center Star Type Unsupport ");
-            break;
         }
     }
 
@@ -100,14 +94,11 @@ namespace SpaceDSL {
         {
         case E_Earth:
             return EarthRadius/sqrt(GM_Earth/EarthRadius);
-            break;
         case E_Sun:
             return AU/sqrt(GM_Sun/AU);
-            break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "NormalizeParameter: Center Star Type Unsupport ");
-            break;
         }
     }
 
@@ -117,14 +108,11 @@ namespace SpaceDSL {
         {
         case E_Earth:
             return  (GM_Earth*mass)/pow(EarthRadius,2);
-            break;
         case E_Sun:
             return (GM_Sun*mass)/pow(AU,2);
-            break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "NormalizeParameter: Center Star Type Unsupport ");
-            break;
         }
     }
 
@@ -172,6 +160,10 @@ namespace SpaceDSL {
                                          double f107A, double f107, double ap[],
                                          double SRPCoef, double SRPArea, bool isUseDrag, bool isUseSRP)
     {
+        if ( m_bIsInitialized == true)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "OrbitPredictConfig: m_OrbitPredictConfig Has Initialized! ");
+
         m_CenterStarType    = centerStarType;
 
         m_MJD_UTC           = Mjd_UTC;
@@ -245,7 +237,6 @@ namespace SpaceDSL {
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: SolarSysStarType Unsupport ");
-            break;
         }
 
         if (gravModelType != GravityModel::GravModelType::E_NotDefinedGravModel)
@@ -278,6 +269,11 @@ namespace SpaceDSL {
         return m_bIsInitialized;
     }
 
+    void OrbitPredictConfig::Update(double Mjd_UTC)
+    {
+        this->SetMJD_UTC(Mjd_UTC);
+    }
+
     void OrbitPredictConfig::SetCenterStarType(SolarSysStarType type)
     {
         if ( m_bIsInitialized == false)
@@ -300,40 +296,28 @@ namespace SpaceDSL {
         {
         case E_Mercury:
             return GM_Mercury;
-            break;
         case E_Venus:
             return GM_Venus;
-            break;
         case E_Earth:
             return GM_Earth;
-            break;
         case E_Mars:
             return GM_Mars;
-            break;
         case E_Jupiter:
             return GM_Jupiter;
-            break;
         case E_Saturn:
             return GM_Saturn;
-            break;
         case E_Uranus:
             return GM_Uranus;
-            break;
         case E_Neptune:
             return GM_Neptune;
-            break;
         case E_Pluto:
             return GM_Pluto;
-            break;
         case E_Moon:
             return GM_Moon;
-            break;
         case E_Sun:
             return GM_Sun;
-            break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,"OrbitPredictConfig:SolarSysStarType Unsupport ");
-            break;
         }
     }
 
@@ -638,7 +622,6 @@ namespace SpaceDSL {
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                               "OrbitPredictConfig: SolarSysStarType Unsupport ");
-            break;
         }
 
     }

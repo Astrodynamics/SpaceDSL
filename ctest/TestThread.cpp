@@ -70,7 +70,7 @@ public:
                 vel(0)/1000<< "       " <<vel(1)/1000<< "       " <<vel(2)/1000<< "       " <<endl;
         for (int i = 0; i < DayToSec/step; ++i)
         {
-            preConfig_twoBody.SetMJD_UTC(Mjd_UTC);
+            preConfig_twoBody.Update(Mjd_UTC);
             twoBodyPre.OrbitStep(preConfig_twoBody,step,RungeKutta::E_RungeKutta4, mass0, pos, vel);
             Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
             //cout << Mjd_UTC << "       " <<pos(0)/1000 << "       " <<pos(1)/1000 << "       " <<pos(2)/1000 << "       " <<
@@ -92,7 +92,7 @@ public:
 
         for (int i = 0; i < 0.5*DayToSec/step; ++i)
         {
-            preConfig1.SetMJD_UTC(Mjd_UTC);
+            preConfig1.Update(Mjd_UTC);
             orbit.OrbitStep(preConfig1, step, E_RungeKutta4, mass0, pos, vel);
             Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
             LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
@@ -163,7 +163,7 @@ public:
 
         for (int i = 0; i < 0.5*DayToSec/step; ++i)
         {
-            preConfig1.SetMJD_UTC(Mjd_UTC);
+            preConfig1.Update(Mjd_UTC);
             orbit.OrbitStep(preConfig1, step, E_RungeKutta4, mass0, pos, vel);
             Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
             LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);

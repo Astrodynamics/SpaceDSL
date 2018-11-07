@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -88,7 +88,7 @@ namespace std {
     EXPIMP_TEMPLATE class SPACEDSL_API exception;
 }
 
-//#pragma warning(disable: 4251)
+#pragma warning(disable: 4251)
 
 // if you want connect network download EOP data, please open WITH_OPENSSL
 //#define WITH_OPENSSL
