@@ -41,7 +41,7 @@
 #include "SpaceDSL_Global.h"
 
 #include <Eigen/Core>
-
+#include <Eigen/Geometry>
 
 using namespace Eigen;
 

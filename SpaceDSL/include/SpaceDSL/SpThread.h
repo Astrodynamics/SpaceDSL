@@ -54,6 +54,7 @@
     #include <process.h>
 #else
     #include <pthread.h>
+    #include <signal.h>
 #endif
 
 using namespace std;

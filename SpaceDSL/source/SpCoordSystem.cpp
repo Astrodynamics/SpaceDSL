@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,8 +36,6 @@
 *************************************************************************/
 
 #include <cmath>
-
-#include <Eigen/Geometry>
 
 #include "SpaceDSL/SpCoordSystem.h"
 #include "SpaceDSL/SpTimeSystem.h"

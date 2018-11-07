@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -44,6 +44,7 @@
 #include "SpConst.h"
 
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 using namespace Eigen;
 

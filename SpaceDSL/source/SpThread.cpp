@@ -283,7 +283,7 @@ namespace SpaceDSL {
             if(exitCode == ESRCH)
                 return false;
             else if(exitCode == EINVAL)
-                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: isFinished Pthread Illegal Signal!");
+                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: isRunning Pthread Illegal Signal!");
             else
                 return true;
         #endif
