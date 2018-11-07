@@ -125,7 +125,7 @@ namespace SpaceDSL{
         {
             return true;
         }
-        else if (fabs(this->m_Sec - time.Sec()) <= EPS)
+        else if (fabs(this->m_Sec - time.Sec()) > EPS)
         {
             return true;
         }
