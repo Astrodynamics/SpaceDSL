@@ -1,4 +1,4 @@
-#include "SpaceDSL/SpUtils.h"
+﻿#include "SpaceDSL/SpUtils.h"
 #include <iostream>
 
 using namespace std;
@@ -30,9 +30,9 @@ namespace SpaceDSL{
         spdlog::set_pattern(format_string);
     }
 
-    void Log::set_formatter(spdlog::formatter_ptr f)
+    void Log::set_formatter(std::unique_ptr<spdlog::formatter> &formatter)
     {
-        spdlog::set_formatter(f);
+        spdlog::set_formatter(std::move(formatter));
     }
 
     void Log::set_level(spdlog::level::level_enum log_level)
@@ -40,19 +40,14 @@ namespace SpaceDSL{
         spdlog::set_level(log_level);
     }
 
-    void Log::set_async_mode(size_t queue_size,
-                             const spdlog::async_overflow_policy overflow_policy ,
-                             const std::function<void()>& worker_warmup_cb ,
-                             const std::chrono::milliseconds& flush_interval_ms,
-                             const std::function<void()>& worker_teardown_cb )
+    void Log::flush_on(spdlog::level::level_enum log_level)
     {
-        spdlog::set_async_mode(queue_size, overflow_policy, worker_warmup_cb,
-                               flush_interval_ms, worker_teardown_cb);
+        spdlog::flush_on(log_level);
     }
 
-    void Log::set_sync_mode()
+    void Log::set_error_handler(spdlog::log_err_handler handler)
     {
-        spdlog::set_sync_mode();
+        spdlog::set_error_handler(handler);
     }
 
     std::shared_ptr<spdlog::logger> Log::basic_logger_mt(const string &logger_name,
