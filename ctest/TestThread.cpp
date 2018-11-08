@@ -177,38 +177,51 @@ int main(int argc, char *argv[])
     cout<<"SpaceDSL Thread Test Run!"<<endl;
     try
     {
-        MyTreadFast testThread1;
-        MyTreadLow testThread2;
-        MyTreadFast testThread3;
-        MyTreadLow testThread4;
-        MyTreadFast testThread5;
-        MyTreadLow testThread6;
 
-        testThread1.SetPriority(SpThread::Priority::HighestPriority);
+        MyTreadFast *pTestThread1 = new MyTreadFast();
+        MyTreadLow *pTestThread2 = new MyTreadLow();
+        MyTreadFast *pTestThread3 = new MyTreadFast();
+        MyTreadLow *pTestThread4 = new MyTreadLow();
+        MyTreadFast *pTestThread5 = new MyTreadFast();
+        MyTreadLow *pTestThread6 = new MyTreadLow();
+
+        pTestThread1->SetPriority(SpThread::Priority::HighestPriority);
 
         SpThreadPool testPool;
         testPool.SetMaxThreadCount(4);
 
-        testPool.Start(&testThread1);
-        testPool.Start(&testThread2);
-        testPool.Start(&testThread3);
-        testPool.Start(&testThread4);
-        testPool.Start(&testThread5);
-        testPool.Start(&testThread6);
+        testPool.Start(pTestThread1);
+        testPool.Start(pTestThread2);
+        testPool.Start(pTestThread3);
+        testPool.Start(pTestThread4);
+        testPool.Start(pTestThread5);
+        testPool.Start(pTestThread6);
 
         testPool.WaitForDone();
         /*
+        MyTreadFast testThread;
         testThread.Start();
+        #ifdef _WIN32
         cout<<"Before Suspend!"<<endl;
         testThread.Suspend();
         cout<<"After Suspend!"<<endl;
         testThread.Resume();
+        #endif
         testThread.Wait();
         */
+
     }
     catch (SPException &e)
     {
         e.what();
+    }
+    catch (runtime_error &e)
+    {
+        e.what();
+    }
+    catch (...)
+    {
+        int i = 1;
     }
     return 0;
 }

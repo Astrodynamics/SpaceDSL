@@ -65,6 +65,8 @@ namespace SpaceDSL {
         #else
             m_Thread_t = 0;
             int policy = 0;
+            pthread_attr_init (&m_Thread_attr);
+            pthread_attr_setdetachstate (&m_Thread_attr, PTHREAD_CREATE_DETACHED);
             pthread_attr_getschedpolicy(&m_Thread_attr, &policy);
             m_MaxPriority = sched_get_priority_max(policy);
             m_MinPriority = sched_get_priority_min(policy);
@@ -210,7 +212,7 @@ namespace SpaceDSL {
                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Start Thread Error!");
            }
        #else
-           if (pthread_create(&m_Thread_t, nullptr, ThreadFunc, this) != 0)
+           if (pthread_create(&m_Thread_t, &m_Thread_attr, ThreadFunc, this) != 0)
            {
                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Start Thread Error!");
            }
@@ -428,7 +430,7 @@ namespace SpaceDSL {
     }
 
     void MonitorThread::Initializer(bool *pIsStarted, vector<SpThread *> *pPool,
-                                    deque<SpThread *> *pBuffer, int *pActiveThreadCount)
+                                    deque<SpThread *> *pBuffer, atomic<int> *pActiveThreadCount)
     {
         m_pIsStarted = pIsStarted;
         m_pActiveThreadCount = pActiveThreadCount;
@@ -459,9 +461,11 @@ namespace SpaceDSL {
 
             for(pool_iter = m_pThreadPool->begin(); pool_iter != m_pThreadPool->end();)
             {
+
                 if ((*pool_iter)->isFinished())
                 {
                     m_CheckLock.lock();
+                    delete (*pool_iter);
                     pool_iter = m_pThreadPool->erase(pool_iter);
                     if(m_pThreadBuffer->size() > 0)
                     {
@@ -470,16 +474,15 @@ namespace SpaceDSL {
                         m_pThreadBuffer->pop_front();
                     }
                     else
+                    {
                         --(*m_pActiveThreadCount);
+                    }
                     m_CheckLock.unlock();
                 }
                 else
                     ++pool_iter;
-
             }
         }
-
-
     }
 
 
