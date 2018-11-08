@@ -1,4 +1,5 @@
 /Build
+/NLOpt/nlopt_config.h
 /ElectronVisualizer/node_modules
 /ElectronVisualizer/.vscode
 CMakeLists.txt.user
