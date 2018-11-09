@@ -231,27 +231,26 @@ namespace SpaceDSL {
         return NULL;
     }
 
+#ifdef _WIN32
     void SpThread::Suspend()
     {
-        #ifdef _WIN32
-            m_SuspendCount = int(SuspendThread(m_Handle));
-            if(m_SuspendCount == -1)
-                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Suspend Thread Error!");
-        #else
-            throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Suspend won't Support it!");
-        #endif
+
+        m_SuspendCount = int(SuspendThread(m_Handle));
+        if(m_SuspendCount == -1)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Suspend Thread Error!");
+
+
     }
 
     void SpThread::Resume()
     {
-        #ifdef _WIN32
-            m_SuspendCount = int(ResumeThread(m_Handle));
-            if(m_SuspendCount == -1)
-                throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Suspend Thread Error!");
-        #else
-            throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Suspend won't Support it!");
-        #endif
+
+        m_SuspendCount = int(ResumeThread(m_Handle));
+        if(m_SuspendCount == -1)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread: Suspend Thread Error!");
+
     }
+#endif
 
     void SpThread::Wait()
     {
