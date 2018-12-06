@@ -342,6 +342,40 @@ namespace SpaceDSL {
         return  RotateY(-x_pole) * RotateX(-y_pole);
     }
 
+    Matrix3d VVLHToICSMtx(CartState &cart)
+    {
+        auto r = cart.Pos().norm();
+        auto nn = cart.Pos().cross(cart.Vel());
+        auto n = nn.norm();
+        auto ss = cart.Pos().cross(nn);
+        auto s = ss.norm();
+
+        Matrix3d mtx,mtxTmp;
+        mtxTmp.row(0) = -ss / s;
+        mtxTmp.row(1) = -nn / n;
+        mtxTmp.row(2) = -cart.Pos() / r;
+
+        mtx = mtxTmp.inverse();
+
+        return mtx;
+    }
+
+    Matrix3d ICSToVVLHMtx(CartState &cart)
+    {
+        auto r = cart.Pos().norm();
+        auto nn = cart.Pos().cross(cart.Vel());
+        auto n = nn.norm();
+        auto ss = cart.Pos().cross(nn);
+        auto s = ss.norm();
+
+        Matrix3d mtx;
+        mtx.row(0) = -ss / s;
+        mtx.row(1) = -nn / n;
+        mtx.row(2) = -cart.Pos() / r;
+
+        return mtx;
+    }
+
     /*****************************************************************
      * Class type: Geodetic Coordingot System
      * Author: Niu ZhiYong

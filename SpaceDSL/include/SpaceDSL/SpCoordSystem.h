@@ -163,6 +163,18 @@ namespace SpaceDSL {
     /********************************************************************/
     Matrix3d SPACEDSL_API PoleMatrix (double x_pole, double y_pole);
 
+    /********************************************************************/
+    /// Transformation VVLH(Vehicle Velocity Local Horizontal) to ICRS Each Other
+    /// ICRS Can be J2000 or ECF(Earth Centered Fixed)
+    /// @Author	Sun Zhenjiang, Niu Zhiyong
+    /// @Date	2019-12-20
+    /// @Input
+    /// @Param	CartState      Position and Velocity in ICRS
+    /// @Return Pole matrix
+    /********************************************************************/
+    Matrix3d SPACEDSL_API VVLHToICSMtx (CartState &cart);
+    Matrix3d SPACEDSL_API ICSToVVLHMtx (CartState &cart);
+
     /*****************************************************************
      * Class type: Geodetic Coordingot System
      * Author: Niu ZhiYong
