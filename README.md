@@ -19,7 +19,7 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - Two Body Orbit Prediction And High Precision Orbit Prediction For Spacecraft.
 - Common Physical Constants
 - Multi Thread Parallel Support: Similar to Qt API, including Thread and Thread Pool.
-- Support Multi Thread Log Output, And Exception Handling Based on STL.
+- Support Exception Handling Based on STL.
 - Provide Nonlinear Optimization Library, Base on [NLopt](https://nlopt.readthedocs.io/en/latest/).
 - Provide ElectronVisualizer, Base on [Electron](https://electronjs.org) and [Cesium](https://cesiumjs.org/).
 ### Later support
@@ -33,7 +33,7 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 ## Dependences
 
 - [Eigen3 library](http://eigen.tuxfamily.org): a C++ template library for linear algebra.`Be careful！ The library must be recompiled when using SpaceDSL dynamic library`.
-All the files of the Eigen3.3.4 have been included in the project.
+All the files of the Eigen3.3.X have been included in the project.
 - [JSON for Modern C++](https://github.com/nlohmann/json): a headonly JSON lib, Used the c++11 standard and Support STL.
 - [OpenSSL](https://www.openssl.org/):OpenSSL is a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
 If you want to use IERS Web Service, this library must be Precompiled.
@@ -41,7 +41,7 @@ If you want to use IERS Web Service, this library must be Precompiled.
 ## Supported compilers
 
 1. Clang/LLVM 3.3 or newer (for Apple Xcode's clang, this is 5.0.0 or newer)
-2. GCC 4.8 or newer
+2. GCC 7.2 or newer
 3. Microsoft Visual Studio 2015 Update 3 or newer
 4. Intel C++ compiler 16 or newer 
 

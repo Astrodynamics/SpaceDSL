@@ -39,6 +39,7 @@
 #include "SpaceDSL/SpIntegration.h"
 #include "SpaceDSL/SpUtils.h"
 #include <iostream>
+#include <vector>
 
 /// All the functions are in the namespace SpaceDSL
 ///
