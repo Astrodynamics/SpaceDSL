@@ -33,6 +33,7 @@
 *   Last modified:
 *
 *   2018-03-27  Niu Zhiyong (1st edition)
+*   2018-12-25  Niu Zhiyong Add Adapted Step Integral
 *
 *************************************************************************/
 
@@ -42,9 +43,12 @@
 #include "SpaceDSL_Global.h"
 #include "SpaceDSL/SpRightFunction.h"
 
+
+#include <vector>
+
 #include <Eigen/Core>
 
-
+using namespace std;
 using namespace Eigen;
 
 /// All the functions are in the namespace SpaceDSL
@@ -55,7 +59,7 @@ namespace SpaceDSL {
     {
         E_NotDefindIntegMethodType = 0,
         E_RungeKutta4 = 1,
-        E_RungeKutta8 = 2
+        E_RungeKutta78 = 2
     };
 	/*************************************************
      * Class type: The class of the N th-order Runge-Kutta method
@@ -68,43 +72,100 @@ namespace SpaceDSL {
 	{
 	public:
         explicit RungeKutta();
-        explicit RungeKutta(IntegMethodType type);
+        explicit RungeKutta(const IntegMethodType type);
         ~RungeKutta();
+    public:
+        void SetIntegMethodType(const IntegMethodType type);
 
-        void SetIntegMethodType(IntegMethodType type);
+        void SetRelativeErrorThreshold(const double relErr);
+
+        double GetRelativeErrorThreshold(const double relErr) const;
 
     public:
         /********************************************************************/
-        /// Runge Kutta Integral One Step
+        /// Runge Kutta Integral One Step(Fixed/Adapted Step Integral)
         /// @Author     Niu Zhiyong
-        /// @Date       2018-03-20
+        /// @Date       2018-03-20, 2018-12-25
         /// @Input
-        /// @Param  func    Right Function of ODE
-        /// @Param	t		The value of the independent variable
-        /// @Param	x		Initial function value
+        /// @Param  func            Right Function of ODE
+        /// @Param	t               The value of the independent variable
+        /// @Param	x               Initial function value
+        /// @Param	initialStep		Initial step
+        /// @Param	minStep                     Mix Adapted step
+        /// @Param	maxStep                     Max Adapted step
+        /// @Param	maxStepAttempts             Max Attempts
+        /// @Param	relativeErrorThreshold		relative Error Threshold
+        /// @Param  bStopIfAccuracyIsViolated   Throw Exception or Not
         /// @Output
-        /// @Param  result  Integral Result
+        /// @Param  result  Integral Step
         /**********************************************************************/
 
-        void OneStep(RightFunc *rightFunc, double t, const VectorXd &x, double step, VectorXd &result);
+        double OneStep(RightFunc *rightFunc, double t, const VectorXd &x, double initialStep, VectorXd &result,
+                       double minStep = 0.0, double maxStep =  0.0, int maxStepAttempts =  0.0,
+                       double accuracyThreshold =  0.0, bool bStopIfAccuracyIsViolated = true);
 
         /********************************************************************/
-        /// Runge Kutta Integral Mult Step
+        /// Runge Kutta Integral Mult Step(Fixed/Adapted Step Integral)
         /// @Author     Niu Zhiyong
-        /// @Date       2018-03-20
+        /// @Date       2018-03-20, 2018-12-25
         /// @Input
-        /// @Param  func    Right Function of ODE
-        /// @Param	t		The value of the independent variable
-        /// @Param	x		Initial function value
+        /// @Param  func            Right Function of ODE
+        /// @Param	t0              The Initial value of the independent variable
+        /// @Param	x               Initial function value
+        /// @Param	initialStep		Initial step
+        /// @Param	t               The End value of the independent variable
+        /// @Param	minStep                     Mix Adapted step
+        /// @Param	maxStep                     Max Adapted step
+        /// @Param	maxStepAttempts             Max Attempts
+        /// @Param	relativeErrorThreshold		relative Error Threshold
+        /// @Param  bStopIfAccuracyIsViolated   Throw Exception or Not
         /// @Output
         /// @Param  result  Integral Result
         /**********************************************************************/
 
-        void MultStep(RightFunc *rightFunc, double t, const VectorXd &x, double step, int stepNum, VectorXd &result);
+        void MultStep(RightFunc *rightFunc, double t0, const VectorXd &x, double initialStep, double t, VectorXd &result,
+                      double minStep = 0, double maxStep = 0, int maxStepAttempts = 0,
+                      double relativeErrorThreshold = 0, bool bStopIfAccuracyIsViolated = true);
+
+    protected:
+        /********************************************************************/
+        /// Runge Kutta Integral Adapted Step Get Function
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-12-25
+        /// @Input
+        /// @Param  func            Right Function of ODE
+        /// @Param	t               The value of the independent variable
+        /// @Param	x               Initial function value
+        /// @Param	initialStep		Initial step
+        /// @Param	maxStepAttempts             Max Attempts
+        /// @Param	relativeErrorThreshold		relative Error Threshold
+        /// @Param  bStopIfAccuracyIsViolated   Throw Exception or Not
+        /// @Output
+        /// @Param  return          Adapted Step
+        /**********************************************************************/
+        double GetAdaptedStep(RightFunc *rightFunc, double t, const VectorXd &x, double initialStep,
+                              double minStep, double maxStep,
+                              int maxStepAttempts, double accuracyThreshold, bool bStopIfAccuracyIsViolated);
 
     protected:
 
         IntegMethodType             m_IntegMethodType;
+
+        int                         m_Stages;           ///< Number of stages in the specific algorithm implemented
+        int                         m_Order;            ///< Order of the expansion used for the integrator
+        VectorXd                    m_C;
+        MatrixXd                    m_A;
+        VectorXd                    m_B;
+        VectorXd                    m_Bbar;
+        vector<VectorXd>            m_K;
+        double                      m_IncPower;
+        double                      m_DecPower;
+
+        bool                        m_bGetAdaptedStep;
+        int                         m_StepAttemptCount;
+        double                      m_RelativeErrorThreshold;
+
+        VectorXd                    m_TempResult;
 
 
 	};
