@@ -60,9 +60,8 @@ namespace SpaceDSL {
         enum AtmosphereModelType
         {
             E_NotDefinedAtmosphereModel     = 0,
-            E_1976StdAtmosphere             = 1,
-            E_NRLMSISE00Atmosphere          = 2,
-            E_HarrisPriesterAtmosphere      = 3,
+            E_NRLMSISE00Atmosphere          = 1
+
         };
 
         explicit AtmosphereModel();
@@ -114,52 +113,6 @@ namespace SpaceDSL {
                                          double f107A = 150, double f107 = 150, double ap[] = nullptr, bool useDailyAp = true);
 
     protected:
-        ///=============================================
-        /// 1976 Standard Atmosphere Calculator(USSA1976)
-        /// @Author	Niu Zhiyong
-        /// @Date	2018-03-20
-        /// Note:
-        ///     The Unit of Altitude is km.
-        ///=============================================
-        VectorXd    GetUSSA1976Composition(double altitude, int stepNum = 100);//Only Valid Between 86 km and 1000 km
-
-        double      GetUSSA1976Density(double altitude);
-
-        double      GetUSSA1976Temperature(double altitude);
-
-        double      GetUSSA1976Pressure(double altitude);
-
-        double      GetUSSA1976SoundVel(double altitude);
-
-        double      GetUSSA1976DynamicVis(double altitude);     //Dynamic Viscosity
-
-        double      GetUSSA1976KinematicVis(double altitude);   //Kinematic Viscosity
-
-        double      GetUSSA1976ThermalCoeff(double altitude);   //Thermal Conductivity Coefficient
-
-
-        //********************************************************************
-        /// Gas Integral Program
-        /// Integral values computed using 5-point Simpsons Rule
-        /// @Author	Niu Zhiyong
-        /// @Date	2018-03-20
-        //********************************************************************
-        void    GasIntegral(double Z_0, double Z_1, VectorXd &M,
-                            VectorXd &sum_n, VectorXd &n_int);
-
-        //********************************************************************
-        /// Tau Integral Computation for Hydrogen Composition Program
-        /// @Author	Niu Zhiyong
-        /// @Date	2018-03-20
-        ///  Note:
-        ///     This program computes the value of Tau directly with the
-        ///     integral done by hand and only the second integration limit
-        ///     needing to be inputed
-        //********************************************************************
-        double      TauIntegral(double alt);
-
-///-----------------------------------------------------------------------------------------------------------
-///-----------------------------------------------------------------------------------------------------------
 
         ///===================================================
         /// NRLMSIS-00 Empirical Atmosphere Model Calculator
