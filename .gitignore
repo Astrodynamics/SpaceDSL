@@ -1,5 +1,6 @@
 /Build
 /NLOpt/nlopt_config.h
 /ElectronVisualizer/node_modules
+/ElectronVisualizer/package-lock.json
 /ElectronVisualizer/.vscode
 CMakeLists.txt.user
