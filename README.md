@@ -15,8 +15,10 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - Reference Coordinate System: including the transformation equations of commonly used spatial coordinate system. such as ECI, TOD, ECEF, VVLH...
 - JPL Ephemeris: Repackage the JPL ephemeris reading module, providing the latest `DE436` file, including data from `1950` to `2050`.
 - Earth Gravity Model: Using the spherical harmonic function to build the earth's high-precision gravitational model, with `EGM2008` data(80X80).
-- Other Perturbation Models: Atmospheric Drag(`USSA1976`,`NRLMSISE2000`), Solar Radiation Pressure, Third Body Gravity.
+- Other Perturbation Models: Atmospheric Drag(`NRLMSISE2000`), Solar Radiation Pressure, Third Body Gravity.
 - Two Body Orbit Prediction And High Precision Orbit Prediction For Spacecraft.
+- Various Ground Target Models and Access Analysis.
+- Sensor Support(`Simple Conic` and `Rectangular`).
 - Common Physical Constants
 - Multi Thread Parallel Support: Similar to Qt API, including Thread and Thread Pool.
 - Support Exception Handling Based on STL.
@@ -25,7 +27,6 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 ### Later support
 
 - Perturbation Models: Earth Tide, Relativistic Effect .
-- Atmospheric Models: Harris-Priester Model.
 - Relative Motion Simulation of Spacecraft.
 - Orbital Maneuver Siumulation Features.
 - Orbit Deviation Prediction.
@@ -33,7 +34,7 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 ## Dependences
 
 - [Eigen3 library](http://eigen.tuxfamily.org): a C++ template library for linear algebra.`Be careful！ The library must be recompiled when using SpaceDSL dynamic library`.
-All the files of the Eigen3.3.X have been included in the project.
+All the files of the Eigen3.3.7 have been included in the project.
 - [JSON for Modern C++](https://github.com/nlohmann/json): a headonly JSON lib, Used the c++11 standard and Support STL.
 - [OpenSSL](https://www.openssl.org/):OpenSSL is a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
 If you want to use IERS Web Service, this library must be Precompiled.
