@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -52,8 +52,10 @@ namespace SpaceDSL {
 
         enum SPACEDSL_API InterpolationType
         {
-            E_NotDefinedInterpolation     = 0,
-            E_LinearInterpolation         = 1,
+            E_NotDefinedInterpolation                   = 0,
+            E_LinearInterpolation                       = 1,
+            E_HermitePolynomialInterpolation            = 2,
+            E_LagrangePolynomialInterpolation           = 3
         };
         /********************************************************************/
         /// Unequidistant Linear Interpolation 
@@ -67,6 +69,33 @@ namespace SpaceDSL {
         /// @Param  result  Interpolation Result
         /**********************************************************************/
 		double LinearInterpolation(const VectorXd& x, const VectorXd& y, double t);
+
+        /********************************************************************/
+        /// Lagrange Polynomial Interpolation
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-12-26
+        /// @Input
+        /// @Param  x    	Independent Variable Array
+        /// @Param	y		Function value array
+        /// @Param	t		Interpolation Point
+        /// @Output
+        /// @Param  result  Interpolation Result
+        /**********************************************************************/
+        double LagrangePolynomialInterpolation(const VectorXd& x, const VectorXd& y, double t);
+
+        /********************************************************************/
+        /// Hermite Polynomial Interpolation
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-12-26
+        /// @Input
+        /// @Param  x    	Independent Variable Array
+        /// @Param	y		Function value array
+        /// @Param	v		Value derivatives array(y')
+        /// @Param	t		Interpolation Point
+        /// @Output
+        /// @Param  result  Interpolation Result [y, y']
+        /**********************************************************************/
+        Vector2d HermitePolynomialInterpolation(const VectorXd& x, const VectorXd& y, const VectorXd &v, double t);
 
 }
 
