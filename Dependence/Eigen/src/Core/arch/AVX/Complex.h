@@ -22,6 +22,7 @@ struct Packet4cf
   __m256  v;
 };
 
+#ifndef EIGEN_VECTORIZE_AVX512
 template<> struct packet_traits<std::complex<float> >  : default_packet_traits
 {
   typedef Packet4cf type;
@@ -44,6 +45,7 @@ template<> struct packet_traits<std::complex<float> >  : default_packet_traits
     HasSetLinear = 0
   };
 };
+#endif
 
 template<> struct unpacket_traits<Packet4cf> { typedef std::complex<float> type; enum {size=4, alignment=Aligned32}; typedef Packet2cf half; };
 
@@ -70,7 +72,7 @@ template<> EIGEN_STRONG_INLINE Packet4cf pmul<Packet4cf>(const Packet4cf& a, con
 template<> EIGEN_STRONG_INLINE Packet4cf pand   <Packet4cf>(const Packet4cf& a, const Packet4cf& b) { return Packet4cf(_mm256_and_ps(a.v,b.v)); }
 template<> EIGEN_STRONG_INLINE Packet4cf por    <Packet4cf>(const Packet4cf& a, const Packet4cf& b) { return Packet4cf(_mm256_or_ps(a.v,b.v)); }
 template<> EIGEN_STRONG_INLINE Packet4cf pxor   <Packet4cf>(const Packet4cf& a, const Packet4cf& b) { return Packet4cf(_mm256_xor_ps(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet4cf pandnot<Packet4cf>(const Packet4cf& a, const Packet4cf& b) { return Packet4cf(_mm256_andnot_ps(a.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet4cf pandnot<Packet4cf>(const Packet4cf& a, const Packet4cf& b) { return Packet4cf(_mm256_andnot_ps(b.v,a.v)); }
 
 template<> EIGEN_STRONG_INLINE Packet4cf pload <Packet4cf>(const std::complex<float>* from) { EIGEN_DEBUG_ALIGNED_LOAD return Packet4cf(pload<Packet8f>(&numext::real_ref(*from))); }
 template<> EIGEN_STRONG_INLINE Packet4cf ploadu<Packet4cf>(const std::complex<float>* from) { EIGEN_DEBUG_UNALIGNED_LOAD return Packet4cf(ploadu<Packet8f>(&numext::real_ref(*from))); }
@@ -228,6 +230,7 @@ struct Packet2cd
   __m256d  v;
 };
 
+#ifndef EIGEN_VECTORIZE_AVX512
 template<> struct packet_traits<std::complex<double> >  : default_packet_traits
 {
   typedef Packet2cd type;
@@ -250,6 +253,7 @@ template<> struct packet_traits<std::complex<double> >  : default_packet_traits
     HasSetLinear = 0
   };
 };
+#endif
 
 template<> struct unpacket_traits<Packet2cd> { typedef std::complex<double> type; enum {size=2, alignment=Aligned32}; typedef Packet1cd half; };
 
@@ -275,7 +279,7 @@ template<> EIGEN_STRONG_INLINE Packet2cd pmul<Packet2cd>(const Packet2cd& a, con
 template<> EIGEN_STRONG_INLINE Packet2cd pand   <Packet2cd>(const Packet2cd& a, const Packet2cd& b) { return Packet2cd(_mm256_and_pd(a.v,b.v)); }
 template<> EIGEN_STRONG_INLINE Packet2cd por    <Packet2cd>(const Packet2cd& a, const Packet2cd& b) { return Packet2cd(_mm256_or_pd(a.v,b.v)); }
 template<> EIGEN_STRONG_INLINE Packet2cd pxor   <Packet2cd>(const Packet2cd& a, const Packet2cd& b) { return Packet2cd(_mm256_xor_pd(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet2cd pandnot<Packet2cd>(const Packet2cd& a, const Packet2cd& b) { return Packet2cd(_mm256_andnot_pd(a.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet2cd pandnot<Packet2cd>(const Packet2cd& a, const Packet2cd& b) { return Packet2cd(_mm256_andnot_pd(b.v,a.v)); }
 
 template<> EIGEN_STRONG_INLINE Packet2cd pload <Packet2cd>(const std::complex<double>* from)
 { EIGEN_DEBUG_ALIGNED_LOAD return Packet2cd(pload<Packet4d>((const double*)from)); }
