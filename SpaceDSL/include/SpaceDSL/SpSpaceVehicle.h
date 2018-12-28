@@ -40,6 +40,7 @@
 
 #include "SpaceDSL_Global.h"
 #include "SpOrbitParam.h"
+#include "SpSensor.h"
 #include "SpTimeSystem.h"
 
 #include <string>
@@ -60,14 +61,17 @@ namespace SpaceDSL {
 	{
 	public:
         explicit SpaceVehicle();
+
         SpaceVehicle(const string &name, const CalendarTime& initialEpoch,
                      const CartState& initialState, const double initialMass,
                      const double dragCoef, const double dragArea,
                      const double SRPCoef, const double SRPArea);
+
         SpaceVehicle(const string &name, const double initialEpoch,
                      const CartState& initialState, const double initialMass,
                      const double dragCoef, const double dragArea,
                      const double SRPCoef, const double SRPArea);
+
 		virtual ~SpaceVehicle();
 		
 	public:
@@ -121,6 +125,20 @@ namespace SpaceDSL {
 
         inline double           GetSRPArea()  const                 { return m_SRPArea; }
 
+        /********************************************************************/
+        /// Insert/Remove a Sensor Belong to The Space Vehicle
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-12-26
+        /// @Input
+        /// @Param  halfAngle1    	Cone Half Angle/Horizontal Half Angle
+        /// @Param	halfAngle2		Vertical Half Angle
+        /// @Output
+        /// @Param
+        /**********************************************************************/
+        void InsertSensor(const string &name, const Sensor::SensorType type, const double halfAngle1, const double halfAngle2 = 0);
+
+        bool RemoveSensor(const int id);
+
 	//
 	// Attribute.
 	//
@@ -142,6 +160,10 @@ namespace SpaceDSL {
         //Solar Radiation Parameters
         double                  m_SRPCoef;          ///< Solar Radiation Pressure Coeff
         double                  m_SRPArea;          ///< Area for SRP
+
+        //Sensor on Space Vehicle
+        int                     m_SensorNumber;
+        vector<Sensor *>        m_SensorList;
 
 
     };

@@ -37,6 +37,7 @@
 
 #include <SpaceDSL/SpCZMLScript.h>
 #include <SpaceDSL/SpMission.h>
+#include <SpaceDSL/SpSpaceVehicle.h>
 #include <SpaceDSL/SpUtils.h>
 
 #include <fstream>
@@ -172,10 +173,15 @@ namespace SpaceDSL {
             (*pJvehicl)["position"]["referenceFrame"] = "INERTIAL";
             (*pJvehicl)["position"]["epoch"] = initialEpochStr;
             auto pProcessDataMap = m_pMission->GetProcessDataMap();
-            auto pVehiclProcessData = pProcessDataMap->find(name)->second;
-            double initialMjd = (*pVehiclProcessData)[0][0];
+            auto iter = pProcessDataMap->find(name);
+            if (iter == pProcessDataMap->end())
+                throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                          "MissionThread::SaveProcessDataLine Cant Find ProcessData!");
+
+            auto pProcessDataList = iter->second;
+            double initialMjd = (*pProcessDataList)[0][0];
             vector<double> processData;
-            for (auto pData:(*pVehiclProcessData))
+            for (auto pData:(*pProcessDataList))
             {
                 for (int i = 0; i < 4; ++i)
                 {

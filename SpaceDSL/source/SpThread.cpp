@@ -42,6 +42,8 @@
 #include <functional>
 #include <mutex>
 #include <chrono>
+
+using namespace std;
 using namespace std::chrono;
 
 namespace SpaceDSL {
@@ -142,7 +144,6 @@ namespace SpaceDSL {
                 break;
             default:
                 throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread::SetPriority Unsupport Thread Priority");
-                break;
             }
             pthread_attr_setschedparam(&m_Thread_attr, &param);
 
@@ -378,8 +379,6 @@ namespace SpaceDSL {
         int  dT = 0;
         while (m_ActiveThreadCount > 0)
         {
-            if (m_ActiveThreadCount == 0)
-                break;
             if (msecs != -1)
             {
                 auto endT = steady_clock::now();
@@ -389,6 +388,10 @@ namespace SpaceDSL {
                 {
                     return false;
                 }
+            }
+            if (m_ActiveThreadCount == 0)
+            {
+                break;
             }
         }
         return true;
@@ -460,7 +463,6 @@ namespace SpaceDSL {
 
             for(pool_iter = m_pThreadPool->begin(); pool_iter != m_pThreadPool->end();)
             {
-
                 if ((*pool_iter)->isFinished())
                 {
                     m_CheckLock.lock();

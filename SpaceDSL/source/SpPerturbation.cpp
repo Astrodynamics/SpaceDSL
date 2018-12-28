@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -95,7 +95,6 @@ namespace SpaceDSL {
             break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "ThirdBodyGravity: SolarSysStarType Unsupport ");
-            break;
         }
     }
 
@@ -144,7 +143,6 @@ namespace SpaceDSL {
             break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "ThirdBodyGravity: SolarSysStarType Unsupport ");
-            break;
         }
     }
 

@@ -264,7 +264,7 @@ namespace SpaceDSL {
         m_bIsInitialized = true;
     }
 
-    bool OrbitPredictConfig::IsInitialized()
+    bool OrbitPredictConfig::IsInitialized() const
     {
         return m_bIsInitialized;
     }
@@ -753,7 +753,7 @@ namespace SpaceDSL {
         m_pSolarRadPressure     = nullptr;
     }
 
-    OrbitPredictRightFunc::OrbitPredictRightFunc(OrbitPredictConfig *pConfig)
+    OrbitPredictRightFunc::OrbitPredictRightFunc(const OrbitPredictConfig *pConfig)
     {
         m_pOrbitPredictConfig = pConfig;
 
@@ -779,7 +779,7 @@ namespace SpaceDSL {
 
     }
 
-    void OrbitPredictRightFunc::SetOrbitPredictConfig(OrbitPredictConfig *pConfig)
+    void OrbitPredictRightFunc::UpdateOrbitPredictConfig(const OrbitPredictConfig *pConfig)
     {
         m_pOrbitPredictConfig = pConfig;
 
@@ -947,7 +947,7 @@ namespace SpaceDSL {
             delete m_pRungeKutta;
     }
 
-    void OrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, double step, IntegMethodType integType,
+    double OrbitPredict::OrbitStep(const OrbitPredictConfig &predictConfig, Propagator *pPropagator,
                                  double &mass, Vector3d &pos, Vector3d &vel)
     {
         if (predictConfig.IsInitialized() == false)
@@ -962,20 +962,23 @@ namespace SpaceDSL {
 
         if (m_pRightFunc == nullptr)
             m_pRightFunc = new OrbitPredictRightFunc(&predictConfig);
-        else
-            m_pRightFunc->SetOrbitPredictConfig(&predictConfig);
 
         if (m_pRungeKutta == nullptr)
-            m_pRungeKutta = new RungeKutta(integType);
-        else
-            m_pRungeKutta->SetIntegMethodType(integType);
+            m_pRungeKutta = new RungeKutta(pPropagator->GetIntegMethodType());
 
-        m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, step, result);
+
+        double adaptedStep = m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, pPropagator->GetAdaptedStep(), result,
+                                                    pPropagator->GetMinStep(), pPropagator->GetMaxStep(),
+                                                    pPropagator->GetMaxStepAttempts(), pPropagator->GetAccuracy(),
+                                                    pPropagator->GetStopIfAccuracyIsViolated());
+
+        pPropagator->SetAdaptedStep(adaptedStep);
 
         pos(0) = result(0);     pos(1) = result(1);     pos(2) = result(2);
         vel(0) = result(3);     vel(1) = result(4);     vel(2) = result(5);
         mass   = result(6);
 
+        return adaptedStep;
     }
 
 
@@ -1002,8 +1005,8 @@ namespace SpaceDSL {
             delete m_pRungeKutta;
     }
 
-    void TwoBodyOrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, double step, IntegMethodType integType,
-                                                  double &mass, Vector3d &pos, Vector3d &vel)
+    void TwoBodyOrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, Propagator *pPropagator,
+                                        double &mass, Vector3d &pos, Vector3d &vel)
     {
         if (predictConfig.IsInitialized() == false)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -1012,7 +1015,7 @@ namespace SpaceDSL {
         {
             SolarSysStarType centerStarType = predictConfig.GetCenterStarType();
             double Mjd_TT = predictConfig.GetMJD_TT()/NormalizeParameter::GetTimePara(centerStarType);
-            double norm_step = step/NormalizeParameter::GetTimePara(centerStarType);
+            double norm_step = pPropagator->GetAdaptedStep()/NormalizeParameter::GetTimePara(centerStarType);
             VectorXd x(7), result(7);
             result.fill(0);
             x(0) = pos(0)/NormalizeParameter::GetLengthPara(centerStarType);
@@ -1027,15 +1030,13 @@ namespace SpaceDSL {
 
             if (m_pRightFunc == nullptr)
                 m_pRightFunc = new TwoBodyOrbitRightFunc(&predictConfig);
-            else
-                m_pRightFunc->SetOrbitPredictConfig(&predictConfig);
 
             if (m_pRungeKutta == nullptr)
-                m_pRungeKutta = new RungeKutta(integType);
-            else
-                m_pRungeKutta->SetIntegMethodType(integType);
+                m_pRungeKutta = new RungeKutta(pPropagator->GetIntegMethodType());
 
-            m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, norm_step, result);
+            double adaptedStep = m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, norm_step, result);
+
+            pPropagator->SetAdaptedStep(adaptedStep);
 
             pos(0) = result(0)*NormalizeParameter::GetLengthPara(centerStarType);
             pos(1) = result(1)*NormalizeParameter::GetLengthPara(centerStarType);
@@ -1055,9 +1056,15 @@ namespace SpaceDSL {
             x(0) = pos(0);  x(1) = pos(1);  x(2) = pos(2);
             x(3) = vel(0);  x(4) = vel(1);  x(5) = vel(2);  x(6) = mass;
 
-            TwoBodyOrbitRightFunc rightFunc(&predictConfig);
-            RungeKutta RK(integType);
-            RK.OneStep(&rightFunc, Mjd_TT*DayToSec ,x, step, result);
+            if (m_pRightFunc == nullptr)
+                m_pRightFunc = new TwoBodyOrbitRightFunc(&predictConfig);
+
+            if (m_pRungeKutta == nullptr)
+                m_pRungeKutta = new RungeKutta(pPropagator->GetIntegMethodType());
+
+            double adaptedStep = m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, pPropagator->GetAdaptedStep(), result);
+
+            pPropagator->SetAdaptedStep(adaptedStep);
 
             pos(0) = result(0);     pos(1) = result(1);     pos(2) = result(2);
             vel(0) = result(3);     vel(1) = result(4);     vel(2) = result(5);
@@ -1077,7 +1084,7 @@ namespace SpaceDSL {
         m_pOrbitPredictConfig = nullptr;
     }
 
-    TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc(OrbitPredictConfig *pConfig)
+    TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc(const OrbitPredictConfig *pConfig)
     {
         m_pOrbitPredictConfig = pConfig;
     }
@@ -1087,7 +1094,7 @@ namespace SpaceDSL {
 
     }
 
-    void TwoBodyOrbitRightFunc::SetOrbitPredictConfig(OrbitPredictConfig *pConfig)
+    void TwoBodyOrbitRightFunc::UpdateOrbitPredictConfig(const OrbitPredictConfig *pConfig)
     {
         m_pOrbitPredictConfig = pConfig;
     }

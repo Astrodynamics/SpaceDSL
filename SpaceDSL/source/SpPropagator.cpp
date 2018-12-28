@@ -52,6 +52,7 @@ namespace SpaceDSL {
     {
         m_IntegMethodType = IntegMethodType::E_NotDefindIntegMethodType;
         m_InitialStep = 0;
+        m_AdaptedStep = 0;
         m_Accuracy = 0;
         m_MinStep = 0;
         m_MaxStep = 0;
@@ -59,12 +60,13 @@ namespace SpaceDSL {
         m_bStopIfAccuracyIsViolated = true;
     }
 
-    Propagator::Propagator(const IntegMethodType integMethodType, const double initialStep, const double accuracy,
-                           const double minStep, const double maxStep, const double maxStepAttempts,
+    Propagator::Propagator(const IntegMethodType  integMethodType, const double initialStep, const double accuracy,
+                           const double  minStep, const double  maxStep, const int maxStepAttempts,
                            const bool bStopIfAccuracyIsViolated, const bool isUseNormalize)
     {
         m_IntegMethodType = integMethodType;
         m_InitialStep = initialStep;
+        m_AdaptedStep = initialStep;
         m_Accuracy = accuracy;
         m_MinStep = minStep;
         m_MaxStep = maxStep;

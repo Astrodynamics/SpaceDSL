@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -70,7 +70,6 @@ namespace SpaceDSL {
         {
         case E_NotDefinedGravModel:
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Gravity Model Type!");
-            break;
         case E_EGM08Model:
             this->m_GM = GM_Earth;//WGS84
             this->m_Radius = EarthRadius;//WGS84
@@ -133,7 +132,7 @@ namespace SpaceDSL {
             fileStream.close();
             break;
         default:
-            break;
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Gravity Model Type!");
         }
     }
 
@@ -163,8 +162,8 @@ namespace SpaceDSL {
         double  x0,y0,z0;                           // Normalized coordinates
         double  ax,ay,az;                           // Acceleration vector
         double  C,S;                                // Gravitational coefficients
-        Vector3d  r_bf(3);  r_bf.fill(0);           // Body-fixed position
-        Vector3d  a_bf(3);  a_bf.fill(0);           // Body-fixed acceleration
+        Vector3d  r_bf;  r_bf.fill(0);              // Body-fixed position
+        Vector3d  a_bf;  a_bf.fill(0);              // Body-fixed acceleration
 
         MatrixXd  V(n_max+2,n_max+2);   V.fill(0);  // Harmonic functions
 

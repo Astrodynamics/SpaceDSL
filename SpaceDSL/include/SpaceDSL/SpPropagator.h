@@ -52,19 +52,21 @@ namespace SpaceDSL {
      * Date:2018-07-30
      * Description:
     **************************************************/
-    class Propagator
+    class SPACEDSL_API Propagator
     {
     public:
         explicit Propagator();
-        Propagator(const IntegMethodType  integMethodType, const double initialStep, const double accuracy,
-                   const double  minStep, const double  maxStep, const double   maxStepAttempts,
-                   const bool bStopIfAccuracyIsViolated, const bool isUseNormalize);
+        Propagator(const IntegMethodType integMethodType, const double initialStep, const double accuracy = 0,
+                   const double minStep = 0, const double maxStep = 0, const int maxStepAttempts = 0,
+                   const bool bStopIfAccuracyIsViolated = true, const bool isUseNormalize = false);
         ~Propagator();
 
     public:
         inline void     SetIntegMethodType(const IntegMethodType  integMethodType)        { m_IntegMethodType = integMethodType; }
 
-        inline void     SetInitialStep(const double initialStep)                          { m_InitialStep = initialStep; }
+        inline void     SetInitialStep(const double initialStep)                          { m_InitialStep = initialStep; m_AdaptedStep = initialStep; }
+
+        inline void     SetAdaptedStep(const double adaptedStep)                          { m_AdaptedStep = adaptedStep; }
 
         inline void     SetAccuracy(const double accuracy)                                { m_Accuracy = accuracy; }
 
@@ -72,7 +74,7 @@ namespace SpaceDSL {
 
         inline void     SetMaxStep(const double  maxStep)                                 { m_MaxStep = maxStep; }
 
-        inline void     SetMaxStepAttempts(const double maxStepAttempts)                  { m_MaxStepAttempts = maxStepAttempts; }
+        inline void     SetMaxStepAttempts(const int maxStepAttempts)                     { m_MaxStepAttempts = maxStepAttempts; }
 
         inline void     SetStopIfAccuracyIsViolated(const bool bStopIfAccuracyIsViolated) { m_bStopIfAccuracyIsViolated = bStopIfAccuracyIsViolated; }
 
@@ -82,25 +84,28 @@ namespace SpaceDSL {
 
         inline double GetInitialStep() const                        { return m_InitialStep; }
 
+        inline double GetAdaptedStep() const                        { return m_AdaptedStep; }
+
         inline double GetAccuracy() const                           { return m_Accuracy; }
 
         inline double GetMinStep() const                            { return m_MinStep; }
 
         inline double GetMaxStep() const                            { return m_MaxStep; }
 
-        inline double GetMaxStepAttempts() const                    { return m_MaxStepAttempts; }
+        inline int    GetMaxStepAttempts() const                    { return m_MaxStepAttempts; }
 
-        inline bool GetStopIfAccuracyIsViolated() const             { return m_bStopIfAccuracyIsViolated; }
+        inline bool   GetStopIfAccuracyIsViolated() const           { return m_bStopIfAccuracyIsViolated; }
 
-        inline bool GetIsUseNormalize() const                       { return m_bIsUseNormalize; }
+        inline bool   GetIsUseNormalize() const                     { return m_bIsUseNormalize; }
 
     private:
         IntegMethodType         m_IntegMethodType;
         double                  m_InitialStep;
+        double                  m_AdaptedStep;
         double                  m_Accuracy;
         double                  m_MinStep;
         double                  m_MaxStep;
-        double                  m_MaxStepAttempts;
+        int                     m_MaxStepAttempts;
         bool                    m_bStopIfAccuracyIsViolated;
         bool                    m_bIsUseNormalize;
     };

@@ -36,6 +36,9 @@
 *************************************************************************/
 
 #include "SpaceDSL/SpSpaceVehicle.h"
+#include "SpaceDSL/SpMath.h"
+#include "SpaceDSL/SpConst.h"
+#include "SpaceDSL/SpUtils.h"
 
 
 
@@ -111,6 +114,36 @@ namespace SpaceDSL {
     SpaceVehicle::~SpaceVehicle()
     {
 
+    }
+
+    void SpaceVehicle::InsertSensor(const string &name, const Sensor::SensorType type, const double halfAngle1, const double halfAngle2)
+    {
+        if (m_SensorNumber != int(m_SensorList.size()))
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "SpaceVehicle::InsertSensor (SensorNumber) != (SensorList.Size)! ");
+        }
+        Sensor *pSensor = new Sensor(name, type, halfAngle1, halfAngle2);
+        ++m_SensorNumber;
+        m_SensorList.push_back(pSensor);
+    }
+
+    bool SpaceVehicle::RemoveSensor(const int id)
+    {
+        for(auto iter = m_SensorList.begin();
+            iter != m_SensorList.end();
+            ++iter)
+        {
+            if ((*iter)->GetID() == id)
+            {
+                delete *iter;
+                m_SensorList.erase(iter);
+                --m_SensorNumber;
+                return true;
+            }
+
+        }
+        return false;
     }
 
 	

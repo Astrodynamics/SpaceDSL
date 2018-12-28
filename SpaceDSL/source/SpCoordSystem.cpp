@@ -457,7 +457,6 @@ namespace SpaceDSL {
             break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
-            break;
         }
         const double  eps     = 100*EPS;            // Convergence criterion
         const double  epsRequ = eps*R_equ;
@@ -523,7 +522,6 @@ namespace SpaceDSL {
             break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
-            break;
         }
         double lat = lla.Latitude();
         double lon = lla.Longitude();

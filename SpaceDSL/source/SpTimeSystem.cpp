@@ -45,7 +45,6 @@
 #include "SpaceDSL/gsoap/soapBinding.nsmap"
 
 #include <fstream>
-#include <iostream>
 
 namespace SpaceDSL{
 

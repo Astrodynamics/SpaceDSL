@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -65,46 +65,35 @@ namespace SpaceDSL {
         case -1:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_FILE_NOT_FOUND");
-            break;
         case -2:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_FSEEK_FAILED");
-            break;
         case -3:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_FREAD_FAILED");
-            break;
         case -4:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_FREAD2_FAILED");
-            break;
         case -5:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_FILE_CORRUPT");
-            break;
         case -6:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_MEMORY_FAILURE");
-            break;
         case -7:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_FREAD3_FAILED");
-            break;
         case -8:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_FREAD4_FAILED");
-            break;
         case -9:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_NOT_CALLED");
-            break;
         case -10:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "JplEphemeris Init: JPL_INIT_FREAD5_FAILED");
-            break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "JplEphemeris: Result is out of Known Situation");
-            break;
         }
 
     }
@@ -149,26 +138,20 @@ namespace SpaceDSL {
         case -1:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris: JPL_EPH_OUTSIDE_RANGE");
-            break;
         case -2:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris:JPL_EPH_READ_ERROR");
-            break;
         case -3:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris:JPL_EPH_QUANTITY_NOT_IN_EPHEMERIS");
-            break;
         case -5:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris:JPL_EPH_INVALID_INDEX");
-            break;
         case -6:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris:JPL_EPH_FSEEK_ERROR");
-            break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "JplEphemeris: Result is out of Known Situation");
-            break;
         }
 
     }
@@ -192,26 +175,20 @@ namespace SpaceDSL {
         case -1:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris: JPL_EPH_OUTSIDE_RANGE");
-            break;
         case -2:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris:JPL_EPH_READ_ERROR");
-            break;
         case -3:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris:JPL_EPH_QUANTITY_NOT_IN_EPHEMERIS");
-            break;
         case -5:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris:JPL_EPH_INVALID_INDEX");
-            break;
         case -6:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                   "GetJplEphemeris:JPL_EPH_FSEEK_ERROR");
-            break;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "JplEphemeris: Result is out of Known Situation");
-            break;
         }
     }
 

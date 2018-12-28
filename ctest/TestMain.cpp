@@ -10,10 +10,6 @@ int main(int argc, char *argv[])
     cout<<"SpaceDSL Test Run!"<<endl;
     try
     {   /// Initial Data
-        UTCCalTime date_time     (2018,1,4,1,0,0.0);
-        double mjd = CalendarTimeToMjd(date_time);
-        UTCCalTime date_time2;
-        MjdToCalendarTime(mjd, date_time2);
         UTCCalTime initial_time     (2018,1,4,16,58,11.1);
         UTCCalTime termination_time (2018,1,5,16,58,11.1);
 
@@ -43,15 +39,20 @@ int main(int argc, char *argv[])
                                  GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,
                                 AtmosphereModel::AtmosphereModelType::E_NRLMSISE00Atmosphere,
                                  150,150,ap,
-                                 false, true);
-        pMission->SetPropagator(E_RungeKutta4, 60, 1.0, 1, 120, 30, true, false);
+                                 true, true);
+        pMission->SetPropagator(E_RungeKutta4, 60);
+        //pMission->SetPropagator(E_RungeKutta78, 60, 0.01, 1, 120, 100);
         pMission->SetMissionSequence(initial_time, termination_time);
-        pMission->Start(true);
+        pMission->Start(false);
+
+        cout<<"Calculation Finished!"<<endl;
 
         /// CZML File Wirte;
         CZMLScript  script;
         script.Initializer("TestData.czml", pMission);
         script.WirteCZML();
+        cout<<"CZML Output Finished!"<<endl;
+        pMission->Destory();
 
     }
     catch (SPException &e)

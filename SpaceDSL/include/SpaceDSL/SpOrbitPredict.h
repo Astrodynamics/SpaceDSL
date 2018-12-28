@@ -45,7 +45,7 @@
 #include "SpTimeSystem.h"
 #include "SpCoordSystem.h"
 #include "SpPerturbation.h"
-#include "SpIntegration.h"
+#include "SpPropagator.h"
 
 #include <Eigen/Core>
 
@@ -102,7 +102,7 @@ namespace SpaceDSL {
                                 double dragCoef = 0, double dragArea = 0, double f107A = 150, double f107 = 150, double ap[] = nullptr,
                                 double SRPCoef = 0, double SRPArea = 0, bool isUseDrag = false, bool isUseSRP = false);
 
-        bool                        IsInitialized();
+        bool                        IsInitialized() const;
 
         void                        Update(double Mjd_UTC);
 
@@ -272,10 +272,10 @@ namespace SpaceDSL {
     {
     public:
         explicit OrbitPredictRightFunc();
-        explicit OrbitPredictRightFunc(OrbitPredictConfig *pConfig);
+        explicit OrbitPredictRightFunc(const OrbitPredictConfig *pConfig);
         ~OrbitPredictRightFunc();
 
-        void SetOrbitPredictConfig(OrbitPredictConfig *pConfig);
+        void UpdateOrbitPredictConfig(const OrbitPredictConfig *pConfig);
     public:
         /// @Param  t                   sec
         /// @Param	step                sec
@@ -284,12 +284,12 @@ namespace SpaceDSL {
         void operator() (double t, const VectorXd &x, VectorXd&result) const override;
 
     protected:
-        OrbitPredictConfig      *m_pOrbitPredictConfig;
-        GravityModel            *m_pGravityModel;
-        GeodeticCoordSystem     *m_pGeodeticSystem;
-        ThirdBodyGravity        *m_pThirdBodyGrva;
-        AtmosphericDrag         *m_pAtmosphericDrag;
-        SolarRadPressure        *m_pSolarRadPressure;
+        const OrbitPredictConfig    *m_pOrbitPredictConfig;
+        GravityModel                *m_pGravityModel;
+        GeodeticCoordSystem         *m_pGeodeticSystem;
+        ThirdBodyGravity            *m_pThirdBodyGrva;
+        AtmosphericDrag             *m_pAtmosphericDrag;
+        SolarRadPressure            *m_pSolarRadPressure;
     };
 
     /*************************************************
@@ -312,17 +312,16 @@ namespace SpaceDSL {
         /// @Date	2018-03-20
         /// @Input
         /// @Param  predictConfig       Orbit Prediction Parameters
-        /// @Param	step                sec
-        /// @Param	integType           IntegMethodType
+        /// @Param	pPropagator         Propagator
         /// @In/Out
         /// @Param	mass                kg
         /// @Param	pos                 m
         /// @Param	vel                 m/s
         /// @Output
-        /// @Return
+        /// @Return adaptedStep         sec
         //********************************************************************
-        void OrbitStep (OrbitPredictConfig &predictConfig, double step, IntegMethodType integType,
-                        double &mass, Vector3d &pos, Vector3d &vel);
+        double OrbitStep (const OrbitPredictConfig &predictConfig, Propagator *pPropagator,
+                          double &mass, Vector3d &pos, Vector3d &vel);
 
 
     protected:
@@ -342,10 +341,10 @@ namespace SpaceDSL {
     {
     public:
         explicit TwoBodyOrbitRightFunc();
-        explicit TwoBodyOrbitRightFunc(OrbitPredictConfig *pConfig);
+        explicit TwoBodyOrbitRightFunc(const OrbitPredictConfig *pConfig);
         ~TwoBodyOrbitRightFunc();
 
-        void SetOrbitPredictConfig(OrbitPredictConfig *pConfig);
+        void UpdateOrbitPredictConfig(const OrbitPredictConfig *pConfig);
     public:
         /// @Param  t                   sec
         /// @Param	step                sec
@@ -355,7 +354,7 @@ namespace SpaceDSL {
 
     protected:
 
-        OrbitPredictConfig      *m_pOrbitPredictConfig;
+        const OrbitPredictConfig      *m_pOrbitPredictConfig;
     };
 
     /*************************************************
@@ -388,7 +387,7 @@ namespace SpaceDSL {
         /// @Param	accel               m/s^2
         /// @Return
         //********************************************************************
-        void OrbitStep (OrbitPredictConfig &predictConfig, double step, IntegMethodType integType,
+        void OrbitStep (OrbitPredictConfig &predictConfig, Propagator *pPropagator,
                         double &mass, Vector3d &pos, Vector3d &vel);
 
 

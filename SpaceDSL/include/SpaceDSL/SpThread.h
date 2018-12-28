@@ -294,14 +294,14 @@ namespace SpaceDSL {
         int     GetActiveThreadCount() const;
 
     private:
-        mutex                   m_ClearLock;
-        MonitorThread           *m_pMonitor;
-        bool                    m_bIsStarted;
-        int                     m_MaxThreadCount;
-        atomic<int>             m_ActiveThreadCount;
+        mutex                           m_ClearLock;
+        MonitorThread                   *m_pMonitor;
+        bool                            m_bIsStarted;
+        int                             m_MaxThreadCount;
+        atomic<int>                     m_ActiveThreadCount;
 
-        vector<SpThread *>      m_ThreadPool;
-        deque<SpThread *>       m_ThreadBuffer;
+        vector<SpThread *>              m_ThreadPool;
+        deque<SpThread *>               m_ThreadBuffer;
 
     };
 
@@ -326,13 +326,13 @@ namespace SpaceDSL {
         void Run() override;
 
     private:
-        bool                m_bIsInitialized;
-        mutex               m_CheckLock;
+        bool                        m_bIsInitialized;
+        mutex                       m_CheckLock;
 
-        bool                *m_pIsStarted;
-        atomic<int>         *m_pActiveThreadCount;
-        vector<SpThread *>  *m_pThreadPool;
-        deque<SpThread *>   *m_pThreadBuffer;
+        bool                        *m_pIsStarted;
+        atomic<int>                 *m_pActiveThreadCount;
+        vector<SpThread *>          *m_pThreadPool;
+        deque<SpThread *>           *m_pThreadBuffer;
     };
 
 }

@@ -62,6 +62,8 @@ public:
 
         Vector3d pos = cart0.Pos(), vel = cart0.Vel();
 
+        Propagator pro( E_RungeKutta4, 60);
+
         /*
         cout << "Time (ModJDate)      x (km)         y (km)        z (km)   vx (km/sec)   vy (km/sec)   vz (km/sec)" <<endl;
         cout << "---------------    ---------       -------        -------   -----------   -----------  -----------" <<endl;
@@ -93,7 +95,7 @@ public:
         for (int i = 0; i < 0.5*DayToSec/step; ++i)
         {
             preConfig1.Update(Mjd_UTC);
-            orbit.OrbitStep(preConfig1, step, E_RungeKutta4, mass0, pos, vel);
+            step = orbit.OrbitStep(preConfig1, &pro, mass0, pos, vel);
             Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
             LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
             //fileLLA << Mjd_UTC <<  "  "  <<LLA.Altitude()/1000<<  "  "  <<LLA.Latitude()*RadToDeg<<  "  "  <<LLA.Longitude()*RadToDeg
@@ -134,6 +136,7 @@ public:
         double Mjd_UTC0 = CalendarTimeToMjd(time);
 
         double step = 10.0;
+        Propagator pro( E_RungeKutta4, 10);
         double Mjd_UTC = Mjd_UTC0;
 
         ThirdBodyGravitySign thirdGravSign;
@@ -164,7 +167,7 @@ public:
         for (int i = 0; i < 0.5*DayToSec/step; ++i)
         {
             preConfig1.Update(Mjd_UTC);
-            orbit.OrbitStep(preConfig1, step, E_RungeKutta4, mass0, pos, vel);
+            step = orbit.OrbitStep(preConfig1, &pro, mass0, pos, vel);
             Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
             LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
         }
