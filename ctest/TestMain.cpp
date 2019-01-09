@@ -13,6 +13,9 @@ int main(int argc, char *argv[])
         UTCCalTime initial_time     (2018,1,4,16,58,11.1);
         UTCCalTime termination_time (2018,1,5,16,58,11.1);
 
+        string targetName1 = "Facility1";// h = 257km
+        PointTarget target1(targetName1, -75.5966*DegToRad, 40.0386*DegToRad, 0, 10*DegToRad);
+
         string vehicle_name1 = "The First Vehicle";// h = 257km
         CartState vehicle1_cart0(-5.04649e+06, -3.53951e+06, -2.44795e+06,
                                     4954.67 , -4008.83, -4417.73 );
@@ -27,6 +30,7 @@ int main(int argc, char *argv[])
         Mission *pMission = new Mission();
         pMission->InsertSpaceVehicle(vehicle_name1,initial_time,vehicle1_cart0,vehicle1_mass, 2.2, 10, 1.0, 10);
         pMission->InsertSpaceVehicle(vehicle_name2,initial_time,vehicle2_cart0,vehicle2_mass, 2.2, 20, 1.0, 20);
+        pMission->InsertFacility(targetName1,-75.5966*DegToRad, 40.0386*DegToRad, 0, 10*DegToRad);
         ThirdBodyGravitySign thirdGravSign;
         thirdGravSign.bIsUseSunGrav = true;
         thirdGravSign.bIsUseMoonGrav = true;
@@ -44,6 +48,24 @@ int main(int argc, char *argv[])
         //pMission->SetPropagator(E_RungeKutta78, 60, 0.01, 1, 120, 100);
         pMission->SetMissionSequence(initial_time, termination_time);
         pMission->Start(false);
+
+
+
+        pMission->CalMissionAccessData();
+        auto accessListMap = pMission->GetAccessData();
+        for (auto iterMap = accessListMap->begin();
+             iterMap != accessListMap->end();
+             ++iterMap)
+        {
+            cout<<"Access Data:"<<endl;
+            cout<<iterMap->first.first->GetName()<<"--------"<<iterMap->first.second->GetName()<<endl;
+            cout<<"  Start Time (UTCG)           Stop Time (UTCG)    Duration (sec)"<<endl;
+            auto accessList = iterMap->second;
+            for(auto &data:accessList)
+            {
+                cout<<data.first.ToString()<<"    "<<data.second.ToString()<<"    "<<(data.second - data.first)<<endl;
+            }
+        }
 
         cout<<"Calculation Finished!"<<endl;
 
