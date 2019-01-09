@@ -300,7 +300,7 @@ namespace SpaceDSL {
         {
             ++accessCount;
             json *pJaccess = new json();
-            int bias = colorStep * accessCount;
+
             string targetName = iterAccess->first.first->GetName();
             string vehicleName = iterAccess->first.second->GetName();
             auto targetType = iterAccess->first.first->GetTargetType();
