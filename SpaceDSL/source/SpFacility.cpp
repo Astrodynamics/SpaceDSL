@@ -20,7 +20,7 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2019-12-26
+* Date:2018-12-26
 * Description:
 *   SpFacility.cpp
 *
@@ -31,7 +31,7 @@
 *
 *   Last modified:
 *
-*   2019-12-26  Niu Zhiyong (1st edition)
+*   2018-12-26  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 #include "SpaceDSL/SpFacility.h"
@@ -45,38 +45,40 @@ namespace SpaceDSL {
     /*************************************************
      * Class type: The class of SpaceDSL Facility
      * Author: Niu ZhiYong
-     * Date:2019-12-26
+     * Date:2018-12-26
      * Description:
      *  Longitude [rad] Latitude [rad] Altitude [m]
      *  This Class is Thread Safe!
     **************************************************/
-    atomic<int> Facility::FacilityID(0);
     Facility::Facility()
     {
-        ++FacilityID;
         m_Name = "Default";
+        m_TargetType = E_Facility;
         m_SensorNumber = 0;
         m_LonLatAltitude.SetLongitude(0);
         m_LonLatAltitude.SetLatitude(0);
         m_LonLatAltitude.SetAltitude(0);
+        m_MinElevation = 0;
     }
 
-    Facility::Facility(const string &name, const double longitude, const double latitude, const double altitude)
+    Facility::Facility(const string &name, const double longitude, const double latitude, const double altitude, const double minElevation)
     {
-        ++FacilityID;
         m_Name = name;
+        m_TargetType = E_Facility;
         m_SensorNumber = 0;
         m_LonLatAltitude.SetLongitude(longitude);
         m_LonLatAltitude.SetLatitude(latitude);
         m_LonLatAltitude.SetAltitude(altitude);
+        m_MinElevation = minElevation;
     }
 
-    Facility::Facility(const string &name, const GeodeticCoord &LLA)
+    Facility::Facility(const string &name, const GeodeticCoord &LLA, const double minElevation)
     {
-        ++FacilityID;
         m_Name = name;
+        m_TargetType = E_Facility;
         m_SensorNumber = 0;
         m_LonLatAltitude = LLA;
+        m_MinElevation = minElevation;
     }
 
     Facility::~Facility()
@@ -87,13 +89,6 @@ namespace SpaceDSL {
                 delete pSensor;
         }
         m_SensorList.clear();
-    }
-
-    void Facility::SetGeodeticCoord(const double longitude, const double latitude, const double altitude)
-    {
-        m_LonLatAltitude.SetLongitude(longitude);
-        m_LonLatAltitude.SetLatitude(latitude);
-        m_LonLatAltitude.SetAltitude(altitude);
     }
 
     void Facility::InsertSensor(const string &name, const Sensor::SensorType type, const double halfAngle1, const double halfAngle2)

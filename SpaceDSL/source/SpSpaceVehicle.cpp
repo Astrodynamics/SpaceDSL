@@ -116,6 +116,21 @@ namespace SpaceDSL {
 
     }
 
+    void SpaceVehicle::UpdateState(const double Mjd, const CartState &state, const double mass)
+    {
+        m_Epoch = Mjd;
+        m_CartState = state;
+        m_Mass = mass;
+    }
+
+    void SpaceVehicle::UpdateState(const double Mjd, const Vector3d &pos, const Vector3d &vel, const double mass)
+    {
+        m_Epoch = Mjd;
+        CartState state(pos, vel);
+        m_CartState = state;
+        m_Mass = mass;
+    }
+
     void SpaceVehicle::InsertSensor(const string &name, const Sensor::SensorType type, const double halfAngle1, const double halfAngle2)
     {
         if (m_SensorNumber != int(m_SensorList.size()))

@@ -274,6 +274,19 @@ namespace SpaceDSL{
         pTimeStr = m_pTimeStr;
     }
 
+    string CalendarTime::ToString()
+    {
+        // char form "yyyy-mm-dd HH:MM:SS"
+        string tempStr = to_string(this->m_Year) + "-";
+        tempStr += ( to_string(this->m_Mon) + "-" );
+        tempStr += ( to_string(this->m_Day) + " " );
+        tempStr += ( to_string(this->m_Hour) + ":" );
+        tempStr += ( to_string(this->m_Min) + ":" );
+        tempStr += ( to_string(this->m_Sec));
+
+        return tempStr;
+    }
+
     void CalendarTime::FillTimeStr()
     {
         // char form "yyyy-mm-dd HH:MM:SS"

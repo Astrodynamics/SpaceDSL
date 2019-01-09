@@ -20,7 +20,7 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2019-12-26
+* Date:2018-12-26
 * Description:
 *   SpFacility.h
 *
@@ -31,7 +31,7 @@
 *
 *   Last modified:
 *
-*   2019-12-26  Niu Zhiyong (1st edition)
+*   2018-12-26  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 
@@ -40,6 +40,7 @@
 
 #include "SpaceDSL_Global.h"
 #include "SpOrbitParam.h"
+#include "SpTarget.h"
 #include "SpSensor.h"
 
 
@@ -56,36 +57,25 @@ namespace SpaceDSL {
     /*************************************************
      * Class type: The class of SpaceDSL Facility
      * Author: Niu ZhiYong
-     * Date:2019-12-26
+     * Date:2018-12-26
      * Description:
      *  Longitude [rad] Latitude [rad] Altitude [m]
      *  This Class is Thread Safe!
     **************************************************/
-    class SPACEDSL_API Facility
+    class SPACEDSL_API Facility : public PointTarget
     {
     public:
         explicit Facility();
-        Facility(const string &name, const double longitude, const double latitude, const double altitude);
-        Facility(const string &name, const GeodeticCoord &LLA);
-        virtual ~Facility();
+        Facility(const string &name, const double longitude, const double latitude, const double altitude, const double minElevation);
+        Facility(const string &name, const GeodeticCoord &LLA, const double minElevation);
+        ~Facility() override;
 
     public:
-        inline void		SetName (const string &name)                    { m_Name = name; }
-
-        inline void		SetGeodeticCoord (const GeodeticCoord &LLA)     { m_LonLatAltitude = LLA; }
-
-        inline void		SetGeodeticCoord (const double longitude, const double latitude, const double altitude);
-
-        inline int                  GetID() const                       { return FacilityID; }
-
-        inline const string&        GetName() const                     { return m_Name; }
-
-        inline const GeodeticCoord& GetGeodeticCoord() const            { return m_LonLatAltitude; }
 
         /********************************************************************/
         /// Insert/Remove a Sensor Belong to The Facility
         /// @Author     Niu Zhiyong
-        /// @Date       2019-12-26
+        /// @Date       2018-12-26
         /// @Input
         /// @Param  halfAngle1    	Cone Half Angle/Horizontal Half Angle
         /// @Param	halfAngle2		Vertical Half Angle
@@ -103,10 +93,6 @@ namespace SpaceDSL {
     // Attribute.
     //
     protected:
-        static atomic<int>      FacilityID;             ///< Facility ID
-        string                  m_Name;                 ///< Facility Name
-        GeodeticCoord           m_LonLatAltitude;        ///< In The Coordinate System of Initialization
-
         int                     m_SensorNumber;
         vector<Sensor *>        m_SensorList;
 

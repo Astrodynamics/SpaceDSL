@@ -1,4 +1,4 @@
-/************************************************************************
+﻿/************************************************************************
 * Copyright (C) 2018 Niu ZhiYong
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -97,6 +97,7 @@ const double EarthFlatFact  	= 3.35281066475E-3;			///< Flattening factor of the
 const double LightSpeed     	= 2.99792458e8;				///< speed of light (IAU 1976 value) [m/s]		
 const double EarthAngVel	   	= 7.2921151467e-5;			///< Nominal mean angular velocity of the Earth (WGS84) [rad/s](TwoPI/86164.0919)
 const double EarthMeanMotion	= 1.9910643985790994404796035026544e-7;	///< (TwoPI/365.2420897/86400) rad/sec
+const double EarthRPSDay        = 1.00273790934;            ///< Earth Rotations Per Siderial Day
 
 const double EARTH_J2          	= 1.0826261e-3;			///< Earth Perturbation J2 Term
 const double EARTH_J3          	= -2.54e-6;				///< Earth Perturbation J3 Term

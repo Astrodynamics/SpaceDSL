@@ -41,6 +41,8 @@
 
 #include "SpaceDSL_Global.h"
 
+#include <string>
+
 using namespace std;
 /// All the functions are in the namespace SpaceDSL
 ///
@@ -93,6 +95,8 @@ namespace SpaceDSL {
         /// @Return
         /**********************************************************************/
         void                ToCharArray(char *&pTimeStr);
+
+        string              ToString();
 
     protected:
         void                FillTimeStr();

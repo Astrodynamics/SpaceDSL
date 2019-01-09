@@ -164,10 +164,34 @@ namespace SpaceDSL {
     Matrix3d SPACEDSL_API PoleMatrix (double x_pole, double y_pole);
 
     /********************************************************************/
+    /// Transformation from Greenwich Meridian System to Local Tangent Coordinates
+    /// @Author	Niu Zhiyong
+    /// @Date	2019-01-05
+    /// @Input
+    /// @Param	longitude   Geodetic East longitude [rad]
+    /// @Param	latitude    Geodetic latitude [rad]
+    /// @Return Rotation matrix from the Earth equator and Greenwich meridian
+    ///         to the local tangent (East-North-Zenith) coordinate system
+    /********************************************************************/
+    Matrix3d GMSToLTCMtx (double longitude, double latitude);
+
+    /********************************************************************/
+    /// Computes Azimuth and Elevation from Local Tangent Coordinates
+    /// @Author	Niu Zhiyong
+    /// @Date	2019-01-05
+    /// @Input
+    /// @Param	range       Topocentric local tangent coordinates (East-North-Zenith frame)
+    /// @Param	A           Azimuth [rad]
+    /// @Param	E           Elevation [rad]
+    /// @Return
+    /********************************************************************/
+    void GetAzEl ( const Vector3d &range, double& azimuth, double& elevation );
+
+    /********************************************************************/
     /// Transformation VVLH(Vehicle Velocity Local Horizontal) to ICRS Each Other
     /// ICRS Can be J2000 or ECF(Earth Centered Fixed)
     /// @Author	Sun Zhenjiang, Niu Zhiyong
-    /// @Date	2019-12-20
+    /// @Date	2018-12-20
     /// @Input
     /// @Param	CartState      Position and Velocity in ICRS
     /// @Return Pole matrix
@@ -206,8 +230,8 @@ namespace SpaceDSL {
         /// @Author	Niu Zhiyong
         /// @Date	2018-06-08
         /// @Input
-        /// @Param	Mjd_UTC2			Julian date of UTC
-        /// @Param	Mjd_UTC1			Julian date of UTC
+        /// @Param	Mjd_UTC2			Modified Julian date of UTC
+        /// @Param	Mjd_UTC1			Modified Julian date of UTC
         /// @Output
         /// @Return                     the transformation matrix
         //********************************************************************
@@ -219,8 +243,8 @@ namespace SpaceDSL {
         /// @Author	Niu Zhiyong
         /// @Date	2018-06-08
         /// @Input
-        /// @Param	Mjd_UTC2			Julian date of UTC
-        /// @Param	Mjd_UTC1			Julian date of UTC
+        /// @Param	Mjd_UTC2			Modified Julian date of UTC
+        /// @Param	Mjd_UTC1			Modified Julian date of UTC
         /// @Output
         /// @Return                     the transformation matrix
         //********************************************************************
@@ -228,25 +252,36 @@ namespace SpaceDSL {
         static  Matrix3d    GetTODToJ2000Mtx (double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
 
         //********************************************************************
-        /// Get the Geodetic Coordinate From the  ECF(Earth Centered Fixed) Position.
+        /// Conversion From the Geodetic Coordinate to ECF(Earth Centered Fixed) Position.
         /// @Author	Niu Zhiyong
         /// @Date	2018-06-08
         /// @Input
         /// @Param  pos/lla
         /// @Output
-        /// @Return GeodeticCoord / Position(in ECF)
+        /// @Return GeodeticCoord / Position(in ECF)(m)
         //********************************************************************
         GeodeticCoord   GetGeodeticCoord (const Vector3d &pos);
         Vector3d        GetPosition (const GeodeticCoord &lla);
 
         //********************************************************************
-        /// Get the Geodetic Coordinate From the  J2000 Position.
+        /// Get the Ground Velocity From the Geodetic Coordinate .
+        /// @Author	Niu Zhiyong
+        /// @Date	2018-06-08
+        /// @Input
+        /// @Param  lla
+        /// @Output
+        /// @Return Velocity(in ECF)(m/s)
+        //********************************************************************
+        Vector3d        GetGroundVelocity (const GeodeticCoord &lla);
+
+        //********************************************************************
+        /// Conversion From the Geodetic Coordinate to the J2000 Position.
         /// @Author	Niu Zhiyong
         /// @Date	2018-06-08
         /// @Input
         /// @Param  pos/lla
         /// @Output
-        /// @Return GeodeticCoord / Position(in J2000)
+        /// @Return GeodeticCoord / Position(in J2000)(m/s)
         //********************************************************************
         GeodeticCoord   GetGeodeticCoord (const Vector3d &pos, double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);
         Vector3d        GetPosition (const GeodeticCoord &lla, double Mjd_UTC2, double Mjd_UTC1 = MJD_J2000);

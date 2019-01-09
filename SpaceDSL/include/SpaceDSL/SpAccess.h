@@ -20,7 +20,7 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2019-12-26
+* Date:2018-12-26
 * Description:
 *   SpAccess.h
 *
@@ -31,7 +31,7 @@
 *
 *   Last modified:
 *
-*   2019-12-26  Niu Zhiyong (1st edition)
+*   2018-12-26  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 
@@ -39,30 +39,124 @@
 #define SPACCESS_H
 
 #include "SpaceDSL_Global.h"
+#include "SpOrbitParam.h"
+#include "SpTimeSystem.h"
+#include "SpThread.h"
 
+#include <map>
+#include <string>
+#include <vector>
 
 #include <Eigen/Core>
 
 
 using namespace Eigen;
-
+using namespace std;
 /// All the functions are in the namespace SpaceDSL
 ///
 namespace SpaceDSL {
 
+    class Mission;
+    class Target;
+    class SpaceVehicle;
+    class Observation;
+    class AccessAnalysisThread;
+    /*************************************************
+     * Class type: The class of SpaceDSL Access Analysis
+     * Author: Niu ZhiYong
+     * Date:2019-01-02
+     * Description:
+     *  This Class is Thread Safe!
+    **************************************************/
+    class SPACEDSL_API AccessAnalysis
+    {
+    public:
+        explicit AccessAnalysis();
+        AccessAnalysis(Mission *pMission);
+        virtual ~AccessAnalysis();
+
+        friend class AccessAnalysisThread;
+
+    public:
+        void                            SetMission(Mission *pMission);
+
+        const Mission                   *GetMission() const;
 
         /********************************************************************/
-        /// Unequidistant Linear Interpolation 
+        /// Calculate a Vehicle Access Time Pair From The Point Target
         /// @Author     Niu Zhiyong
-        /// @Date       2018-03-20
+        /// @Date       2019-01-04
         /// @Input
-        /// @Param  x    	Independent Variable Array
-        /// @Param	y		Function value array
-        /// @Param	t		Interpolation Point
+        /// @Param      vehicleName         Vehicle Name
+        /// @Param      target              Point Target Object Point
+        /// @Param      order               Lagrange Polynomial Interpolation Order
+        /// @Param      precision           Iterative precision (unit: sec)
         /// @Output
-        /// @Param  result  Interpolation Result
+        /// @Return     List<Start Mjd, End Mjd >
         /**********************************************************************/
+        vector<pair<UTCCalTime, UTCCalTime> > CalTargetAccessData(const string &vehicleName, const Target *target,
+                                                                  int order = 5, double precision = 0.01);
 
+        /********************************************************************/
+        /// Calculate All Vehicle Access Time Pair From The Point Target
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-01-04
+        /// @Input
+        /// @Param      target              Point Target Object Point
+        /// @Param      order               Lagrange Polynomial Interpolation Order
+        /// @Param      precision           Iterative precision (unit: sec)
+        /// @Output
+        /// @Return     {Vehicle, List<Start Mjd, End Mjd >}
+        /**********************************************************************/
+        map<SpaceVehicle *, vector<pair<UTCCalTime, UTCCalTime > > > CalTargetAccessData(const Target *target,
+                                                                                         int order = 5, double precision = 0.01);
+
+        /********************************************************************/
+        /// Calculate Access Time Pair Misssion
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-01-04
+        /// @Input
+        /// @Param      order               Lagrange Polynomial Interpolation Order
+        /// @Param      precision           Iterative precision (unit: sec)
+        /// @Output
+        /// @Return
+        /**********************************************************************/
+        void                            CalMissionAccessData(int order = 5, double precision = 0.01);
+
+
+    protected:
+        void            Reset();
+
+        /********************************************************************/
+        /// Calculate Access Point Mjd
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-01-04
+        /// @Input
+        /// @Param      MjdList             Orbit Epoch
+        /// @Param      eleList             Elevation List at MjdList
+        /// @Param      targetEle           Target Elevation
+        /// @Param      precision           Iterative precision (unit: sec)
+        /// @Output
+        /// @Return     Access Point Orbit Epoch
+        /**********************************************************************/
+        double          CalAccessPoint(const VectorXd &MjdList, const VectorXd &eleList, const double targetEle, const double precision);
+
+    //
+    // Attribute.
+    //
+    protected:
+        Mission                                     *m_pMission;
+        vector<Target *>                            *m_pTargetList;
+        vector<SpaceVehicle *>                      *m_pSpaceVehicleList;
+        CalendarTime                                *m_pInitialEpoch;
+        CalendarTime                                *m_pTerminationEpoch;
+
+        ///< [Vehicle, [Mjd_UTC, pos(3), vel(3), LLA(3), mass]]
+        map<SpaceVehicle *, vector<double *> *>                                         *m_pProcessDataMap;
+        ///< [pair<Target, Vehicle>, [pair<StartMjd_UTC, EndMjd_UTC>]]
+        map<pair<Target *, SpaceVehicle *>, vector<pair<UTCCalTime, UTCCalTime> > >     *m_pAccessDataMap;
+
+    };
 }
 
 #endif //SPACCESS_H

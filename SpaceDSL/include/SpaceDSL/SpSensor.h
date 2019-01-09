@@ -20,7 +20,7 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2019-12-26
+* Date:2018-12-26
 * Description:
 *   SpSensor.h
 *
@@ -31,7 +31,7 @@
 *
 *   Last modified:
 *
-*   2019-12-26  Niu Zhiyong (1st edition)
+*   2018-12-26  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 
@@ -54,7 +54,7 @@ namespace SpaceDSL {
     /*************************************************
      * Class type: The class of SpaceDSL Sensor
      * Author: Niu ZhiYong
-     * Date:2019-12-26
+     * Date:2018-12-26
      * Description:
      *  Half Angle Unit is [rad]
      *  This Class is Thread Safe!
@@ -73,7 +73,7 @@ namespace SpaceDSL {
         /********************************************************************/
         /// Create a Sensor According to The Specified Type
         /// @Author     Niu Zhiyong
-        /// @Date       2019-12-26
+        /// @Date       2018-12-26
         /// @Input
         /// @Param  halfAngle1    	Cone Half Angle/Horizontal Half Angle
         /// @Param	halfAngle2		Vertical Half Angle

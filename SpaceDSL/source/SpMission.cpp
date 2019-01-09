@@ -61,10 +61,17 @@ namespace SpaceDSL {
         m_bIsMultThread = false;
 
         m_SpaceVehicleNumber = 0;
+        m_FacilityNumber = 0;
+        m_TargetNumber = 0;
+
         m_SpaceVehicleList.clear();
+        m_FacilityList.clear();
+        m_TargetList.clear();
+
         m_pEnvironment = nullptr;
         m_pPropagator = nullptr;
         m_pMissionThreadPool = new SpThreadPool();
+        m_pAccessAnalysis = new AccessAnalysis(this);
 
         m_DurationSec = 0;
 
@@ -79,12 +86,12 @@ namespace SpaceDSL {
         }
         m_SpaceVehicleList.clear();
 
-        for (auto pFacility:m_FacilityList)
+        for (auto pTarget:m_TargetList)
         {
-            if (pFacility != nullptr)
-                delete pFacility;
+            if (pTarget != nullptr)
+                delete pTarget;
         }
-        m_FacilityList.clear();
+        m_TargetList.clear();
 
         for (auto iter = m_ProcessDataMap.begin();
              iter != m_ProcessDataMap.end();
@@ -110,6 +117,9 @@ namespace SpaceDSL {
 
         if (m_pMissionThreadPool != nullptr)
             delete m_pMissionThreadPool;
+
+        if (m_pAccessAnalysis != nullptr)
+            delete m_pAccessAnalysis;
     }
 
     void Mission::InsertSpaceVehicle(const string &name, const CalendarTime& initialEpoch,
@@ -129,7 +139,7 @@ namespace SpaceDSL {
         ++m_SpaceVehicleNumber;
         m_SpaceVehicleList.push_back(pVehicle);
         vector<double *> *pOneVehicleData = new vector<double *>;
-        m_ProcessDataMap.insert(pair<string, vector<double *> *>(name ,pOneVehicleData));
+        m_ProcessDataMap.insert(pair<SpaceVehicle *, vector<double *> *>(pVehicle ,pOneVehicleData));
 
     }
 
@@ -151,20 +161,26 @@ namespace SpaceDSL {
         return false;
     }
 
-    void Mission::InsertFacility(const string &name, const double longitude, const double latitude, const double altitude)
+    void Mission::InsertFacility(const string &name, const double longitude, const double latitude, const double altitude, const double minElevation)
     {
-        if (m_SpaceVehicleNumber != int(m_SpaceVehicleList.size()))
+        if ( m_FacilityNumber != int(m_FacilityList.size()))
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                      "Mission::InsertSpaceVehicle (SpaceVehicleNumber) != (SpaceVehicleList.Size)! ");
+                      "Mission::InsertFacility (FacilityNumber) != (FacilityList.Size)! ");
         }
-        Facility *pFacility = new Facility(name, longitude, latitude, altitude);
-        ++m_SpaceVehicleNumber;
+        Facility *pFacility = new Facility(name, longitude, latitude, altitude, minElevation);
+        ++m_FacilityNumber;
         m_FacilityList.push_back(pFacility);
+
+        ++m_TargetNumber;
+        m_TargetList.push_back(pFacility);
     }
 
     bool Mission::RemoveFacility(const int id)
     {
+        bool bRemoveFacilityList = false;
+        bool bRemoveTargetList = false;
+
         for(auto iter = m_FacilityList.begin();
             iter != m_FacilityList.end();
             ++iter)
@@ -174,6 +190,70 @@ namespace SpaceDSL {
                 delete *iter;
                 m_FacilityList.erase(iter);
                 --m_FacilityNumber;
+                bRemoveFacilityList = true;
+            }
+
+        }
+
+        for(auto iter = m_TargetList.begin();
+            iter != m_TargetList.end();
+            ++iter)
+        {
+            if ((*iter)->GetID() == id)
+            {
+                delete *iter;
+                m_TargetList.erase(iter);
+                --m_TargetNumber;
+                bRemoveTargetList = true;
+            }
+        }
+
+        if (bRemoveTargetList && bRemoveFacilityList)
+            return true;
+        else
+            return false;
+    }
+
+    void Mission::InsertTarget(const string &name, const Target::TargetType type)
+    {
+        if (m_TargetNumber != int(m_TargetList.size()))
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::InsertTarget (SpaceVehicleNumber) != (SpaceVehicleList.Size)! ");
+        }
+        Target *pTarget = nullptr;
+        switch (type)
+        {
+        case Target::E_NotDefindTargetType:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,"Undefined Target Type!");
+        case Target::E_PointTarget:
+            pTarget = new PointTarget();
+            break;
+        case Target::E_LineTarget:
+            pTarget = new LineTarget();
+            break;
+        case Target::E_AreaTarget:
+            pTarget = new AreaTarget();
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,"Undefined Target Type!");
+        }
+        pTarget->SetName(name);
+        ++m_TargetNumber;
+        m_TargetList.push_back(pTarget);
+    }
+
+    bool Mission::RemoveTarget(const int id)
+    {
+        for(auto iter = m_TargetList.begin();
+            iter != m_TargetList.end();
+            ++iter)
+        {
+            if ((*iter)->GetID() == id)
+            {
+                delete *iter;
+                m_TargetList.erase(iter);
+                --m_TargetNumber;
                 return true;
             }
 
@@ -252,7 +332,7 @@ namespace SpaceDSL {
            || m_SpaceVehicleNumber <= 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                      "Mission::Start (Space Vehicle Initialise Error)! ");
+                      "Mission::GetSpaceVehicleList (Space Vehicle Initialise Error)! ");
         }
         return m_SpaceVehicleList;
     }
@@ -263,9 +343,53 @@ namespace SpaceDSL {
            || m_SpaceVehicleNumber <= 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                      "Mission::Start (Space Vehicle Initialise Error)! ");
+                      "Mission::GetSpaceVehicleNumber (Space Vehicle Initialise Error)! ");
         }
         return m_SpaceVehicleNumber;
+    }
+
+    const vector<Facility *> &Mission::GetFacilityList() const
+    {
+        if (m_FacilityNumber != int(m_FacilityList.size())
+           || m_FacilityNumber <= 0)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::GetFacilityList (Facility Initialise Error)! ");
+        }
+        return m_FacilityList;
+    }
+
+    int Mission::GetFacilityNumber() const
+    {
+        if (m_FacilityNumber != int(m_FacilityList.size())
+           || m_FacilityNumber <= 0)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::GetFacilityNumber (Facility Initialise Error)! ");
+        }
+        return m_FacilityNumber;
+    }
+
+    const vector<Target *> &Mission::GetTargetList() const
+    {
+        if (m_TargetNumber != int(m_TargetList.size())
+           || m_TargetNumber <= 0)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::GetTargetList (Target Initialise Error)! ");
+        }
+        return m_TargetList;
+    }
+
+    int Mission::GetTargetNumber() const
+    {
+        if (m_TargetNumber != int(m_TargetList.size())
+           || m_TargetNumber <= 0)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::GetTargetNumber (Target Initialise Error)! ");
+        }
+        return m_TargetNumber;
     }
 
     Environment *Mission::GetEnvironment() const
@@ -318,9 +442,47 @@ namespace SpaceDSL {
         return m_DurationSec;
     }
 
-    const map<string, vector<double *> *> *Mission::GetProcessDataMap() const
+    double Mission::GetAverageOrbitalPeriod(const string &name) const
     {
-        return &m_ProcessDataMap;
+        OrbitElem elem;
+        SpaceVehicle *pVehicle = nullptr;
+        int count = 0;
+        for(auto &veh:m_SpaceVehicleList)
+        {
+            if (veh->GetName() == name)
+            {
+                pVehicle = veh;
+                break;
+            }
+            ++count;
+        }
+
+        if (pVehicle == nullptr)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::GetAverageOrbitalPeriod (Can not Find  Input Space Vehicle Name)! ");
+
+        CartToOrbitElem (pVehicle->GetInitialCartState(), GM_Earth, elem);
+        double T0 = 2*PI*sqrt(pow(elem.SMajAx(),3)/GM_Earth);
+
+        CartToOrbitElem (pVehicle->GetCartState(), GM_Earth, elem);
+        double Tt = 2*PI*sqrt(pow(elem.SMajAx(),3)/GM_Earth);
+
+        return (Tt + T0)/2;
+    }
+
+    vector<pair<UTCCalTime, UTCCalTime> > Mission::CalTargetAccessData(const string &vehicleName, const Target *target, int order, double precision)
+    {
+        return m_pAccessAnalysis->CalTargetAccessData(vehicleName, target, order, precision);
+    }
+
+    map<SpaceVehicle *, vector<pair<UTCCalTime, UTCCalTime> > > Mission::CalTargetAccessData(const Target *target, int order, double precision)
+    {
+        return m_pAccessAnalysis->CalTargetAccessData(target, order, precision);
+    }
+
+    void Mission::CalMissionAccessData(int order, double precision)
+    {
+        m_pAccessAnalysis->CalMissionAccessData(order, precision);
     }
 
     void Mission::Start(bool bIsMultThread)
@@ -356,9 +518,7 @@ namespace SpaceDSL {
 
         if (m_bIsMultThread == false)
         {
-            auto pMissionThread = new MissionThread();
-            pMissionThread->Initializer(this, &m_SpaceVehicleList, m_pEnvironment,
-                                        m_pPropagator, &m_ProcessDataMap);
+            auto pMissionThread = new MissionThread(this);
             m_pMissionThreadPool->Start(pMissionThread);
         }
         else
@@ -366,8 +526,7 @@ namespace SpaceDSL {
             for (int id = 0; id < int(m_SpaceVehicleList.size()); ++id)
             {
                 auto pMissionThread = new MissionThread();
-                pMissionThread->Initializer(this, &m_SpaceVehicleList, m_pEnvironment,
-                                            m_pPropagator, &m_ProcessDataMap, id);
+                pMissionThread->SetSpaceVehicleIndex(id);
                 m_pMissionThreadPool->Start(pMissionThread);
             }
         }
@@ -420,6 +579,17 @@ namespace SpaceDSL {
         }
     }
 
+    const map<SpaceVehicle *, vector<double *> *> *Mission::GetProcessDataMap() const
+    {
+        return &m_ProcessDataMap;
+    }
+
+    const map<pair<Target *, SpaceVehicle *>, vector<pair<UTCCalTime, UTCCalTime> > > *Mission::GetAccessData() const
+    {
+        return &m_AccessDataMap;
+    }
+
+
     /*************************************************
      * Class type: Mission Thread Run in Mission Class
      * Author: Niu ZhiYong
@@ -436,38 +606,47 @@ namespace SpaceDSL {
         m_pProcessDataMap = nullptr;
     }
 
+    MissionThread::MissionThread(Mission *pMission)
+    {
+        m_SpaceVehicleIndex = -1;
+        m_pMission = pMission;
+        m_pSpaceVehicleList = &(pMission->m_SpaceVehicleList);
+        m_pEnvironment = pMission->m_pEnvironment;
+        m_pPropagator = pMission->m_pPropagator;
+        m_pProcessDataMap = &(pMission->m_ProcessDataMap);
+    }
+
     MissionThread::~MissionThread()
     {
 
     }
 
-    void SpaceDSL::MissionThread::Initializer(Mission *pMission, vector<SpaceVehicle *> *spaceVehicleList,
-                                              Environment *pEnvironment, Propagator *pPropagator,
-                                              map<string, vector<double *> *> *pProcessDataMap,
-                                              int spaceVehicleIndex)
+    void MissionThread::SetMission(Mission *pMission)
     {
+        m_SpaceVehicleIndex = -1;
         m_pMission = pMission;
-        m_pSpaceVehicleList = spaceVehicleList;
-        m_pEnvironment = pEnvironment;
-        m_pPropagator = pPropagator;
-        m_pProcessDataMap = pProcessDataMap;
-        m_SpaceVehicleIndex = spaceVehicleIndex;
+        m_pSpaceVehicleList = &(pMission->m_SpaceVehicleList);
+        m_pEnvironment = pMission->m_pEnvironment;
+        m_pPropagator = pMission->m_pPropagator;
+        m_pProcessDataMap = &(pMission->m_ProcessDataMap);
+    }
+
+    void MissionThread::SetSpaceVehicleIndex(int index)
+    {
+        m_SpaceVehicleIndex = index;
     }
 
     void MissionThread::SaveProcessDataLine(SpaceVehicle *pVehicle, const double Mjd,
                                             const Vector3d &pos, const Vector3d &vel,
                                             const GeodeticCoord &LLA, const double mass)
     {
-        double *processData = new double[11];
-        auto iter = m_pProcessDataMap->find(pVehicle->GetName());
+        auto iter = m_pProcessDataMap->find(pVehicle);
         if (iter == m_pProcessDataMap->end())
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "MissionThread::SaveProcessDataLine Cant Find ProcessData!");
+
+        double *processData = new double[11];
         auto processDataList = iter->second;
-        CartState currentState(pos, vel);
-        pVehicle->SetTime(Mjd);
-        pVehicle->SetCartState(currentState);
-        pVehicle->SetMass(mass);
 
         processData[0] = Mjd;
         processData[1] = pos(0);   processData[2] = pos(1);   processData[3] = pos(2);
@@ -481,6 +660,10 @@ namespace SpaceDSL {
 
     void MissionThread::Run()
     {
+        if (m_pMission == nullptr)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "MissionThread::Run() m_pMission == nullptr!");
+
         GeodeticCoordSystem GEO(GeodeticCoordSystem::GeodeticCoordType::E_WGS84System);
         GeodeticCoord LLA;
         double Mjd_UTC0 ;
@@ -528,6 +711,7 @@ namespace SpaceDSL {
                     step = orbit.OrbitStep(predictConfig, m_pPropagator, mass, pos, vel);
                     Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
                     LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
+                    pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
                     this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
                 }
 

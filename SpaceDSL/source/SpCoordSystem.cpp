@@ -80,10 +80,6 @@ namespace SpaceDSL {
 
     double GMST(double Mjd_UT1)
     {
-        // Constants
-
-        const double Secs = 86400.0;        // Seconds per day
-
         // Variables
 
         double Mjd_0, UT1 , T_0, T, gmst;
@@ -91,14 +87,14 @@ namespace SpaceDSL {
         // Mean Sidereal Time
 
         Mjd_0 = floor(Mjd_UT1);
-        UT1   = Secs*(Mjd_UT1 - Mjd_0);          // [s]
+        UT1   = DayToSec*(Mjd_UT1 - Mjd_0);          // [s]
         T_0   = (Mjd_0  - MJD_J2000)/36525.0;
         T     = (Mjd_UT1 - MJD_J2000)/36525.0;
 
         gmst  = 24110.54841 + 8640184.812866*T_0 + 1.002737909350795*UT1
               + (0.093104-6.2e-6*T)*T*T; // [s]
 
-        return  TwoPI*Fraction(gmst/Secs);       // [rad], 0..2pi
+        return  TwoPI*Fraction(gmst/DayToSec);       // [rad], 0..2pi
     }
 
     double GAST(double Mjd_UT1)
@@ -342,6 +338,33 @@ namespace SpaceDSL {
         return  RotateY(-x_pole) * RotateX(-y_pole);
     }
 
+    Matrix3d GMSToLTCMtx(double longitude, double latitude)
+    {
+        Matrix3d  M;
+        double  Aux;
+
+        // Transformation to Zenith-East-North System
+        M = RotateY(-latitude) * RotateZ(longitude);
+
+        // Cyclic shift of rows 0,1,2 to 1,2,0 to obtain East-North-Zenith system
+        for (int j = 0; j < 3; j++)
+        {
+            Aux = M(0,j);
+            M(0,j)=M(1,j);
+            M(1,j)=M(2,j);
+            M(2,j)= Aux;
+        }
+
+        return  M;
+    }
+
+    void GetAzEl(const Vector3d &range, double &azimuth, double &elevation)
+    {
+        azimuth = atan2(range(0), range(1));
+        azimuth = ((azimuth<0.0)? azimuth+TwoPI : azimuth);
+        elevation = atan ( range(2) / sqrt(range(0)*range(0)+range(1)*range(1)) );
+    }
+
     Matrix3d VVLHToICSMtx(CartState &cart)
     {
         auto r = cart.Pos().norm();
@@ -544,6 +567,51 @@ namespace SpaceDSL {
         r(2) =  ((1.0-e2)*N+h)*SinLat;
 
         return r;
+    }
+
+    Vector3d GeodeticCoordSystem::GetGroundVelocity(const GeodeticCoord &lla)
+    {
+        double R_equ;                               // Equator radius [m]
+        double f;                                   // Flattening
+        switch (m_GeodeticCoordType)
+        {
+        case E_NotDefinedGeodeticType:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
+            break;
+        case E_WGS84System:
+            R_equ = WGS84RE;
+            f     = WGS84F;
+            break;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "Undefined Geodetic Coord System Type!");
+        }
+        double lat = lla.Latitude();
+        double lon = lla.Longitude();
+        double  h  = lla.Altitude();
+
+        const double  e2     = f*(2.0-f);                   // Square of eccentricity
+        const double  CosLat = cos(lat);                    // (Co)sine of geodetic latitude
+        const double  SinLat = sin(lat);
+
+        double      N;
+        Vector3d    r;
+
+
+        // Position vector
+
+        N = R_equ / sqrt(1.0-e2*SinLat*SinLat);
+
+        r(0) =  (         N+h)*CosLat*cos(lon);
+        r(1) =  (         N+h)*CosLat*sin(lon);
+        r(2) =  ((1.0-e2)*N+h)*SinLat;
+
+        Vector3d    vel;
+
+        r(0) = (-EarthAngVel * r(1));
+        r(1) = (EarthAngVel * r(0));
+        r(2) = (0);
+        return vel;
+
     }
 
     GeodeticCoord GeodeticCoordSystem::GetGeodeticCoord(const Vector3d &pos, double Mjd_UTC2, double Mjd_UTC1)

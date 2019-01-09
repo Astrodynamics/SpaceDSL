@@ -73,7 +73,7 @@ namespace SpaceDSL {
         /********************************************************************/
         /// Lagrange Polynomial Interpolation
         /// @Author     Niu Zhiyong
-        /// @Date       2019-12-26
+        /// @Date       2018-12-26
         /// @Input
         /// @Param  x    	Independent Variable Array
         /// @Param	y		Function value array
@@ -86,7 +86,7 @@ namespace SpaceDSL {
         /********************************************************************/
         /// Hermite Polynomial Interpolation
         /// @Author     Niu Zhiyong
-        /// @Date       2019-12-26
+        /// @Date       2018-12-26
         /// @Input
         /// @Param  x    	Independent Variable Array
         /// @Param	y		Function value array

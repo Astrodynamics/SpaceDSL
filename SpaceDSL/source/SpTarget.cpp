@@ -20,7 +20,7 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2019-12-26
+* Date:2018-12-26
 * Description:
 *   SpTarget.cpp
 *
@@ -31,7 +31,7 @@
 *
 *   Last modified:
 *
-*   2019-12-26  Niu Zhiyong (1st edition)
+*   2018-12-26  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 #include "SpaceDSL/SpTarget.h"
@@ -44,18 +44,37 @@
 namespace SpaceDSL {
 
     /*************************************************
+     * Class type: The Base class of SpaceDSL Target
+     * Author: Niu ZhiYong
+     * Date:2018-12-26
+     * Description:
+     *  This Class is Thread Safe!
+    **************************************************/
+    atomic<int> Target::TargetID(0);
+    Target::Target()
+    {
+        ++TargetID;
+        m_TargetType = E_NotDefindTargetType;
+    }
+
+    Target::~Target()
+    {
+
+    }
+
+    /*************************************************
      * Class type: The class of SpaceDSL Point Target
      * Author: Niu ZhiYong
-     * Date:2019-12-26
+     * Date:2018-12-26
      * Description:
      *  Longitude [rad] Latitude [rad] Altitude [m]  MinElevation [rad]
      *  This Class is Thread Safe!
     **************************************************/
-    atomic<int> PointTarget::PointTargetID(0);
+
     PointTarget::PointTarget()
     {
-        ++PointTargetID;
         m_Name = "Default";
+        m_TargetType = E_PointTarget;
         m_LonLatAltitude.SetLongitude(0);
         m_LonLatAltitude.SetLatitude(0);
         m_LonLatAltitude.SetAltitude(0);
@@ -64,8 +83,8 @@ namespace SpaceDSL {
 
     PointTarget::PointTarget(const string &name, const double longitude, const double latitude, const double altitude, const double minElevation)
     {
-        ++PointTargetID;
         m_Name = name;
+        m_TargetType = E_PointTarget;
         m_LonLatAltitude.SetLongitude(longitude);
         m_LonLatAltitude.SetLatitude(latitude);
         m_LonLatAltitude.SetAltitude(altitude);
@@ -74,8 +93,8 @@ namespace SpaceDSL {
 
     PointTarget::PointTarget(const string &name, const GeodeticCoord &LLA, const double minElevation)
     {
-        ++PointTargetID;
         m_Name = name;
+        m_TargetType = E_PointTarget;
         m_LonLatAltitude = LLA;
         m_MinElevation = minElevation;
     }
@@ -85,6 +104,11 @@ namespace SpaceDSL {
 
     }
 
+    void PointTarget::SetGeodeticCoord(const GeodeticCoord &LLA)
+    {
+        m_LonLatAltitude = LLA;
+    }
+
     void PointTarget::SetGeodeticCoord(const double longitude, const double latitude, const double altitude)
     {
         m_LonLatAltitude.SetLongitude(longitude);
@@ -92,19 +116,29 @@ namespace SpaceDSL {
         m_LonLatAltitude.SetAltitude(altitude);
     }
 
+    const vector<double> PointTarget::GetGeodeticPos() const
+    {
+        GeodeticCoordSystem ECFSys(GeodeticCoordSystem::E_WGS84System);
+        Vector3d geoPos = ECFSys.GetPosition(m_LonLatAltitude);
+        vector<double> pos;
+        pos.push_back(geoPos(0));
+        pos.push_back(geoPos(1));
+        pos.push_back(geoPos(2));
+        return pos;
+    }
+
     /*************************************************
      * Class type: The class of SpaceDSL Line Target
      * Author: Niu ZhiYong
-     * Date:2019-12-26
+     * Date:2018-12-26
      * Description:
      *  Longitude [rad] Latitude [rad] Altitude [m]  MinElevation [rad]
      *  This Class is Thread Safe!
     **************************************************/
-    atomic<int> LineTarget::LineTargetID(0);
     LineTarget::LineTarget()
     {
-        ++LineTargetID;
         m_Name = "Default";
+        m_TargetType = E_LineTarget;
         m_PointList.clear();
         m_AnchorPointIndex = -1;
         m_MinElevation = 0;
@@ -113,8 +147,8 @@ namespace SpaceDSL {
     LineTarget::LineTarget(const string &name, const vector<GeodeticCoord> &points,
                            const int anchorPointIndex, const double minElevation)
     {
-        ++LineTargetID;
         m_Name = name;
+        m_TargetType = E_LineTarget;
         m_PointList = points;
         m_AnchorPointIndex = anchorPointIndex;
         m_MinElevation = minElevation;
@@ -128,16 +162,15 @@ namespace SpaceDSL {
     /*************************************************
      * Class type: The class of SpaceDSL Area Target
      * Author: Niu ZhiYong
-     * Date:2019-12-26
+     * Date:2018-12-26
      * Description:
      *  Longitude [rad] Latitude [rad] Altitude [m]  MinElevation [rad]
      *  This Class is Thread Safe!
     **************************************************/
-    atomic<int> AreaTarget::AreaTargetID(0);
     AreaTarget::AreaTarget()
     {
-        ++AreaTargetID;
         m_Name = "Default";
+        m_TargetType = E_LineTarget;
         m_PointList.clear();
         m_CenterPoint = GeodeticCoord(0,0,0);
         m_MinElevation = 0;
@@ -145,8 +178,8 @@ namespace SpaceDSL {
 
     AreaTarget::AreaTarget(const string &name, const vector<GeodeticCoord> &points, const double minElevation)
     {
-        ++AreaTargetID;
         m_Name = name;
+        m_TargetType = E_LineTarget;
         m_PointList = points;
         if (this->IsSimplePolygon() == false)
              throw SPException(__FILE__, __FUNCTION__, __LINE__, "AreaTarget::AreaTarget AreaTarget is Not a Simple Polygon! ");
@@ -235,10 +268,5 @@ namespace SpaceDSL {
 
         return GeodeticCoord(midpointList[0](0), midpointList[0](1), 0);
     }
-
-    
-
-
-
 
 }

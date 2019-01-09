@@ -125,10 +125,14 @@ namespace SpaceDSL {
 
         inline double           GetSRPArea()  const                 { return m_SRPArea; }
 
+        inline void             UpdateState(const double Mjd, const CartState& state, const double mass);
+
+        inline void             UpdateState(const double Mjd, const Vector3d& pos, const Vector3d& vel,const double mass);
+
         /********************************************************************/
         /// Insert/Remove a Sensor Belong to The Space Vehicle
         /// @Author     Niu Zhiyong
-        /// @Date       2019-12-26
+        /// @Date       2018-12-26
         /// @Input
         /// @Param  halfAngle1    	Cone Half Angle/Horizontal Half Angle
         /// @Param	halfAngle2		Vertical Half Angle

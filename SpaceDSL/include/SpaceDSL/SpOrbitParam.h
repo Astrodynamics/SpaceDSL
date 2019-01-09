@@ -62,7 +62,8 @@ namespace SpaceDSL {
     public:
             explicit CartState();
             CartState(const Vector3d& pos, const Vector3d& vel);
-            CartState(double xPos, double yPos, double zPos, double xVel, double yVel, double zVel);
+            CartState(const double xPos, const double yPos, const double zPos,
+                      const double xVel, const double yVel, const double zVel);
             virtual ~CartState();
 
             inline Vector3d     Pos() const {return m_Pos;}
@@ -108,7 +109,7 @@ namespace SpaceDSL {
     {
     public:
             explicit GeodeticCoord();
-            GeodeticCoord(double longitude, double latitude, double altitude);
+            GeodeticCoord(const double longitude, const double latitude, const double altitude);
             virtual ~GeodeticCoord();
 
             inline double Longitude()   const {return m_Longitude;}
@@ -143,7 +144,7 @@ namespace SpaceDSL {
     {
     public:
             explicit OrbitElem();
-            OrbitElem(double sMajAx, double ecc, double i, double raan, double argPeri, double trueA);
+            OrbitElem(const double sMajAx, const double ecc, const double i, const double raan, const double argPeri, const double trueA);
             virtual ~OrbitElem();
 
             inline double     SMajAx()  const {return m_SMajAx;}
@@ -153,12 +154,12 @@ namespace SpaceDSL {
             inline double     ArgPeri() const {return m_ArgPeri;}
             inline double     TrueA()   const {return m_TrueA;}
 
-            inline void       SetSMajAx(double sMajAx)   { m_SMajAx = sMajAx;}
-            inline void       SetEcc(double ecc)         { m_Ecc = ecc;}
-            inline void       SetI(double i)             { m_I = i;}
-            inline void       SetRAAN(double raan)       { m_RAAN = raan;}
-            inline void       SetArgPeri(double argPeri) { m_ArgPeri = argPeri;}
-            inline void       SetTrueA(double trueA)     { m_TrueA = trueA;}
+            inline void       SetSMajAx(const double sMajAx)   { m_SMajAx = sMajAx;}
+            inline void       SetEcc(const double ecc)         { m_Ecc = ecc;}
+            inline void       SetI(const double i)             { m_I = i;}
+            inline void       SetRAAN(const double raan)       { m_RAAN = raan;}
+            inline void       SetArgPeri(const double argPeri) { m_ArgPeri = argPeri;}
+            inline void       SetTrueA(const double trueA)     { m_TrueA = trueA;}
     protected:
             double	m_SMajAx;	///< Semimajor axis
             double	m_Ecc;		///< Eccentricity

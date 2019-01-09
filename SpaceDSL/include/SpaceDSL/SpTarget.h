@@ -20,7 +20,7 @@
 * SOFTWARE.
 *
 * Author: Niu ZhiYong
-* Date:2019-12-26
+* Date:2018-12-26
 * Description:
 *   SpTarget.h
 *
@@ -31,7 +31,7 @@
 *
 *   Last modified:
 *
-*   2019-12-26  Niu Zhiyong (1st edition)
+*   2018-12-26  Niu Zhiyong (1st edition)
 *
 *************************************************************************/
 
@@ -57,14 +57,57 @@ using namespace Eigen;
 namespace SpaceDSL {
 
     /*************************************************
+     * Class type: The Base class of SpaceDSL Target
+     * Author: Niu ZhiYong
+     * Date:2018-12-26
+     * Description:
+     *  This Class is Thread Safe!
+    **************************************************/
+    class SPACEDSL_API Target
+    {
+    public:
+        explicit Target();
+        virtual ~Target();
+
+        enum TargetType
+        {
+            E_NotDefindTargetType = 0,
+            E_PointTarget = 1,
+            E_LineTarget = 2,
+            E_AreaTarget = 3,
+
+            E_Facility = 11,
+        };
+
+    protected:
+        static atomic<int>      TargetID;               ///< Target ID
+        string                  m_Name;                 ///< Target Name
+        TargetType              m_TargetType;           ///< Target Type
+        double                  m_MinElevation;         ///< Minimum Observation Elevations
+
+    public:
+        inline void             SetName (const string &name)        { m_Name = name; }
+
+        inline void             SetMinElevation (const double angle){ m_MinElevation = angle; }
+
+        inline const string&    GetName() const                     { return m_Name; }
+
+        inline int              GetID() const                       { return TargetID; }
+
+        inline TargetType       GetTargetType() const               { return m_TargetType; }
+
+        inline double           GetMinElevation() const             { return m_MinElevation; }
+
+    };
+    /*************************************************
      * Class type: The class of SpaceDSL Point Target
      * Author: Niu ZhiYong
-     * Date:2019-12-26
+     * Date:2018-12-26
      * Description:
      *  Longitude [rad] Latitude [rad] Altitude [m]  MinElevation [rad]
      *  This Class is Thread Safe!
     **************************************************/
-    class SPACEDSL_API PointTarget
+    class SPACEDSL_API PointTarget : public Target
     {
     public:
         explicit PointTarget();
@@ -73,21 +116,13 @@ namespace SpaceDSL {
         virtual ~PointTarget();
 
     public:
-        inline void		SetName (const string &name)                    { m_Name = name; }
-
-        inline void		SetGeodeticCoord (const GeodeticCoord &LLA)     { m_LonLatAltitude = LLA; }
+        inline void		SetGeodeticCoord (const GeodeticCoord &LLA);
 
         inline void		SetGeodeticCoord (const double longitude, const double latitude, const double altitude);
 
-        inline void     SetMinElevation (const double angle)            { m_MinElevation = angle; }
-
-        inline int                  GetID() const                       { return PointTargetID; }
-
-        inline const string&        GetName() const                     { return m_Name; }
-
         inline const GeodeticCoord& GetGeodeticCoord() const            { return m_LonLatAltitude; }
 
-        inline double               GetMinElevation() const             { return m_MinElevation; }
+        inline const vector<double> GetGeodeticPos() const;
 
     protected:
 
@@ -95,20 +130,17 @@ namespace SpaceDSL {
     // Attribute.
     //
     protected:
-        static atomic<int>      PointTargetID;              ///< Point Target ID
-        string                  m_Name;                     ///< Point Target Name
         GeodeticCoord           m_LonLatAltitude;           ///< In The Coordinate System of Initialization
-        double                  m_MinElevation;             ///< Minimum Observation Elevations
     };
     /*************************************************
      * Class type: The class of SpaceDSL Line Target
      * Author: Niu ZhiYong
-     * Date:2019-12-26
+     * Date:2018-12-26
      * Description:
      *  Longitude [rad] Latitude [rad] Altitude [m]  MinElevation [rad]
      *  This Class is Thread Safe!
     **************************************************/
-    class SPACEDSL_API LineTarget
+    class SPACEDSL_API LineTarget : public Target
     {
     public:
         explicit LineTarget();
@@ -117,23 +149,13 @@ namespace SpaceDSL {
         virtual ~LineTarget();
 
     public:
-        inline void		SetName (const string &name)                        { m_Name = name; }
-
         inline void		SetPointList (const vector<GeodeticCoord> &points)  { m_PointList = points; }
 
         inline void     SetAnchorPointIndex (const int index)               { m_AnchorPointIndex = index; }
 
-        inline void     SetMinElevation (const double angle)                { m_MinElevation = angle; }
-
-        inline int                          GetID() const                   { return LineTargetID; }
-
-        inline const string&                GetName() const                 { return m_Name; }
-
         inline const vector<GeodeticCoord>& GetPointList() const            { return m_PointList; }
 
         inline int                          GetAnchorPointIndex() const     { return m_AnchorPointIndex; }
-
-        inline double                       GetMinElevation() const         { return m_MinElevation; }
 
     protected:
 
@@ -141,22 +163,19 @@ namespace SpaceDSL {
     // Attribute.
     //
     protected:
-        static atomic<int>      LineTargetID;               ///< Line Target ID
-        string                  m_Name;                     ///< Line Target Name
         vector<GeodeticCoord>   m_PointList;                ///< Point List of Component The Line
         int                     m_AnchorPointIndex;         ///< Anchor Point Index In m_PointList of The Line
-        double                  m_MinElevation;             ///< Minimum Observation Elevations
     };
 
     /*************************************************
      * Class type: The class of SpaceDSL Area Target
      * Author: Niu ZhiYong
-     * Date:2019-12-26
+     * Date:2018-12-26
      * Description:
      *  Longitude [rad] Latitude [rad] Altitude [m]  MinElevation [rad]
      *  This Class is Thread Safe!
     **************************************************/
-    class SPACEDSL_API AreaTarget
+    class SPACEDSL_API AreaTarget : public Target
     {
     public:
         explicit AreaTarget();
@@ -164,21 +183,11 @@ namespace SpaceDSL {
         virtual ~AreaTarget();
 
     public:
-        inline void		SetName (const string &name)                        { m_Name = name; }
-
         inline void		SetPointList (const vector<GeodeticCoord> &points);
-
-        inline void     SetMinElevation (const double angle)                { m_MinElevation = angle; }
-
-        inline int                          GetID() const                   { return AreaTargetID; }
-
-        inline const string&                GetName() const                 { return m_Name; }
 
         inline const vector<GeodeticCoord>& GetPointList() const            { return m_PointList; }
 
         inline const GeodeticCoord        & GetCenterPoint() const          { return m_CenterPoint; }
-
-        inline double                       GetMinElevation() const         { return m_MinElevation; }
 
     protected:
         bool            IsSimplePolygon();
@@ -189,11 +198,8 @@ namespace SpaceDSL {
     // Attribute.
     //
     protected:
-        static atomic<int>      AreaTargetID;               ///< Line Target ID
-        string                  m_Name;                     ///< Line Target Name
         vector<GeodeticCoord>   m_PointList;                ///< Point List of Component The Line
         GeodeticCoord           m_CenterPoint;              ///< Center Point In Area
-        double                  m_MinElevation;             ///< Minimum Observation Elevations
     };
 
 }

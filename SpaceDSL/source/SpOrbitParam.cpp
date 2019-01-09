@@ -65,7 +65,8 @@ namespace SpaceDSL{
         this->m_Vel = vel;
     }
 
-    CartState::CartState(double xPos, double yPos, double zPos, double xVel, double yVel, double zVel)
+    CartState::CartState(const double xPos,const  double yPos, const double zPos,
+                         const double xVel, const double yVel, const double zVel)
     {
         this->m_Pos[0] = xPos;
         this->m_Pos[1] = yPos;
@@ -132,7 +133,7 @@ namespace SpaceDSL{
         m_Altitude  = 0;
     }
 
-    GeodeticCoord::GeodeticCoord(double longitude, double latitude, double altitude)
+    GeodeticCoord::GeodeticCoord(const double longitude, const double latitude, const double altitude)
     {
         m_Longitude = longitude;
         m_Latitude  = latitude;
@@ -160,7 +161,7 @@ namespace SpaceDSL{
         this->m_TrueA = 0;
     }
 
-    OrbitElem::OrbitElem(double sMajAx, double ecc, double i, double raan, double argPeri, double trueA)
+    OrbitElem::OrbitElem(const double sMajAx, const double ecc, const double i, const double raan, const double argPeri, const double trueA)
     {
         this->m_SMajAx = sMajAx;
         this->m_Ecc = ecc;
