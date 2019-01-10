@@ -209,7 +209,7 @@ namespace SpaceDSL {
 
 
 
-        void                                            Start(bool bIsMultThread);
+        void                                            Start(bool bIsMultThread = false);
 
         void                                            Reset();
 
