@@ -547,6 +547,29 @@ namespace SpaceDSL{
         cart = CartState(r, v);
     }
 
+    void TLEToOrbitElem(const string &line1, const string &line2, double &Mjd, OrbitElem &elem)
+    {
+        int year = 2000 + stoi(line1.substr(18, 2));
+        UTCCalTime time(year, 1, 1, 0, 0, 0);
+        Mjd = CalendarTimeToMjd(time) + stod(line1.substr(20,12));
+
+        double i = stod(line2.substr(8, 8)) * DegToRad;
+        double raan = stod(line2.substr(17, 8)) * DegToRad;
+        double e = stod("0." + line2.substr(26, 7));
+        double argPeri = stod(line2.substr(34, 8)) * DegToRad;
+        double meanA = stod(line2.substr(43, 8)) * DegToRad;
+        double T = DayToSec/stod(line2.substr(52, 11));
+        double sMajAx = pow(GM_Earth * (T/TwoPI) * (T/TwoPI), 1.0/3);
+        double trueA = MeanAnomalyToTrue(meanA, e);
+
+        elem.SetSMajAx(sMajAx);
+        elem.SetEcc(e);
+        elem.SetI(i);
+        elem.SetRAAN(raan);
+        elem.SetArgPeri(argPeri);
+        elem.SetTrueA(trueA);
+    }
+
 
 
 }

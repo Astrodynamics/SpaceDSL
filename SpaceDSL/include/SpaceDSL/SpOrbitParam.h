@@ -40,9 +40,12 @@
 
 #include "SpaceDSL_Global.h"
 
+#include <string>
+
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
+using namespace std;
 using namespace Eigen;
 
 /// All the functions are in the namespace SpaceDSL
@@ -420,6 +423,20 @@ namespace SpaceDSL {
     void SPACEDSL_API OrbitElemToCart (const OrbitElem& elem, double gm, CartState& cart);
 
     void SPACEDSL_API CartToOrbitElem (const CartState& cart, double gm, OrbitElem& elem);
+
+    /********************************************************************/
+    ///Calculate The Orbits Elements from NORAD Two-Line Element
+    /// @Author     Niu Zhiyong
+    /// @Date       2019-01-00
+    /// @Input
+    /// @Param      line1           The First Line of TLE
+    /// @Param      line2           The Second Line of TLE
+    /// @OutPut
+    /// @Param      Mjd             Orbit Epoch
+    /// @Param      elem            Classic Orbit Element
+    /// @Return     void
+    /**********************************************************************/
+    void SPACEDSL_API TLEToOrbitElem (const string &line1, const string &line2, double &Mjd, OrbitElem& elem);
 		
 }
 #endif //SPORBITPARAM_H

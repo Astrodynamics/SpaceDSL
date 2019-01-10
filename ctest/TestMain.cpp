@@ -9,7 +9,8 @@ int main(int argc, char *argv[])
 {
     cout<<"SpaceDSL Test Run!"<<endl;
     try
-    {   /// Initial Data
+    {
+        /// Initial Data
         UTCCalTime initial_time     (2018,1,4,16,58,11.1);
         UTCCalTime termination_time (2018,1,5,16,58,11.1);
 
