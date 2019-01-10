@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
         UTCCalTime initial_time     (2018,1,4,16,58,11.1);
         UTCCalTime termination_time (2018,1,5,16,58,11.1);
 
-        string targetName1 = "Facility1";// h = 257km
+        string targetName1 = "Facility1";
         PointTarget target1(targetName1, -75.5966*DegToRad, 40.0386*DegToRad, 0, 10*DegToRad);
 
         string vehicle_name1 = "The First Vehicle";// h = 257km
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
         double vehicle1_mass = 1000.0;
 
         string vehicle_name2 = "The Second Vehicle"; // h = 1065km
-               CartState vehicle2_cart0(-5.65484e+06, -3.96619e+06, -2.74305e+06,
+        CartState vehicle2_cart0(-5.65484e+06, -3.96619e+06, -2.74305e+06,
                                     4680.57 , -3787.06, -4173.34 );
         double vehicle2_mass = 1500.0;
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         pMission->SetPropagator(E_RungeKutta4, 60);
         //pMission->SetPropagator(E_RungeKutta78, 60, 0.01, 1, 120, 100);
         pMission->SetMissionSequence(initial_time, termination_time);
-        pMission->Start(false);
+        pMission->Start(true);
 
 
 

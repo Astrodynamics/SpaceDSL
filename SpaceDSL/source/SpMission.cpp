@@ -525,7 +525,7 @@ namespace SpaceDSL {
         {
             for (int id = 0; id < int(m_SpaceVehicleList.size()); ++id)
             {
-                auto pMissionThread = new MissionThread();
+                auto pMissionThread = new MissionThread(this);
                 pMissionThread->SetSpaceVehicleIndex(id);
                 m_pMissionThreadPool->Start(pMissionThread);
             }
@@ -759,7 +759,6 @@ namespace SpaceDSL {
             {
                 predictConfig.Update(Mjd_UTC);
                 step = orbit.OrbitStep(predictConfig, m_pPropagator, mass, pos, vel);
-                cout<<"step = "<<step<<endl;
                 Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
                 LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
                 this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
