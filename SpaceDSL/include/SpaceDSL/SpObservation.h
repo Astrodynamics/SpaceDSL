@@ -112,7 +112,7 @@ namespace SpaceDSL {
     /// @Output
     /// @Return     result      Max Observation Latitude
     /**********************************************************************/
-    double CalMaxObservationLat(const CartState &cart);
+    double SPACEDSL_API CalMaxObservationLat(const CartState &cart);
 
     /********************************************************************/
     /// Calculate Object Observation Param From Point Target
@@ -126,7 +126,7 @@ namespace SpaceDSL {
     /// @Param      result
     /// @Return     false : The Target Can not be Seen
     /**********************************************************************/
-    bool CalObservation(const double Mjd, const CartState &cart, Target *target, Observation &result);
+    bool SPACEDSL_API CalObservation(const double Mjd, const CartState &cart, Target *target, Observation &result);
 
     /********************************************************************/
     /// Calculate Sun Observation Param From Point Target
@@ -138,7 +138,7 @@ namespace SpaceDSL {
     /// @Output
     /// @Return     result      Observation Param
     /**********************************************************************/
-    Observation CalSunObservation(const double Mjd, Target *target);
+    Observation SPACEDSL_API CalSunObservation(const double Mjd, Target *target);
 
 }
 

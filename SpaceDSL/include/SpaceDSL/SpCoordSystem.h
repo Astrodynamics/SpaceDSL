@@ -173,7 +173,7 @@ namespace SpaceDSL {
     /// @Return Rotation matrix from the Earth equator and Greenwich meridian
     ///         to the local tangent (East-North-Zenith) coordinate system
     /********************************************************************/
-    Matrix3d GMSToLTCMtx (double longitude, double latitude);
+    Matrix3d SPACEDSL_API GMSToLTCMtx (double longitude, double latitude);
 
     /********************************************************************/
     /// Computes Azimuth and Elevation from Local Tangent Coordinates
@@ -185,7 +185,7 @@ namespace SpaceDSL {
     /// @Param	E           Elevation [rad]
     /// @Return
     /********************************************************************/
-    void GetAzEl ( const Vector3d &range, double& azimuth, double& elevation );
+    void SPACEDSL_API GetAzEl (const Vector3d &range, double& azimuth, double& elevation);
 
     /********************************************************************/
     /// Transformation VVLH(Vehicle Velocity Local Horizontal) to ICRS Each Other
@@ -293,9 +293,6 @@ namespace SpaceDSL {
 
     private:
         static  IERSService         m_IERSService;
-
-
-
 
     };
 }

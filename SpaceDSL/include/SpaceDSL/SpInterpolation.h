@@ -68,7 +68,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Param  result  Interpolation Result
         /**********************************************************************/
-		double LinearInterpolation(const VectorXd& x, const VectorXd& y, double t);
+        double SPACEDSL_API LinearInterpolation(const VectorXd& x, const VectorXd& y, double t);
 
         /********************************************************************/
         /// Lagrange Polynomial Interpolation
@@ -81,7 +81,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Param  result  Interpolation Result
         /**********************************************************************/
-        double LagrangePolynomialInterpolation(const VectorXd& x, const VectorXd& y, double t);
+        double SPACEDSL_API LagrangePolynomialInterpolation(const VectorXd& x, const VectorXd& y, double t);
 
         /********************************************************************/
         /// Hermite Polynomial Interpolation
@@ -95,7 +95,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Param  result  Interpolation Result [y, y']
         /**********************************************************************/
-        Vector2d HermitePolynomialInterpolation(const VectorXd& x, const VectorXd& y, const VectorXd &v, double t);
+        Vector2d SPACEDSL_API HermitePolynomialInterpolation(const VectorXd& x, const VectorXd& y, const VectorXd &v, double t);
 
 }
 
