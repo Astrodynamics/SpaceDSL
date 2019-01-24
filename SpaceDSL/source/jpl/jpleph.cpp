@@ -701,19 +701,14 @@ void * DLL_FUNC jpl_init_ephemeris( const char *ephemeris_filename,
     unsigned i, j;
     long de_version;
     char title[84];
-    //******************** By Niu Zhiyong
-//    FILE *ifile;
-//    FILE **ppfile = &ifile;
-//    int e = fopen_s(ppfile,ephemeris_filename, "rb");
-//    ifile = *ppfile;
-    //***************
 
 #if defined(_WIN32)
-    FILE *ifile;
+    FILE *ifile = nullptr;
     FILE **ppfile = &ifile;
     int e = fopen_s(ppfile,ephemeris_filename, "rb");
     ifile = *ppfile;
 #else
+
     FILE *ifile = fopen( ephemeris_filename, "rb");
 #endif
 

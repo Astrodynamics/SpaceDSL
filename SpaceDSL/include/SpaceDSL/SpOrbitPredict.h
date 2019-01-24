@@ -397,6 +397,46 @@ namespace SpaceDSL {
 
     };
 
+    /*************************************************
+     * Class type: SGP4/SDP4 Orbit Prediction with TLE
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  Predict ECI position and velocity of near-earth orbit
+     * (SGP4:period < 225 minutes)(SDP4:period >= 225 minutes)
+     *  according to SGP4 model and the given orbital parameters.
+    **************************************************/
+    class SPACEDSL_API TLEOrbitPredict
+    {
+    public:
+        TLEOrbitPredict();
+        TLEOrbitPredict(const string &tleLine1, const string &tleLine2);
+        virtual ~TLEOrbitPredict();
+
+    public:
+        inline  void            SetTLEString(const string &tleLine1, const string &tleLine2);
+
+        inline  void            GetTLEString(string &tleLine1, string &tleLine2) const      { tleLine1 = m_TLELine1; tleLine2 = m_TLELine2; }
+
+        //********************************************************************
+        /// Using the Two Body Orbit Model to Calculate the Orbit, One Step ,Without Maneuver
+        /// @author	Niu ZhiYong
+        /// @Date	2018-03-20
+        /// @Input
+        /// @Param  Mjd      Modified Julian date of UTC
+        /// @Output
+        /// @Param	pos      m
+        /// @Param	vel     m/s
+        /// @Return
+        //********************************************************************
+        void OrbitStep(const double Mjd, Vector3d &pos, Vector3d &vel);
+
+
+    private:
+        string          m_TLELine1;
+        string          m_TLELine2;
+    };
+
 }
 
 #endif //SPORBITPREDICT_H

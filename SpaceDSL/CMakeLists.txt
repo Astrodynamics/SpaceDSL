@@ -22,6 +22,10 @@ add_subdirectory(source)
 
 # Set src file list
 aux_source_directory (${PROJECT_SOURCE_DIR}/source/ SRC_LIST)
+aux_source_directory (${PROJECT_SOURCE_DIR}/source/jpl SRC_LIST)
+aux_source_directory (${PROJECT_SOURCE_DIR}/source/nrlmsise00 SRC_LIST)
+aux_source_directory (${PROJECT_SOURCE_DIR}/source/gsoap SRC_LIST)
+aux_source_directory (${PROJECT_SOURCE_DIR}/source/sxp SRC_LIST)
 
 # Set Include h file path
 list(APPEND SpaceDSL_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include)

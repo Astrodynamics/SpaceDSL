@@ -37,7 +37,7 @@ int main ()
     std::vector<double> lb(2);
     lb[0] = -HUGE_VAL; lb[1] = 0;
     opt.SetLowerBounds(lb);
-    opt.SetMinObjective(myfunc, NULL);
+    opt.SetMinObjective(myfunc, nullptr);
     my_constraint_data data[2] = { {2,0}, {-1,1} };
     opt.AddInequalityConstraint(myconstraint, &data[0], 1e-8);
     opt.AddInequalityConstraint(myconstraint, &data[1], 1e-8);

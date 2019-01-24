@@ -425,6 +425,20 @@ namespace SpaceDSL {
     void SPACEDSL_API CartToOrbitElem (const CartState& cart, double gm, OrbitElem& elem);
 
     /********************************************************************/
+    ///Calculate The Position and Velocity from NORAD Two-Line Element
+    /// @Author     Niu Zhiyong
+    /// @Date       2019-01-00
+    /// @Input
+    /// @Param      line1           The First Line of TLE
+    /// @Param      line2           The Second Line of TLE
+    /// @OutPut
+    /// @Param      Mjd             Orbit Epoch
+    /// @Param      cart       Classic Orbit Element/Position velocity
+    /// @Return     void
+    /**********************************************************************/
+    void SPACEDSL_API TLEToCartState (const string &line1, const string &line2, double &Mjd, CartState& cart);
+
+    /********************************************************************/
     ///Calculate The Orbits Elements from NORAD Two-Line Element
     /// @Author     Niu Zhiyong
     /// @Date       2019-01-00
@@ -433,10 +447,10 @@ namespace SpaceDSL {
     /// @Param      line2           The Second Line of TLE
     /// @OutPut
     /// @Param      Mjd             Orbit Epoch
-    /// @Param      elem            Classic Orbit Element
+    /// @Param      elem/cart       Classic Orbit Element/Position velocity
     /// @Return     void
     /**********************************************************************/
     void SPACEDSL_API TLEToOrbitElem (const string &line1, const string &line2, double &Mjd, OrbitElem& elem);
-		
+
 }
 #endif //SPORBITPARAM_H

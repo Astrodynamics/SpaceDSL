@@ -4,3 +4,4 @@
 add_subdirectory(jpl)
 add_subdirectory(gsoap)
 add_subdirectory(nrlmsise00)
+add_subdirectory(sxp)

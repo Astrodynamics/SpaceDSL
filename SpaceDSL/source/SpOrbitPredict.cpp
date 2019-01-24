@@ -40,7 +40,7 @@
 #include "SpaceDSL/SpMath.h"
 #include "SpaceDSL/SpUtils.h"
 
-
+#include "SpaceDSL/sxp/norad.h"
 
 namespace SpaceDSL {
 
@@ -1132,6 +1132,124 @@ namespace SpaceDSL {
             result(6) = 1;
         }
 
+
+    }
+
+    /*************************************************
+     * Class type: SGP4/SDP4 Orbit Prediction with TLE
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+     *  Predict ECI position and velocity of near-earth orbit
+     * (SGP4:period < 225 minutes)(SDP4:period >= 225 minutes)
+     *  according to SGP4 model and the given orbital parameters.
+    **************************************************/
+    TLEOrbitPredict::TLEOrbitPredict()
+    {
+
+    }
+
+    TLEOrbitPredict::TLEOrbitPredict(const string &tleLine1, const string &tleLine2)
+    {
+        m_TLELine1 = tleLine1;
+        m_TLELine2 = tleLine2;
+    }
+
+    TLEOrbitPredict::~TLEOrbitPredict()
+    {
+
+    }
+
+    void TLEOrbitPredict::SetTLEString(const string &tleLine1, const string &tleLine2)
+    {
+        m_TLELine1 = tleLine1;
+        m_TLELine2 = tleLine2;
+    }
+
+    void TLEOrbitPredict::OrbitStep(const double Mjd, Vector3d &pos, Vector3d &vel)
+    {
+        double mjd0;
+        OrbitElem ele0;
+        TLEToOrbitElem(m_TLELine1, m_TLELine2, mjd0, ele0);
+
+        double delatTime = (Mjd - mjd0) * DayToMin;
+
+        tle_t tle; /* Pointer to two-line elements set for satellite */
+        double endVel[3], endPos[3]; /* Satellite position and velocity vectors */
+        int ephem = TLE_EPHEMERIS_TYPE_SGP4;       /* default to SGP4 */
+        if (parse_elements(m_TLELine1.c_str(), m_TLELine2.c_str(), &tle) >= 0)
+        {
+            int is_deep = select_ephemeris(&tle);
+            double sat_params[N_SAT_PARAMS];
+
+            if (is_deep)
+                if (ephem == TLE_EPHEMERIS_TYPE_SGP4 || ephem == TLE_EPHEMERIS_TYPE_SGP8)
+                    ephem++;    /* switch to an SDPx model */
+            if (!is_deep)
+                if (ephem == TLE_EPHEMERIS_TYPE_SDP4 || ephem == TLE_EPHEMERIS_TYPE_SDP8)
+                    ephem--;    /* switch to an SGPx model */
+
+            /* Calling of NORAD routines */
+            /* Each NORAD routine (SGP, SGP4, SGP8, SDP4, SDP8)   */
+            /* will be called in turn with the appropriate TLE set */
+            switch (ephem)
+            {
+            case TLE_EPHEMERIS_TYPE_SGP:
+                SGP_init(sat_params, &tle);
+                break;
+            case TLE_EPHEMERIS_TYPE_SGP4:
+                SGP4_init(sat_params, &tle);
+                break;
+            case TLE_EPHEMERIS_TYPE_SGP8:
+                SGP8_init(sat_params, &tle);
+                break;
+            case TLE_EPHEMERIS_TYPE_SDP4:
+                SDP4_init(sat_params, &tle);
+                break;
+            case TLE_EPHEMERIS_TYPE_SDP8:
+                SDP8_init(sat_params, &tle);
+                break;
+            }
+
+            switch (ephem)
+            {
+            case TLE_EPHEMERIS_TYPE_SGP:
+                SGP(delatTime, &tle, sat_params, endPos, endVel);
+                break;
+            case TLE_EPHEMERIS_TYPE_SGP4:
+                SGP4(delatTime, &tle, sat_params, endPos, endVel);
+                break;
+            case TLE_EPHEMERIS_TYPE_SGP8:
+                SGP8(delatTime, &tle, sat_params, endPos, endVel);
+                break;
+            case TLE_EPHEMERIS_TYPE_SDP4:
+                SDP4(delatTime, &tle, sat_params, endPos, endVel);
+                break;
+            case TLE_EPHEMERIS_TYPE_SDP8:
+                SDP8(delatTime, &tle, sat_params, endPos, endVel);
+                break;
+            }
+            /* cvt km/minute to km/second */
+            endVel[0] /= 60.;
+            endVel[1] /= 60.;
+            endVel[2] /= 60.;
+
+            /* Calculate and print results(m, m/s) */
+            pos(0) = endPos[0] * 1000.0;
+            pos(1) = endPos[1] * 1000.0;
+            pos(2) = endPos[2] * 1000.0;
+
+
+            vel(0) = endVel[0] * 1000.0;
+            vel(1) = endVel[1] * 1000.0;
+            vel(2) = endVel[2] * 1000.0;
+
+        }
+        else
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "TLEOrbitPredict::OrbitStep  Can Not Get a TLE! ");
+        }
 
     }
 

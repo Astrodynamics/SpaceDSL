@@ -607,7 +607,7 @@ namespace SpaceDSL {
             }
             else
             {
-                return MjdSecC;
+                return MjdSecC*SecToDay;
             }
             ++count;
 

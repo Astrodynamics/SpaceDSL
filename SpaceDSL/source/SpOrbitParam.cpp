@@ -39,6 +39,7 @@
 
 #include "SpaceDSL/SpOrbitParam.h"
 #include "SpaceDSL/SpCoordSystem.h"
+#include "SpaceDSL/sxp/norad.h"
 #include "SpaceDSL/SpMath.h"
 #include "SpaceDSL/SpUtils.h"
 #include "SpaceDSL/SpConst.h"
@@ -547,28 +548,99 @@ namespace SpaceDSL{
         cart = CartState(r, v);
     }
 
+    void TLEToCartState(const string &line1, const string &line2, double &Mjd, CartState &cart)
+    {
+        tle_t tle; /* Pointer to two-line elements set for satellite */
+        double endVel[3], endPos[3]; /* Satellite position and velocity vectors */
+        int ephem = TLE_EPHEMERIS_TYPE_SGP4;       /* default to SGP4 */
+        if (parse_elements(line1.c_str(), line2.c_str(), &tle) >= 0)
+        {
+            Mjd = tle.epoch - MJDOffset;
+            int is_deep = select_ephemeris(&tle);
+            double sat_params[N_SAT_PARAMS];
+
+            if (is_deep)
+                if (ephem == TLE_EPHEMERIS_TYPE_SGP4 || ephem == TLE_EPHEMERIS_TYPE_SGP8)
+                    ephem++;    /* switch to an SDPx model */
+            if (!is_deep)
+                if (ephem == TLE_EPHEMERIS_TYPE_SDP4 || ephem == TLE_EPHEMERIS_TYPE_SDP8)
+                    ephem--;    /* switch to an SGPx model */
+
+            /* Calling of NORAD routines */
+            /* Each NORAD routine (SGP, SGP4, SGP8, SDP4, SDP8)   */
+            /* will be called in turn with the appropriate TLE set */
+            switch (ephem)
+            {
+            case TLE_EPHEMERIS_TYPE_SGP:
+                SGP_init(sat_params, &tle);
+                break;
+            case TLE_EPHEMERIS_TYPE_SGP4:
+                SGP4_init(sat_params, &tle);
+                break;
+            case TLE_EPHEMERIS_TYPE_SGP8:
+                SGP8_init(sat_params, &tle);
+                break;
+            case TLE_EPHEMERIS_TYPE_SDP4:
+                SDP4_init(sat_params, &tle);
+                break;
+            case TLE_EPHEMERIS_TYPE_SDP8:
+                SDP8_init(sat_params, &tle);
+                break;
+            }
+
+            switch (ephem)
+            {
+            case TLE_EPHEMERIS_TYPE_SGP:
+                SGP(0.0, &tle, sat_params, endPos, endVel);
+                break;
+            case TLE_EPHEMERIS_TYPE_SGP4:
+                SGP4(0.0, &tle, sat_params, endPos, endVel);
+                break;
+            case TLE_EPHEMERIS_TYPE_SGP8:
+                SGP8(0.0, &tle, sat_params, endPos, endVel);
+                break;
+            case TLE_EPHEMERIS_TYPE_SDP4:
+                SDP4(0.0, &tle, sat_params, endPos, endVel);
+                break;
+            case TLE_EPHEMERIS_TYPE_SDP8:
+                SDP8(0.0, &tle, sat_params, endPos, endVel);
+                break;
+            }
+            /* cvt km/minute to km/second */
+            endVel[0] /= 60.;
+            endVel[1] /= 60.;
+            endVel[2] /= 60.;
+
+            /* Calculate and print results(m, m/s) */
+            Vector3d pos, vel;
+            pos(0) = endPos[0] * 1000.0;
+            pos(1) = endPos[1] * 1000.0;
+            pos(2) = endPos[2] * 1000.0;
+
+
+            vel(0) = endVel[0] * 1000.0;
+            vel(1) = endVel[1] * 1000.0;
+            vel(2) = endVel[2] * 1000.0;
+
+            cart.SetPos(pos);
+            cart.SetVel(vel);
+
+        }
+        else
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "TLEOrbitPredict::OrbitStep  Can Not Get a TLE! ");
+        }
+    }
+
     void TLEToOrbitElem(const string &line1, const string &line2, double &Mjd, OrbitElem &elem)
     {
-        int year = 2000 + stoi(line1.substr(18, 2));
-        UTCCalTime time(year, 1, 1, 0, 0, 0);
-        Mjd = CalendarTimeToMjd(time) + stod(line1.substr(20,12));
-
-        double i = stod(line2.substr(8, 8)) * DegToRad;
-        double raan = stod(line2.substr(17, 8)) * DegToRad;
-        double e = stod("0." + line2.substr(26, 7));
-        double argPeri = stod(line2.substr(34, 8)) * DegToRad;
-        double meanA = stod(line2.substr(43, 8)) * DegToRad;
-        double T = DayToSec/stod(line2.substr(52, 11));
-        double sMajAx = pow(GM_Earth * (T/TwoPI) * (T/TwoPI), 1.0/3);
-        double trueA = MeanAnomalyToTrue(meanA, e);
-
-        elem.SetSMajAx(sMajAx);
-        elem.SetEcc(e);
-        elem.SetI(i);
-        elem.SetRAAN(raan);
-        elem.SetArgPeri(argPeri);
-        elem.SetTrueA(trueA);
+        CartState cart;
+        TLEToCartState(line1, line2, Mjd, cart);
+        CartToOrbitElem(cart, GM_Earth, elem);
     }
+
+
 
 
 
