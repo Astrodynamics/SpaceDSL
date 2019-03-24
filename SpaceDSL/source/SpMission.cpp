@@ -763,6 +763,7 @@ namespace SpaceDSL {
                 LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
                 this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
             }
+
         }
     }
 

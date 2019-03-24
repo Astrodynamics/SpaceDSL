@@ -296,8 +296,7 @@ namespace SpaceDSL {
         int     GetActiveThreadCount() const;
 
     private:
-        mutex                           m_StartLock;
-        mutex                           m_ClearLock;
+
         MonitorThread                   *m_pMonitor;
         bool                            m_bIsStarted;
         int                             m_MaxThreadCount;
@@ -330,8 +329,6 @@ namespace SpaceDSL {
 
     private:
         bool                        m_bIsInitialized;
-        mutex                       m_CheckLock;
-
         bool                        *m_pIsStarted;
         atomic<int>                 *m_pActiveThreadCount;
         vector<SpThread *>          *m_pThreadPool;
