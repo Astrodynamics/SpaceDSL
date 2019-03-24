@@ -42,7 +42,7 @@
 #include <functional>
 #include <mutex>
 #include <chrono>
-
+#include <iostream>
 using namespace std;
 using namespace std::chrono;
 
@@ -124,23 +124,23 @@ namespace SpaceDSL {
         #else
             struct sched_param param;
             if (m_MaxPriority == 0)
-                param.__sched_priority = 0;
+                param.sched_priority = 0;
             switch (priority)
             {
             case NormalPriority:
-                param.__sched_priority = 50;
+                param.sched_priority = 50;
                 break;
             case HighPriority:
-                param.__sched_priority = 70;
+                param.sched_priority = 70;
                 break;
             case HighestPriority:
-                param.__sched_priority = 99;
+                param.sched_priority = 99;
                 break;
             case LowPriority:
-                param.__sched_priority = 30;
+                param.sched_priority = 30;
                 break;
             case LowestPriority:
-                param.__sched_priority = 1;
+                param.sched_priority = 1;
                 break;
             default:
                 throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread::SetPriority Unsupport Thread Priority");
@@ -176,16 +176,16 @@ namespace SpaceDSL {
         #else
             struct sched_param param;
             pthread_attr_getschedparam(&m_Thread_attr, &param);
-            if (param.__sched_priority == 0
-                || (param.__sched_priority >= 40 && param.__sched_priority <= 59))
+            if (param.sched_priority == 0
+                || (param.sched_priority >= 40 && param.sched_priority <= 59))
                 return NormalPriority;
-            else if (param.__sched_priority >= 1 && param.__sched_priority <= 19)
+            else if (param.sched_priority >= 1 && param.sched_priority <= 19)
                 return LowestPriority;
-            else if (param.__sched_priority >= 20 && param.__sched_priority <= 39)
+            else if (param.sched_priority >= 20 && param.sched_priority <= 39)
                 return LowPriority;
-            else if (param.__sched_priority >= 60 && param.__sched_priority <= 79)
+            else if (param.sched_priority >= 60 && param.sched_priority <= 79)
                 return HighPriority;
-            else if (param.__sched_priority >= 80 && param.__sched_priority <= 99)
+            else if (param.sched_priority >= 80 && param.sched_priority <= 99)
                 return HighestPriority;
             else
                 throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThread::Getpriority Unsupport Thread Priority");
@@ -351,11 +351,13 @@ namespace SpaceDSL {
 
         if ( m_ActiveThreadCount < m_MaxThreadCount)
         {
+            m_StartLock.lock();
             m_ThreadPool.push_back(thread);
             ++m_ActiveThreadCount;
             if (m_ActiveThreadCount != int(m_ThreadPool.size()))
                 throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThreadPool: m_ActiveThreadCount != m_ThreadPool.size()");
             thread->Start();
+            m_StartLock.unlock();
         }
         else
         {
@@ -457,16 +459,22 @@ namespace SpaceDSL {
         vector<SpThread *>::iterator pool_iter;
         while ( *m_pIsStarted == true )
         {
+            m_CheckLock.lock();
             if (m_pThreadPool->size() == 0 &&
                  m_pThreadBuffer->size() == 0)
                 break;
 
             for(pool_iter = m_pThreadPool->begin(); pool_iter != m_pThreadPool->end();)
             {
-                if ((*pool_iter)->isFinished())
+                if(m_pThreadPool->size() == 0)
+                    break;
+
+                if ((*pool_iter) == nullptr || (*pool_iter)->isFinished())
                 {
-                    m_CheckLock.lock();
-                    delete (*pool_iter);
+                    #ifdef _WIN32
+                        delete (*pool_iter);
+                    #endif
+
                     pool_iter = m_pThreadPool->erase(pool_iter);
                     if(m_pThreadBuffer->size() > 0)
                     {
@@ -478,11 +486,18 @@ namespace SpaceDSL {
                     {
                         --(*m_pActiveThreadCount);
                     }
-                    m_CheckLock.unlock();
+
                 }
                 else
                     ++pool_iter;
             }
+            m_CheckLock.unlock();
+
+            #ifdef _WIN32
+                Sleep(100);
+            #else
+                usleep(100000);
+            #endif
         }
     }
 

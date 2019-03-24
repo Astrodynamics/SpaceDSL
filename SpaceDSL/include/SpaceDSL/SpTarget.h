@@ -122,7 +122,7 @@ namespace SpaceDSL {
 
         inline const GeodeticCoord& GetGeodeticCoord() const            { return m_LonLatAltitude; }
 
-        inline const vector<double> GetGeodeticPos() const;
+        const vector<double> GetGeodeticPos() const;
 
     protected:
 

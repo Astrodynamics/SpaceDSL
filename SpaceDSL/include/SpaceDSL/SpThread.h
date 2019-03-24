@@ -53,8 +53,10 @@
     #include <Windows.h>
     #include <process.h>
 #else
+    #include <thread>
     #include <pthread.h>
     #include <signal.h>
+    #include <unistd.h>
 #endif
 
 using namespace std;
@@ -294,6 +296,7 @@ namespace SpaceDSL {
         int     GetActiveThreadCount() const;
 
     private:
+        mutex                           m_StartLock;
         mutex                           m_ClearLock;
         MonitorThread                   *m_pMonitor;
         bool                            m_bIsStarted;

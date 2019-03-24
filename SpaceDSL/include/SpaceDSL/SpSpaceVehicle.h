@@ -125,9 +125,9 @@ namespace SpaceDSL {
 
         inline double           GetSRPArea()  const                 { return m_SRPArea; }
 
-        inline void             UpdateState(const double Mjd, const CartState& state, const double mass);
+        void                    UpdateState(const double Mjd, const CartState& state, const double mass);
 
-        inline void             UpdateState(const double Mjd, const Vector3d& pos, const Vector3d& vel,const double mass);
+        void                    UpdateState(const double Mjd, const Vector3d& pos, const Vector3d& vel,const double mass);
 
         /********************************************************************/
         /// Insert/Remove a Sensor Belong to The Space Vehicle
