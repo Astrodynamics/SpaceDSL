@@ -84,6 +84,20 @@ namespace SpaceDSL {
         double SPACEDSL_API LagrangePolynomialInterpolation(const VectorXd& x, const VectorXd& y, double t);
 
         /********************************************************************/
+        /// Lagrange Polynomial Interpolation Gradient Using Finite Difference Method
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-12-26
+        /// @Input
+        /// @Param  x    	Independent Variable Array
+        /// @Param	y		Function value array
+        /// @Param	t		Interpolation Point
+        /// @Param	step	Difference Step
+        /// @Output
+        /// @Param  result  Gradient Result
+        /**********************************************************************/
+        double SPACEDSL_API LagrangePolynomialInterpolationGradient(const VectorXd& x, const VectorXd& y, double t, double step = 0.01);
+
+        /********************************************************************/
         /// Hermite Polynomial Interpolation
         /// @Author     Niu Zhiyong
         /// @Date       2018-12-26

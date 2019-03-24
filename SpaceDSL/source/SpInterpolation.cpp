@@ -126,6 +126,29 @@ namespace SpaceDSL {
         return result;
     }
 
+    double LagrangePolynomialInterpolationGradient(const VectorXd &x, const VectorXd &y, double t, double step)
+    {
+        int length = static_cast<int>(x.size());
+
+        if(length != static_cast<int>(y.size()))
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "LagrangePolynomialInterpolation: x.size() != y.size()!");
+
+        double gradient = 0;
+        for ( int i = 0; i < length; ++i )
+        {
+            t += 0.5*step;
+            gradient = 4* LagrangePolynomialInterpolation(x, y, t)/ ( 3* step );
+            t -= step;
+            gradient -= 4* LagrangePolynomialInterpolation(x, y, t)/ ( 3* step );
+            t += 3* step/2;
+            gradient -= LagrangePolynomialInterpolation(x, y, t)/ ( 6* step );
+            t -= 2* step;
+            gradient += LagrangePolynomialInterpolation(x, y, t)/ ( 6* step );
+        }
+
+        return gradient;
+    }
+
     Vector2d HermitePolynomialInterpolation(const VectorXd &x, const VectorXd &y, const VectorXd &v, double t)
     {
         int length = static_cast<int>(x.size());
@@ -181,8 +204,6 @@ namespace SpaceDSL {
 
         return result;
     }
-
-
 
 
 }
