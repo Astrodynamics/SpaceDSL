@@ -48,8 +48,6 @@ using namespace std::chrono;
 
 namespace SpaceDSL {
 
-    mutex   g_CheckLock;
-
     /*************************************************
      * Class type: Thread Class of SpaceDSL
      * Author: Niu ZhiYong
@@ -335,7 +333,7 @@ namespace SpaceDSL {
         m_MaxThreadCount = 0;
         m_ActiveThreadCount = 0;
         m_pMonitor = new MonitorThread();
-        m_pMonitor->Initializer(&m_bIsStarted, &m_ThreadPool, &m_ThreadBuffer, &m_ActiveThreadCount);
+        m_pMonitor->Initializer(&m_bIsStarted, &m_ThreadPool, &m_ThreadBuffer, &m_ActiveThreadCount, &m_CheckLock);
         m_pMonitor->Start();
     }
 
@@ -352,7 +350,7 @@ namespace SpaceDSL {
         if (m_MaxThreadCount <= 0)
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThreadPool: m_MaxThreadCount <= 0");
 
-        g_CheckLock.lock();
+        lock_guard<mutex>guard(m_CheckLock);
         if ( m_ActiveThreadCount < m_MaxThreadCount)
         {
             m_ThreadPool.push_back(thread);
@@ -365,15 +363,14 @@ namespace SpaceDSL {
         {
             m_ThreadBuffer.push_back(thread);
         }
-        g_CheckLock.unlock();
+
         m_bIsStarted = true;
     }
 
     void SpThreadPool::Clear()
     {
-        g_CheckLock.lock();
+        lock_guard<mutex>guard(m_CheckLock);
         m_ThreadBuffer.clear();
-        g_CheckLock.unlock();
     }
 
     bool SpThreadPool::WaitForDone(int msecs)
@@ -428,6 +425,7 @@ namespace SpaceDSL {
         m_pActiveThreadCount = nullptr;
         m_pThreadPool = nullptr;
         m_pThreadBuffer = nullptr;
+        m_pCheckLock = nullptr;
         m_bIsInitialized = false;
     }
 
@@ -437,12 +435,14 @@ namespace SpaceDSL {
     }
 
     void MonitorThread::Initializer(bool *pIsStarted, vector<SpThread *> *pPool,
-                                    deque<SpThread *> *pBuffer, atomic<int> *pActiveThreadCount)
+                                    deque<SpThread *> *pBuffer, atomic<int> *pActiveThreadCount,
+                                    mutex *pMutex)
     {
         m_pIsStarted = pIsStarted;
         m_pActiveThreadCount = pActiveThreadCount;
         m_pThreadPool = pPool;
         m_pThreadBuffer = pBuffer;
+        m_pCheckLock = pMutex;
         m_bIsInitialized = true;
     }
 
@@ -467,7 +467,7 @@ namespace SpaceDSL {
         vector<SpThread *>::iterator pool_iter;
         while ( *m_pIsStarted == true )
         {
-            g_CheckLock.lock();
+            lock_guard<mutex>guard(*m_pCheckLock);
 
             if ((*m_pThreadPool).size() == 0 &&
                  (*m_pThreadBuffer).size() == 0)
@@ -501,8 +501,6 @@ namespace SpaceDSL {
                 else
                     ++pool_iter;
             }
-
-            g_CheckLock.unlock();
 
             #ifdef _WIN32
                 Sleep(100);
