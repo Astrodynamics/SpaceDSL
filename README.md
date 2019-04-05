@@ -1,4 +1,4 @@
-﻿![logo](https://github.com/Astrodynamics/SpaceDSL/blob/master/doc/logo.png)
+![logo](https://github.com/Astrodynamics/SpaceDSL/blob/master/doc/logo.png)
 
 # SpaceDSL(Testing)[![Build Status](https://travis-ci.org/Astrodynamics/SpaceDSL.svg?branch=master)](https://travis-ci.org/Astrodynamics/SpaceDSL.svg?branch=master)&nbsp;
 
@@ -16,7 +16,7 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - JPL Ephemeris: Repackage the JPL ephemeris reading module, providing the latest `DE436` file, including data from `1950` to `2050`.
 - Earth Gravity Model: Using the spherical harmonic function to build the earth's high-precision gravitational model, with `EGM2008` data(80X80).
 - Other Perturbation Models: Atmospheric Drag(`NRLMSISE2000`), Solar Radiation Pressure, Third Body Gravity.
-- Two Body Orbit Prediction And High Precision Orbit Prediction For Spacecraft.
+- Two Body Orbit Prediction, J2 Orbit Prediction And High Precision Orbit Prediction For Spacecraft.
 - Various Ground Target Models and Access Analysis.
 - Sensor Support(`Simple Conic` and `Rectangular`).
 - Common Physical Constants
