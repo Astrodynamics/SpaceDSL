@@ -99,9 +99,9 @@ const double EarthAngVel	   	= 7.2921151467e-5;			///< Nominal mean angular velo
 const double EarthMeanMotion	= 1.9910643985790994404796035026544e-7;	///< (TwoPI/365.2420897/86400) rad/sec
 const double EarthRPSDay        = 1.00273790934;            ///< Earth Rotations Per Siderial Day
 
-const double EARTH_J2          	= 1.0826261e-3;			///< Earth Perturbation J2 Term
-const double EARTH_J3          	= -2.54e-6;				///< Earth Perturbation J3 Term
-const double EARTH_J4          	= -1.61e-6;				///< Earth Perturbation J4 Term
+const double Earth_J2          	= 1.0826261e-3;			///< Earth Perturbation J2 Term
+const double Earth_J3          	= -2.54e-6;				///< Earth Perturbation J3 Term
+const double Earth_J4          	= -1.61e-6;				///< Earth Perturbation J4 Term
 
 //
 //WGS84 constant
@@ -119,8 +119,9 @@ const double WGS84SRE    		= 6.96E8;			//IAU76
 // moon parameter 
 //
 const double GM_Moon            = 4.9027949e12;		///< moon gravitation constant [m^3/s^2]
-const double MoonRadius         = 1738200.0;			///< Equatorial radius of the Moon [m]
+const double MoonRadius         = 1738200.0;		///< Equatorial radius of the Moon [m]
 const double MoonMinRadius      = 1738200.0;
+const double Moon_J2            = 0.2027e-3;
 
 //
 // Jupiter parameter
@@ -128,6 +129,7 @@ const double MoonMinRadius      = 1738200.0;
 const double GM_Jupiter         = 1.26712000000000e+017;
 const double JupiterRadius      = 7.14920000000000e+007;
 const double JupiterMinRadius   = 6.68540000000000e+007;
+const double Jupiter_J2         = 0.01475;
 
 //
 // Mars parameter
@@ -135,6 +137,8 @@ const double JupiterMinRadius   = 6.68540000000000e+007;
 const double GM_Mars            = 4.28282868534000e+013;
 const double MarsRadius         = 3.39700000000000e+006;
 const double MarsMinRadius      = 3.37500000000000e+006;
+const double Mars_J2            = 1.96045e-3;
+
 
 //
 // Mercury parameter
@@ -142,6 +146,7 @@ const double MarsMinRadius      = 3.37500000000000e+006;
 const double GM_Mercury         = 2.20320800000000e+013;
 const double MercuryRadius      = 2.43970000000000e+006;
 const double MercuryMinRadius   = 2.43970000000000e+006;
+const double Mercury_J2         = 50.3e-6;
 
 //
 // Neptune parameter 
@@ -149,20 +154,21 @@ const double MercuryMinRadius   = 2.43970000000000e+006;
 const double GM_Neptune         = 6.87130000000000e+015;
 const double NeptuneRadius      = 2.52690000000000e+007;
 const double NeptuneMinRadius   = 2.48000000000000e+007;
-
+const double Neptune_J2          = 3.411e-3;
 //
 // Pluto parameter
 //
 const double GM_Pluto           = 1.00907600000000e+012;
 const double PlutoRadius        = 1.16200000000000e+006;
 const double PlutoMinRadius     = 1.16200000000000e+006;
-
+const double Pluto_J2           = 0.0;
 //
 // Saturn parameter
 //
 const double GM_Saturn          = 3.79340000000000e+016;
 const double SaturnRadius       = 6.02680000000000e+007;
 const double SaturnMinRadius    = 5.43640000000000e+007;
+const double Saturn_J2          = 0.016298;
 
 //
 // Sun parameter
@@ -171,13 +177,14 @@ const double GM_Sun             = 1.327122E20;				///< Heliocentric gravitation 
 const double SunRadius          = 695990000.0;				///< Equatorial radius of the Sun [m], Seidelmann 1992
 const double SunMinRadius       = 695990000.0;
 const double SolarRadPreAtAU    = 4.560E-6;                 ///< Solar Radiation pressure at 1 AU [N/m^2] (~1367 W/m^2); IERS 96
-
+const double Sun_J2             = 0.0;
 //
 // Uranus parameter
 //
 const double GM_Uranus          = 5.80320000000000e+015;
 const double UranusRadius       = 2.55590000000000e+007;
 const double UranusMinRadius    = 2.49730000000000e+007;
+const double Uranus_J2          = 3.34343e-3;
 
 //
 // Venus parameter
@@ -185,7 +192,7 @@ const double UranusMinRadius    = 2.49730000000000e+007;
 const double GM_Venus           = 3.24858800000000e+014;
 const double VenusRadius        = 6.05190000000000e+006;
 const double VenusMinRadius     = 6.05190000000000e+006;
-
+const double Venus_J2           = 4.458e-6;
 
 //===================================
 // Unit conversion constants
