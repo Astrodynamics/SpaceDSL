@@ -34,8 +34,6 @@ INCLUDE_DIRECTORIES(${CTEST_INCLUDE_DIRS})
 #
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Instruct CMake to run moc automatically when needed
-set(CMAKE_AUTOMOC ON)
 
 set(EXECUTABLE_OUTPUT_PATH  ${ALL_OUTPUT_PATH})
 message(STATUS "#ALL_OUTPUT_PATH=${ALL_OUTPUT_PATH}")

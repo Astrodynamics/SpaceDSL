@@ -52,8 +52,6 @@ INCLUDE_DIRECTORIES(${SpaceDSL_INCLUDE_DIRS})
 #
 # Find includes in corresponding build directories
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# Instruct CMake to run moc automatically when needed
-set(CMAKE_AUTOMOC ON)
 
 set(LIBRARY_OUTPUT_PATH  ${ALL_OUTPUT_PATH})
 
