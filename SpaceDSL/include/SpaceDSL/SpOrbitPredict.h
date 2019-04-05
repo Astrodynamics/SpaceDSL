@@ -112,6 +112,10 @@ namespace SpaceDSL {
 
         double                      GetCenterStarGM() const;
 
+        double                      GetCenterStarJ2() const;
+
+        double                      GetCenterStarRadius() const;
+
         void                        SetMJD_UTC(double Mjd_UTC);
 
         double                      GetMJD_UTC() const;
@@ -396,7 +400,71 @@ namespace SpaceDSL {
         RungeKutta                      *m_pRungeKutta;
 
     };
+    /*************************************************
+     * Class type: J2 Orbit Prediction Right Function
+     * Author: Niu ZhiYong
+     * Date:2019-03-25
+     * Description:
+    **************************************************/
+    class J2OrbitRightFunc : public RightFunc
+    {
+    public:
+        explicit J2OrbitRightFunc();
+        explicit J2OrbitRightFunc(const OrbitPredictConfig *pConfig);
+        ~J2OrbitRightFunc();
 
+        void UpdateOrbitPredictConfig(const OrbitPredictConfig *pConfig);
+    public:
+        /// @Param  t                   sec
+        /// @Param	step                sec
+        /// @Param  x                   m,m/s
+        /// @Param  result              m,m/s
+        void operator() (double t, const VectorXd &x, VectorXd&result) const override;
+
+    protected:
+
+        const OrbitPredictConfig      *m_pOrbitPredictConfig;
+    };
+
+    /*************************************************
+     * Class type: J2 Orbit Prediction
+     * Author: Niu ZhiYong
+     * Date:2019-03-25
+     * Description:
+     *  Orbit Prediction Algorithm and Function
+    **************************************************/
+    class SPACEDSL_API J2OrbitPredict
+    {
+    public:
+        J2OrbitPredict();
+        virtual ~J2OrbitPredict();
+    public:
+
+        //********************************************************************
+        /// Using the J2 Orbit Model to Calculate the Orbit, One Step ,Without Maneuver
+        /// @author	Niu ZhiYong
+        /// @Date	2018-03-20
+        /// @Input
+        /// @Param  centerStarType      Solar System Star Type
+        /// @Param	step                sec
+        /// @Param	integType           IntegMethodType
+        /// @In/Out
+        /// @Param	mass                kg
+        /// @Param	pos                 m
+        /// @Param	vel                 m/s
+        /// @Output
+        /// @Param	accel               m/s^2
+        /// @Return
+        //********************************************************************
+        void OrbitStep (OrbitPredictConfig &predictConfig, Propagator *pPropagator,
+                        double &mass, Vector3d &pos, Vector3d &vel);
+
+
+    protected:
+        J2OrbitRightFunc                *m_pRightFunc;
+        RungeKutta                      *m_pRungeKutta;
+
+    };
     /*************************************************
      * Class type: SGP4/SDP4 Orbit Prediction with TLE
      * Author: Niu ZhiYong

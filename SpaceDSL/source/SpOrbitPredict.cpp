@@ -66,6 +66,24 @@ namespace SpaceDSL {
         {
         case E_Earth:
             return EarthRadius;
+        case E_Mercury:
+            return MercuryRadius;
+        case E_Venus:
+            return VenusRadius;
+        case E_Mars:
+            return MarsRadius;
+        case E_Jupiter:
+            return JupiterRadius;
+        case E_Saturn:
+            return SaturnRadius;
+        case E_Uranus:
+            return UranusRadius;
+        case E_Neptune:
+            return NeptuneRadius;
+        case E_Pluto:
+            return PlutoRadius;
+        case E_Moon:
+            return MoonRadius;
         case E_Sun:
             return AU;
         default:
@@ -80,6 +98,24 @@ namespace SpaceDSL {
         {
         case E_Earth:
             return sqrt(GM_Earth/EarthRadius);
+        case E_Mercury:
+            return sqrt(GM_Mercury/MercuryRadius);
+        case E_Venus:
+            return sqrt(GM_Venus/VenusRadius);
+        case E_Mars:
+            return sqrt(GM_Mars/MarsRadius);
+        case E_Jupiter:
+            return sqrt(GM_Jupiter/JupiterRadius);
+        case E_Saturn:
+            return sqrt(GM_Saturn/SaturnRadius);
+        case E_Uranus:
+            return sqrt(GM_Uranus/UranusRadius);
+        case E_Neptune:
+            return sqrt(GM_Neptune/NeptuneRadius);
+        case E_Pluto:
+            return sqrt(GM_Pluto/PlutoRadius);
+        case E_Moon:
+            return sqrt(GM_Moon/MoonRadius);
         case E_Sun:
             return sqrt(GM_Sun/AU);
         default:
@@ -94,6 +130,24 @@ namespace SpaceDSL {
         {
         case E_Earth:
             return EarthRadius/sqrt(GM_Earth/EarthRadius);
+        case E_Mercury:
+            return MercuryRadius/sqrt(GM_Mercury/MercuryRadius);
+        case E_Venus:
+            return VenusRadius/sqrt(GM_Venus/VenusRadius);
+        case E_Mars:
+            return MarsRadius/sqrt(GM_Mars/MarsRadius);
+        case E_Jupiter:
+            return JupiterRadius/sqrt(GM_Jupiter/JupiterRadius);
+        case E_Saturn:
+            return SaturnRadius/sqrt(GM_Saturn/SaturnRadius);
+        case E_Uranus:
+            return UranusRadius/sqrt(GM_Uranus/UranusRadius);
+        case E_Neptune:
+            return NeptuneRadius/sqrt(GM_Neptune/NeptuneRadius);
+        case E_Pluto:
+            return PlutoRadius/sqrt(GM_Pluto/PlutoRadius);
+        case E_Moon:
+            return MoonRadius/sqrt(GM_Moon/MoonRadius);
         case E_Sun:
             return AU/sqrt(GM_Sun/AU);
         default:
@@ -108,6 +162,24 @@ namespace SpaceDSL {
         {
         case E_Earth:
             return  (GM_Earth*mass)/pow(EarthRadius,2);
+        case E_Mercury:
+            return (GM_Mercury*mass)/pow(MercuryRadius,2);
+        case E_Venus:
+            return (GM_Venus*mass)/pow(VenusRadius,2);
+        case E_Mars:
+            return (GM_Mars*mass)/pow(MarsRadius,2);
+        case E_Jupiter:
+            return (GM_Jupiter*mass)/pow(JupiterRadius,2);
+        case E_Saturn:
+            return (GM_Saturn*mass)/pow(SaturnRadius,2);
+        case E_Uranus:
+            return (GM_Uranus*mass)/pow(UranusRadius,2);
+        case E_Neptune:
+            return (GM_Neptune*mass)/pow(NeptuneRadius,2);
+        case E_Pluto:
+            return (GM_Pluto*mass)/pow(PlutoRadius,2);
+        case E_Moon:
+            return (GM_Moon*mass)/pow(MoonRadius,2);
         case E_Sun:
             return (GM_Sun*mass)/pow(AU,2);
         default:
@@ -316,6 +388,68 @@ namespace SpaceDSL {
             return GM_Moon;
         case E_Sun:
             return GM_Sun;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,"OrbitPredictConfig:SolarSysStarType Unsupport ");
+        }
+    }
+
+    double OrbitPredictConfig::GetCenterStarJ2() const
+    {
+        switch (m_CenterStarType)
+        {
+        case E_Mercury:
+            return Mercury_J2;
+        case E_Venus:
+            return Venus_J2;
+        case E_Earth:
+            return Earth_J2;
+        case E_Mars:
+            return Mars_J2;
+        case E_Jupiter:
+            return Jupiter_J2;
+        case E_Saturn:
+            return Saturn_J2;
+        case E_Uranus:
+            return Uranus_J2;
+        case E_Neptune:
+            return Neptune_J2;
+        case E_Pluto:
+            return Pluto_J2;
+        case E_Moon:
+            return Moon_J2;
+        case E_Sun:
+            return Sun_J2;
+        default:
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,"OrbitPredictConfig:SolarSysStarType Unsupport ");
+        }
+    }
+
+    double OrbitPredictConfig::GetCenterStarRadius() const
+    {
+        switch (m_CenterStarType)
+        {
+        case E_Mercury:
+            return MercuryRadius;
+        case E_Venus:
+            return VenusRadius;
+        case E_Earth:
+            return EarthRadius;
+        case E_Mars:
+            return MarsRadius;
+        case E_Jupiter:
+            return JupiterRadius;
+        case E_Saturn:
+            return SaturnRadius;
+        case E_Uranus:
+            return UranusRadius;
+        case E_Neptune:
+            return NeptuneRadius;
+        case E_Pluto:
+            return PlutoRadius;
+        case E_Moon:
+            return MoonRadius;
+        case E_Sun:
+            return SunRadius;
         default:
             throw SPException(__FILE__, __FUNCTION__, __LINE__,"OrbitPredictConfig:SolarSysStarType Unsupport ");
         }
@@ -981,7 +1115,66 @@ namespace SpaceDSL {
         return adaptedStep;
     }
 
+    /*************************************************
+     * Class type: Tow Body Orbit Prediction Right Function
+     * Author: Niu ZhiYong
+     * Date:2018-03-20
+     * Description:
+    **************************************************/
+    TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc()
+    {
+        m_pOrbitPredictConfig = nullptr;
+    }
 
+    TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc(const OrbitPredictConfig *pConfig)
+    {
+        m_pOrbitPredictConfig = pConfig;
+    }
+
+    TwoBodyOrbitRightFunc::~TwoBodyOrbitRightFunc()
+    {
+
+    }
+
+    void TwoBodyOrbitRightFunc::UpdateOrbitPredictConfig(const OrbitPredictConfig *pConfig)
+    {
+        m_pOrbitPredictConfig = pConfig;
+    }
+
+    void TwoBodyOrbitRightFunc::operator()(double t, const VectorXd &x, VectorXd &result) const
+    {
+        Vector3d pos;
+        pos(0) = x(0);  pos(1) = x(1);  pos(2) = x(2);
+        Vector3d vel;
+        vel(0) = x(3);  vel(1) = x(4);  vel(2) = x(5);
+        double r = pos.norm();
+        if (m_pOrbitPredictConfig->IsUseNormalize())
+        {
+            /// make the right function
+            for (int i = 0; i < 3; ++i)
+            {
+                result(i) = vel(i);
+            }
+            result(3) = -pos(0)/pow(r,3);
+            result(4) = -pos(1)/pow(r,3);
+            result(5) = -pos(2)/pow(r,3);
+            result(6) = 0;
+        }
+        else
+        {
+            double GM = m_pOrbitPredictConfig->GetCenterStarGM();
+            /// make the right function
+            for (int i = 0; i < 3; ++i)
+            {
+                result(i) = vel(i);
+            }
+            result(3) = -GM*pos(0)/pow(r,3);
+            result(4) = -GM*pos(1)/pow(r,3);
+            result(5) = -GM*pos(2)/pow(r,3);
+            result(6) = 0;
+        }
+
+    }
 
     /*************************************************
      * Class type: Tow Body Orbit Prediction
@@ -1074,32 +1267,32 @@ namespace SpaceDSL {
     }
 
     /*************************************************
-     * Class type: Tow Body Orbit Prediction Right Function
+     * Class type: J2 Orbit Prediction Right Function
      * Author: Niu ZhiYong
-     * Date:2018-03-20
+     * Date:2019-03-25
      * Description:
     **************************************************/
-    TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc()
+    J2OrbitRightFunc::J2OrbitRightFunc()
     {
         m_pOrbitPredictConfig = nullptr;
     }
 
-    TwoBodyOrbitRightFunc::TwoBodyOrbitRightFunc(const OrbitPredictConfig *pConfig)
+    J2OrbitRightFunc::J2OrbitRightFunc(const OrbitPredictConfig *pConfig)
     {
         m_pOrbitPredictConfig = pConfig;
     }
 
-    TwoBodyOrbitRightFunc::~TwoBodyOrbitRightFunc()
+    J2OrbitRightFunc::~J2OrbitRightFunc()
     {
 
     }
 
-    void TwoBodyOrbitRightFunc::UpdateOrbitPredictConfig(const OrbitPredictConfig *pConfig)
+    void J2OrbitRightFunc::UpdateOrbitPredictConfig(const OrbitPredictConfig *pConfig)
     {
         m_pOrbitPredictConfig = pConfig;
     }
 
-    void TwoBodyOrbitRightFunc::operator()(double t, const VectorXd &x, VectorXd &result) const
+    void J2OrbitRightFunc::operator()(double t, const VectorXd &x, VectorXd &result) const
     {
         Vector3d pos;
         pos(0) = x(0);  pos(1) = x(1);  pos(2) = x(2);
@@ -1108,31 +1301,128 @@ namespace SpaceDSL {
         double r = pos.norm();
         if (m_pOrbitPredictConfig->IsUseNormalize())
         {
+            SolarSysStarType centerStarType = m_pOrbitPredictConfig->GetCenterStarType();
+            double J2 = m_pOrbitPredictConfig->GetCenterStarJ2();
+            double normR  = m_pOrbitPredictConfig->GetCenterStarRadius()/NormalizeParameter::GetLengthPara(centerStarType);
+
+            double factor1 = 3*J2*pow(normR/r,2)/2;
+            double factor2 = 5*pow(pos(2),2)/pow(r,2);
             /// make the right function
             for (int i = 0; i < 3; ++i)
             {
                 result(i) = vel(i);
             }
-            result(3) = -pos(0)/pow(r,3);
-            result(4) = -pos(1)/pow(r,3);
-            result(5) = -pos(2)/pow(r,3);
+            result(3) = -pos(0)/pow(r,3) * (1 + factor1 * (1 - factor2));
+            result(4) = -pos(1)/pow(r,3) * (1 + factor1 * (1 - factor2));
+            result(5) = -pos(2)/pow(r,3) * (1 + factor1 * (3 - factor2));
             result(6) = 0;
         }
         else
         {
             double GM = m_pOrbitPredictConfig->GetCenterStarGM();
+            double J2 = m_pOrbitPredictConfig->GetCenterStarJ2();
+            double R  = m_pOrbitPredictConfig->GetCenterStarRadius();
+
+            double factor1 = 3*J2*pow(R/r,2)/2;
+            double factor2 = 5*pow(pos(2),2)/pow(r,2);
             /// make the right function
             for (int i = 0; i < 3; ++i)
             {
                 result(i) = vel(i);
             }
-            result(3) = -GM*pos(0)/pow(r,3);
-            result(4) = -GM*pos(1)/pow(r,3);
-            result(5) = -GM*pos(2)/pow(r,3);
-            result(6) = 1;
+            result(3) = -GM*pos(0)/pow(r,3) * (1 + factor1 * (1 - factor2));
+            result(4) = -GM*pos(1)/pow(r,3) * (1 + factor1 * (1 - factor2));
+            result(5) = -GM*pos(2)/pow(r,3) * (1 + factor1 * (3 - factor2));
+            result(6) = 0;
         }
+    }
 
+    /*************************************************
+     * Class type: J2 Orbit Prediction
+     * Author: Niu ZhiYong
+     * Date:2019-03-25
+     * Description:
+     *  Orbit Prediction Algorithm and Function
+    **************************************************/
+    J2OrbitPredict::J2OrbitPredict()
+    {
+        m_pRightFunc = nullptr;
+        m_pRungeKutta = nullptr;
+    }
 
+    J2OrbitPredict::~J2OrbitPredict()
+    {
+        if (m_pRightFunc != nullptr)
+            delete m_pRightFunc;
+
+        if (m_pRungeKutta != nullptr)
+            delete m_pRungeKutta;
+    }
+
+    void J2OrbitPredict::OrbitStep(OrbitPredictConfig &predictConfig, Propagator *pPropagator, double &mass, Vector3d &pos, Vector3d &vel)
+    {
+        if (predictConfig.IsInitialized() == false)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "J2OrbitPredict: m_OrbitPredictConfig UnInitialized! ");
+        if (predictConfig.IsUseNormalize())
+        {
+            SolarSysStarType centerStarType = predictConfig.GetCenterStarType();
+            double Mjd_TT = predictConfig.GetMJD_TT()/NormalizeParameter::GetTimePara(centerStarType);
+            double norm_step = pPropagator->GetAdaptedStep()/NormalizeParameter::GetTimePara(centerStarType);
+            VectorXd x(7), result(7);
+            result.fill(0);
+            x(0) = pos(0)/NormalizeParameter::GetLengthPara(centerStarType);
+            x(1) = pos(1)/NormalizeParameter::GetLengthPara(centerStarType);
+            x(2) = pos(2)/NormalizeParameter::GetLengthPara(centerStarType);
+
+            x(3) = vel(0)/NormalizeParameter::GetSpeedPara(centerStarType);
+            x(4) = vel(1)/NormalizeParameter::GetSpeedPara(centerStarType);
+            x(5) = vel(2)/NormalizeParameter::GetSpeedPara(centerStarType);
+
+            x(6) = mass;
+
+            if (m_pRightFunc == nullptr)
+                m_pRightFunc = new J2OrbitRightFunc(&predictConfig);
+
+            if (m_pRungeKutta == nullptr)
+                m_pRungeKutta = new RungeKutta(pPropagator->GetIntegMethodType());
+
+            double adaptedStep = m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, norm_step, result);
+
+            pPropagator->SetAdaptedStep(adaptedStep);
+
+            pos(0) = result(0)*NormalizeParameter::GetLengthPara(centerStarType);
+            pos(1) = result(1)*NormalizeParameter::GetLengthPara(centerStarType);
+            pos(2) = result(2)*NormalizeParameter::GetLengthPara(centerStarType);
+
+            vel(0) = result(3)*NormalizeParameter::GetSpeedPara(centerStarType);
+            vel(1) = result(4)*NormalizeParameter::GetSpeedPara(centerStarType);
+            vel(2) = result(5)*NormalizeParameter::GetSpeedPara(centerStarType);
+
+            mass   = result(6);
+        }
+        else
+        {
+            double Mjd_TT = predictConfig.GetMJD_TT();
+            VectorXd x(7), result(7);
+            result.fill(0);
+            x(0) = pos(0);  x(1) = pos(1);  x(2) = pos(2);
+            x(3) = vel(0);  x(4) = vel(1);  x(5) = vel(2);  x(6) = mass;
+
+            if (m_pRightFunc == nullptr)
+                m_pRightFunc = new J2OrbitRightFunc(&predictConfig);
+
+            if (m_pRungeKutta == nullptr)
+                m_pRungeKutta = new RungeKutta(pPropagator->GetIntegMethodType());
+
+            double adaptedStep = m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, pPropagator->GetAdaptedStep(), result);
+
+            pPropagator->SetAdaptedStep(adaptedStep);
+
+            pos(0) = result(0);     pos(1) = result(1);     pos(2) = result(2);
+            vel(0) = result(3);     vel(1) = result(4);     vel(2) = result(5);
+            mass   = result(6);
+        }
     }
 
     /*************************************************
