@@ -4,3 +4,4 @@
 /ElectronVisualizer/package-lock.json
 /ElectronVisualizer/.vscode
 CMakeLists.txt.user
+.DS_Store
