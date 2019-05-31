@@ -109,6 +109,8 @@ namespace SpaceDSL {
         }
         m_ProcessDataMap.clear();
 
+        m_AccessDataMap.clear();
+
         if (m_pEnvironment != nullptr)
             delete m_pEnvironment;
 
@@ -329,7 +331,7 @@ namespace SpaceDSL {
     const vector<SpaceVehicle *> &Mission::GetSpaceVehicleList() const
     {
         if (m_SpaceVehicleNumber != int(m_SpaceVehicleList.size())
-           || m_SpaceVehicleNumber <= 0)
+           || m_SpaceVehicleNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::GetSpaceVehicleList (Space Vehicle Initialise Error)! ");
@@ -340,7 +342,7 @@ namespace SpaceDSL {
     int Mission::GetSpaceVehicleNumber() const
     {
         if (m_SpaceVehicleNumber != int(m_SpaceVehicleList.size())
-           || m_SpaceVehicleNumber <= 0)
+           || m_SpaceVehicleNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::GetSpaceVehicleNumber (Space Vehicle Initialise Error)! ");
@@ -351,7 +353,7 @@ namespace SpaceDSL {
     const vector<Facility *> &Mission::GetFacilityList() const
     {
         if (m_FacilityNumber != int(m_FacilityList.size())
-           || m_FacilityNumber <= 0)
+           || m_FacilityNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::GetFacilityList (Facility Initialise Error)! ");
@@ -362,7 +364,7 @@ namespace SpaceDSL {
     int Mission::GetFacilityNumber() const
     {
         if (m_FacilityNumber != int(m_FacilityList.size())
-           || m_FacilityNumber <= 0)
+           || m_FacilityNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::GetFacilityNumber (Facility Initialise Error)! ");
@@ -373,7 +375,7 @@ namespace SpaceDSL {
     const vector<Target *> &Mission::GetTargetList() const
     {
         if (m_TargetNumber != int(m_TargetList.size())
-           || m_TargetNumber <= 0)
+           || m_TargetNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::GetTargetList (Target Initialise Error)! ");
@@ -384,7 +386,7 @@ namespace SpaceDSL {
     int Mission::GetTargetNumber() const
     {
         if (m_TargetNumber != int(m_TargetList.size())
-           || m_TargetNumber <= 0)
+           || m_TargetNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::GetTargetNumber (Target Initialise Error)! ");

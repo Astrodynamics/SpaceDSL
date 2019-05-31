@@ -192,99 +192,110 @@ namespace SpaceDSL {
             m_pJsonList->push_back(*pJvehicl);
         }
         // Facility Data
-        colorStep = int(255/(m_pMission->GetFacilityNumber()+1));
-        int facilityCount = 0;
-        for(auto pFacility:m_pMission->GetFacilityList())
+        int facilityNumber = m_pMission->GetFacilityNumber();
+        if (facilityNumber > 0)
         {
-            ++facilityCount;
-            int bias = colorStep * facilityCount;
-            json *pJfacility = new json();
-            string name = pFacility->GetName();
-
-            json Jcolor;
-            Jcolor["rgba"] = {255 , 255 - bias, bias , 255};
-            facilityColorMap.insert(pair<string, json>(name, Jcolor));
-
-            (*pJfacility)["id"] = "Facility/" + name;
-            (*pJfacility)["name"] = name;
-            (*pJfacility)["availability"] = intervalEpochStr;
-            (*pJfacility)["description"] = "<!--HTML-->\r\n<p>  Test Facility  </p>";
-
-            (*pJfacility)["billboard"]["horizontalOrigin"] = "CENTER";
-            (*pJfacility)["billboard"]["verticalOrigin"] = "CENTER";
-            (*pJfacility)["billboard"]["image"] = "data:image/bmp;base64,Qk04BQAAAAAAADYEAAAoAAAAEAAAABAAAAABAAgAAAAAAAIBAADDDgAAww4AAAAAAAAAAAAAAAAAAAAAgAAAgAAAAICAAIAAAACAAIAAgIAAAMDAwADA3MAA8MqmAAAgQAAAIGAAACCAAAAgoAAAIMAAACDgAABAAAAAQCAAAEBAAABAYAAAQIAAAECgAABAwAAAQOAAAGAAAABgIAAAYEAAAGBgAABggAAAYKAAAGDAAABg4AAAgAAAAIAgAACAQAAAgGAAAICAAACAoAAAgMAAAIDgAACgAAAAoCAAAKBAAACgYAAAoIAAAKCgAACgwAAAoOAAAMAAAADAIAAAwEAAAMBgAADAgAAAwKAAAMDAAADA4AAA4AAAAOAgAADgQAAA4GAAAOCAAADgoAAA4MAAAODgAEAAAABAACAAQABAAEAAYABAAIAAQACgAEAAwABAAOAAQCAAAEAgIABAIEAAQCBgAEAggABAIKAAQCDAAEAg4ABAQAAAQEAgAEBAQABAQGAAQECAAEBAoABAQMAAQEDgAEBgAABAYCAAQGBAAEBgYABAYIAAQGCgAEBgwABAYOAAQIAAAECAIABAgEAAQIBgAECAgABAgKAAQIDAAECA4ABAoAAAQKAgAECgQABAoGAAQKCAAECgoABAoMAAQKDgAEDAAABAwCAAQMBAAEDAYABAwIAAQMCgAEDAwABAwOAAQOAAAEDgIABA4EAAQOBgAEDggABA4KAAQODAAEDg4ACAAAAAgAAgAIAAQACAAGAAgACAAIAAoACAAMAAgADgAIAgAACAICAAgCBAAIAgYACAIIAAgCCgAIAgwACAIOAAgEAAAIBAIACAQEAAgEBgAIBAgACAQKAAgEDAAIBA4ACAYAAAgGAgAIBgQACAYGAAgGCAAIBgoACAYMAAgGDgAICAAACAgCAAgIBAAICAYACAgIAAgICgAICAwACAgOAAgKAAAICgIACAoEAAgKBgAICggACAoKAAgKDAAICg4ACAwAAAgMAgAIDAQACAwGAAgMCAAIDAoACAwMAAgMDgAIDgAACA4CAAgOBAAIDgYACA4IAAgOCgAIDgwACA4OAAwAAAAMAAIADAAEAAwABgAMAAgADAAKAAwADAAMAA4ADAIAAAwCAgAMAgQADAIGAAwCCAAMAgoADAIMAAwCDgAMBAAADAQCAAwEBAAMBAYADAQIAAwECgAMBAwADAQOAAwGAAAMBgIADAYEAAwGBgAMBggADAYKAAwGDAAMBg4ADAgAAAwIAgAMCAQADAgGAAwICAAMCAoADAgMAAwIDgAMCgAADAoCAAwKBAAMCgYADAoIAAwKCgAMCgwADAoOAAwMAAAMDAIADAwEAAwMBgAMDAgADAwKAA8Pv/AKSgoACAgIAAAAD/AAD/AAAA//8A/wAAAP8A/wD//wAA////AAdSLi4cNzcmLlIdHR0dHVIHUi4uHDc3Ji5SHR0dHR1SB1IuLhw3NyYuUh0dHR0dUgdSLi4cHBwmLlImHR0dHVIHUi4uJhwcJi5SJiYdHR1SB1JSLi4uLi4uUiYmJh1SUgcHB1JSLi4uLlImJlJSBwcHB1L//1JSLi5SUlL391IHBwdS/wf/B1JSUgf39/dSBwcHUv///wcHBwcHB/f3UgcHB1IH/wf//wcH9wcH91IHBwdS/////wf/BwcH9wdSBwcHB1L/B/////cHBwdSBwcHBwdS////B///B/cHUgcHBwcHB1JS////BwdSUgcHBwcHBwcHB1JSUlJSBwcHBwcAAA==";
-            (*pJfacility)["billboard"]["scale"] = 1;
-            (*pJfacility)["billboard"]["show"] = true;
-
-            (*pJfacility)["label"]["text"] = name;
-            (*pJfacility)["label"]["horizontalOrigin"] ="LEFT";
-            (*pJfacility)["label"]["verticalOrigin"] ="CENTER";
-            (*pJfacility)["label"]["fillColor"] = Jcolor;
-            (*pJfacility)["label"]["font"] ="11pt Lucida Console";
-            (*pJfacility)["label"]["pixelOffset"]["cartesian2"] = {6, -4};
-            (*pJfacility)["label"]["show"] = true;
-
-            (*pJfacility)["position"]["cartesian"] = pFacility->GetGeodeticPos();
-
-            m_pJsonList->push_back(*pJfacility);
-        }
-        // Target Data
-        int targetWithoutFacilityNum = m_pMission->GetTargetNumber() - m_pMission->GetFacilityNumber();
-        colorStep = int(255/(targetWithoutFacilityNum + 1));
-        int targetWithoutFacilityCount = 0;
-        for(auto pTarget:m_pMission->GetTargetList())
-        {
-            auto targetType = pTarget->GetTargetType();
-            if ( targetType == Target::E_Facility)
-                continue;
-
-            ++targetWithoutFacilityCount;
-            int bias = colorStep * targetWithoutFacilityCount;
-            json *pJtarget = new json();
-            string name = pTarget->GetName();
-            json Jcolor;
-            Jcolor["rgba"] = {255 , 255 - bias, bias , 255};
-            targetColorMap.insert(pair<string, json>(name, Jcolor));
-
-            switch (targetType)
+            colorStep = int(255/(facilityNumber + 1));
+            int facilityCount = 0;
+            for(auto pFacility:m_pMission->GetFacilityList())
             {
-            case Target::E_NotDefindTargetType:
-                throw SPException(__FILE__, __FUNCTION__, __LINE__, "CZMLScript::WirteCZML TargetType = E_NotDefinedTargetType!");
-            case Target::E_PointTarget:
-                (*pJtarget)["id"] = "Target/" + name;
-                (*pJtarget)["name"] = name;
-                (*pJtarget)["availability"] = intervalEpochStr;
-                (*pJtarget)["description"] = "<!--HTML-->\r\n<p>  Test Target  </p>";
+                ++facilityCount;
+                int bias = colorStep * facilityCount;
+                json *pJfacility = new json();
+                string name = pFacility->GetName();
 
-                (*pJtarget)["billboard"]["horizontalOrigin"] = "CENTER";
-                (*pJtarget)["billboard"]["verticalOrigin"] = "CENTER";
-                (*pJtarget)["billboard"]["image"] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACVSURBVDhPnZHBDYQwDARTmkuhNEqhFErgzwNslA2OWUfASCsFez3S6QpDRA6Wus5BcZVCMxSNDmMeki/HSCexj8VLJjkiNqMCe8y6bAJyDKgkCsA6L3dZ36DNNGOBK2ZzLti3R/GaV/wsF2h+/YRLom9IIq/+iUySHhsQdBJXZukEBpOw0GNgCy+Kwb7Wc1CMqWtHKScCcvdPa1WrSwAAAABJRU5ErkJggg==";
-                (*pJtarget)["billboard"]["scale"] = 1;
-                (*pJtarget)["billboard"]["show"] = true;
+                json Jcolor;
+                Jcolor["rgba"] = {255 , 255 - bias, bias , 255};
+                facilityColorMap.insert(pair<string, json>(name, Jcolor));
 
-                (*pJtarget)["label"]["text"] = name;
-                (*pJtarget)["label"]["horizontalOrigin"] ="LEFT";
-                (*pJtarget)["label"]["verticalOrigin"] ="CENTER";
-                (*pJtarget)["label"]["fillColor"] = Jcolor;
-                (*pJtarget)["label"]["font"] ="11pt Lucida Console";
-                (*pJtarget)["label"]["pixelOffset"]["cartesian2"] = {6, -4};
-                (*pJtarget)["label"]["show"] = true;
+                (*pJfacility)["id"] = "Facility/" + name;
+                (*pJfacility)["name"] = name;
+                (*pJfacility)["availability"] = intervalEpochStr;
+                (*pJfacility)["description"] = "<!--HTML-->\r\n<p>  Test Facility  </p>";
 
-                (*pJtarget)["position"]["cartesian"] = static_cast<PointTarget *>(pTarget)->GetGeodeticPos();
+                (*pJfacility)["billboard"]["horizontalOrigin"] = "CENTER";
+                (*pJfacility)["billboard"]["verticalOrigin"] = "CENTER";
+                (*pJfacility)["billboard"]["image"] = "data:image/bmp;base64,Qk04BQAAAAAAADYEAAAoAAAAEAAAABAAAAABAAgAAAAAAAIBAADDDgAAww4AAAAAAAAAAAAAAAAAAAAAgAAAgAAAAICAAIAAAACAAIAAgIAAAMDAwADA3MAA8MqmAAAgQAAAIGAAACCAAAAgoAAAIMAAACDgAABAAAAAQCAAAEBAAABAYAAAQIAAAECgAABAwAAAQOAAAGAAAABgIAAAYEAAAGBgAABggAAAYKAAAGDAAABg4AAAgAAAAIAgAACAQAAAgGAAAICAAACAoAAAgMAAAIDgAACgAAAAoCAAAKBAAACgYAAAoIAAAKCgAACgwAAAoOAAAMAAAADAIAAAwEAAAMBgAADAgAAAwKAAAMDAAADA4AAA4AAAAOAgAADgQAAA4GAAAOCAAADgoAAA4MAAAODgAEAAAABAACAAQABAAEAAYABAAIAAQACgAEAAwABAAOAAQCAAAEAgIABAIEAAQCBgAEAggABAIKAAQCDAAEAg4ABAQAAAQEAgAEBAQABAQGAAQECAAEBAoABAQMAAQEDgAEBgAABAYCAAQGBAAEBgYABAYIAAQGCgAEBgwABAYOAAQIAAAECAIABAgEAAQIBgAECAgABAgKAAQIDAAECA4ABAoAAAQKAgAECgQABAoGAAQKCAAECgoABAoMAAQKDgAEDAAABAwCAAQMBAAEDAYABAwIAAQMCgAEDAwABAwOAAQOAAAEDgIABA4EAAQOBgAEDggABA4KAAQODAAEDg4ACAAAAAgAAgAIAAQACAAGAAgACAAIAAoACAAMAAgADgAIAgAACAICAAgCBAAIAgYACAIIAAgCCgAIAgwACAIOAAgEAAAIBAIACAQEAAgEBgAIBAgACAQKAAgEDAAIBA4ACAYAAAgGAgAIBgQACAYGAAgGCAAIBgoACAYMAAgGDgAICAAACAgCAAgIBAAICAYACAgIAAgICgAICAwACAgOAAgKAAAICgIACAoEAAgKBgAICggACAoKAAgKDAAICg4ACAwAAAgMAgAIDAQACAwGAAgMCAAIDAoACAwMAAgMDgAIDgAACA4CAAgOBAAIDgYACA4IAAgOCgAIDgwACA4OAAwAAAAMAAIADAAEAAwABgAMAAgADAAKAAwADAAMAA4ADAIAAAwCAgAMAgQADAIGAAwCCAAMAgoADAIMAAwCDgAMBAAADAQCAAwEBAAMBAYADAQIAAwECgAMBAwADAQOAAwGAAAMBgIADAYEAAwGBgAMBggADAYKAAwGDAAMBg4ADAgAAAwIAgAMCAQADAgGAAwICAAMCAoADAgMAAwIDgAMCgAADAoCAAwKBAAMCgYADAoIAAwKCgAMCgwADAoOAAwMAAAMDAIADAwEAAwMBgAMDAgADAwKAA8Pv/AKSgoACAgIAAAAD/AAD/AAAA//8A/wAAAP8A/wD//wAA////AAdSLi4cNzcmLlIdHR0dHVIHUi4uHDc3Ji5SHR0dHR1SB1IuLhw3NyYuUh0dHR0dUgdSLi4cHBwmLlImHR0dHVIHUi4uJhwcJi5SJiYdHR1SB1JSLi4uLi4uUiYmJh1SUgcHB1JSLi4uLlImJlJSBwcHB1L//1JSLi5SUlL391IHBwdS/wf/B1JSUgf39/dSBwcHUv///wcHBwcHB/f3UgcHB1IH/wf//wcH9wcH91IHBwdS/////wf/BwcH9wdSBwcHB1L/B/////cHBwdSBwcHBwdS////B///B/cHUgcHBwcHB1JS////BwdSUgcHBwcHBwcHB1JSUlJSBwcHBwcAAA==";
+                (*pJfacility)["billboard"]["scale"] = 1;
+                (*pJfacility)["billboard"]["show"] = true;
 
-                m_pJsonList->push_back(*pJtarget);
-                break;
-            case Target::E_LineTarget:
-                // Support Later
-                break;
-            case Target::E_AreaTarget:
-                // Support Later
-                break;
-            default:
-                throw SPException(__FILE__, __FUNCTION__, __LINE__, "CalObservation: Just Support Point Target!");
+                (*pJfacility)["label"]["text"] = name;
+                (*pJfacility)["label"]["horizontalOrigin"] ="LEFT";
+                (*pJfacility)["label"]["verticalOrigin"] ="CENTER";
+                (*pJfacility)["label"]["fillColor"] = Jcolor;
+                (*pJfacility)["label"]["font"] ="11pt Lucida Console";
+                (*pJfacility)["label"]["pixelOffset"]["cartesian2"] = {6, -4};
+                (*pJfacility)["label"]["show"] = true;
+
+                (*pJfacility)["position"]["cartesian"] = pFacility->GetGeodeticPos();
+
+                m_pJsonList->push_back(*pJfacility);
             }
-
         }
+
+        // Target Data
+        int targetNumber = m_pMission->GetTargetNumber();
+        int targetWithoutFacilityNum = targetNumber - facilityNumber;
+
+        if (targetWithoutFacilityNum > 0)
+        {
+            colorStep = int(255/(targetWithoutFacilityNum + 1));
+            int targetWithoutFacilityCount = 0;
+            for(auto pTarget:m_pMission->GetTargetList())
+            {
+                auto targetType = pTarget->GetTargetType();
+                if ( targetType == Target::E_Facility)
+                    continue;
+
+                ++targetWithoutFacilityCount;
+                int bias = colorStep * targetWithoutFacilityCount;
+                json *pJtarget = new json();
+                string name = pTarget->GetName();
+                json Jcolor;
+                Jcolor["rgba"] = {255 , 255 - bias, bias , 255};
+                targetColorMap.insert(pair<string, json>(name, Jcolor));
+
+                switch (targetType)
+                {
+                case Target::E_NotDefindTargetType:
+                    throw SPException(__FILE__, __FUNCTION__, __LINE__, "CZMLScript::WirteCZML TargetType = E_NotDefinedTargetType!");
+                case Target::E_PointTarget:
+                    (*pJtarget)["id"] = "Target/" + name;
+                    (*pJtarget)["name"] = name;
+                    (*pJtarget)["availability"] = intervalEpochStr;
+                    (*pJtarget)["description"] = "<!--HTML-->\r\n<p>  Test Target  </p>";
+
+                    (*pJtarget)["billboard"]["horizontalOrigin"] = "CENTER";
+                    (*pJtarget)["billboard"]["verticalOrigin"] = "CENTER";
+                    (*pJtarget)["billboard"]["image"] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAACVSURBVDhPnZHBDYQwDARTmkuhNEqhFErgzwNslA2OWUfASCsFez3S6QpDRA6Wus5BcZVCMxSNDmMeki/HSCexj8VLJjkiNqMCe8y6bAJyDKgkCsA6L3dZ36DNNGOBK2ZzLti3R/GaV/wsF2h+/YRLom9IIq/+iUySHhsQdBJXZukEBpOw0GNgCy+Kwb7Wc1CMqWtHKScCcvdPa1WrSwAAAABJRU5ErkJggg==";
+                    (*pJtarget)["billboard"]["scale"] = 1;
+                    (*pJtarget)["billboard"]["show"] = true;
+
+                    (*pJtarget)["label"]["text"] = name;
+                    (*pJtarget)["label"]["horizontalOrigin"] ="LEFT";
+                    (*pJtarget)["label"]["verticalOrigin"] ="CENTER";
+                    (*pJtarget)["label"]["fillColor"] = Jcolor;
+                    (*pJtarget)["label"]["font"] ="11pt Lucida Console";
+                    (*pJtarget)["label"]["pixelOffset"]["cartesian2"] = {6, -4};
+                    (*pJtarget)["label"]["show"] = true;
+
+                    (*pJtarget)["position"]["cartesian"] = static_cast<PointTarget *>(pTarget)->GetGeodeticPos();
+
+                    m_pJsonList->push_back(*pJtarget);
+                    break;
+                case Target::E_LineTarget:
+                    // Support Later
+                    break;
+                case Target::E_AreaTarget:
+                    // Support Later
+                    break;
+                default:
+                    throw SPException(__FILE__, __FUNCTION__, __LINE__, "CalObservation: Just Support Point Target!");
+                }
+
+            }
+        }
+
         // Access Data
         json *pJaccessParent = new json();
         (*pJaccessParent)["id"] = "AccessParent";

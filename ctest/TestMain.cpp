@@ -10,23 +10,6 @@ int main(int argc, char *argv[])
     cout<<"SpaceDSL Test Run!"<<endl;
     try
     {
-        string tleLine1 = "1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927";
-        string tleLine2 = "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537";
-        double mjd0;
-        OrbitElem ele0;
-        TLEToOrbitElem(tleLine1, tleLine2, mjd0, ele0);
-        CartState state0;
-        double mjd00;
-        TLEToCartState(tleLine1, tleLine2, mjd00, state0);
-        UTCCalTime time0;
-        MjdToCalendarTime(mjd0, time0);
-
-        TLEOrbitPredict tle(tleLine1, tleLine2);
-        UTCCalTime tle_time(2008, 9, 21, 0, 0, 40.104);
-        Vector3d tlePos, tleVel;
-        double tleMjd = CalendarTimeToMjd(tle_time);
-        tle.OrbitStep(tleMjd, tlePos, tleVel);
-
         /// Initial Data
         UTCCalTime initial_time     (2018,1,4,16,58,11.1);
         UTCCalTime termination_time (2018,1,5,16,58,11.1);
