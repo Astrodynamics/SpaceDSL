@@ -339,7 +339,7 @@ namespace SpaceDSL {
     SpThreadPool::~SpThreadPool()
     {
         m_ThreadPool.clear();
-        m_ThreadBuffer.clear();
+        m_ThreadBuffer.clear();  
         m_pMonitor->Stop();
         m_pMonitor->Wait();
         delete m_pMonitor;
@@ -481,8 +481,9 @@ namespace SpaceDSL {
             {
                 lock_guard<mutex>guard(*m_pCheckLock);
 
-                if ((*m_pThreadPool).size() == 0 &&
-                     (*m_pThreadBuffer).size() == 0)
+                auto poolSize = (*m_pThreadPool).size();
+                auto buffSize = (*m_pThreadBuffer).size();
+                if ( poolSize == 0 && buffSize == 0)
                     break;
 
                 for(pool_iter = m_pThreadPool->begin(); pool_iter != m_pThreadPool->end();)
@@ -515,9 +516,9 @@ namespace SpaceDSL {
                 }
 
                 #ifdef _WIN32
-                    Sleep(100);
+                    Sleep(50);
                 #else
-                    usleep(100000);
+                    usleep(50000);
                 #endif
             }
 
