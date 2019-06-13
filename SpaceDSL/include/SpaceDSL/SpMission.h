@@ -90,8 +90,9 @@ namespace SpaceDSL {
         /// @Param	halfAngle2		Vertical Half Angle
         /// @Output
         /// @Param
+        /// @Return SpaceVehicle *  The SpaceVehicle Point Which Insert into The Mission
         /**********************************************************************/
-        void            InsertSpaceVehicle(const string &name, const CalendarTime& initialEpoch,
+        SpaceVehicle    *InsertSpaceVehicle(const string &name, const CalendarTime& initialEpoch,
                                            const CartState& initialState, const double initialMass,
                                            const double dragCoef, const double dragArea,
                                            const double SRPCoef, const double SRPArea);
@@ -107,8 +108,9 @@ namespace SpaceDSL {
         /// @Param	halfAngle2		Vertical Half Angle
         /// @Output
         /// @Param
+        /// @Return Facility *      The Facility Point Which Insert into The Mission
         /**********************************************************************/
-        void            InsertFacility(const string &name,const double longitude, const double latitude, const double altitude, const double minElevation);
+        Facility        *InsertFacility(const string &name,const double longitude, const double latitude, const double altitude, const double minElevation);
 
         bool            RemoveFacility(const int id);
 
@@ -121,8 +123,9 @@ namespace SpaceDSL {
         /// @Param	halfAngle2		Vertical Half Angle
         /// @Output
         /// @Param
+        /// @Return Target *        The Target Point Which Insert into The Mission
         /**********************************************************************/
-        void            InsertTarget(const string &name, const Target::TargetType type);
+        Target          *InsertTarget(const string &name, const Target::TargetType type);
 
         bool            RemoveTarget(const int id);
 
@@ -139,7 +142,7 @@ namespace SpaceDSL {
 
         void            SetOptimization();
 
-        void            SetMissionSequence(const CalendarTime& initialEpoch, const CalendarTime& terminationEpoch);
+        void            SetMissionSequence(const CalendarTime& initialEpoch,  double durationSec);
 
         const vector<SpaceVehicle *>            &GetSpaceVehicleList() const;
 
@@ -211,7 +214,9 @@ namespace SpaceDSL {
 
         void                                            Start(bool bIsMultThread = false);
 
-        void                                            Reset();
+        void                                            ClearProcessData();
+
+        void                                            Clear();
 
         const map<SpaceVehicle *, vector<double *> *>                                       *GetProcessDataMap() const;
 

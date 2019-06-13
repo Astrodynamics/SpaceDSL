@@ -131,6 +131,13 @@ namespace SpaceDSL {
         m_Mass = mass;
     }
 
+    void SpaceVehicle::Reset()
+    {
+        m_Epoch = m_InitialEpoch;
+        m_CartState = m_InitialCartState;
+        m_Mass = m_InitialMass;
+    }
+
     void SpaceVehicle::InsertSensor(const string &name, const Sensor::SensorType type, const double halfAngle1, const double halfAngle2)
     {
         if (m_SensorNumber != int(m_SensorList.size()))

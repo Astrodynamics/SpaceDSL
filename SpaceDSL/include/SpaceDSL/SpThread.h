@@ -324,12 +324,16 @@ namespace SpaceDSL {
         void Initializer(bool *pIsStarted, vector<SpThread *> *pPool,
                          deque<SpThread *> *pBuffer, atomic<int> *pActiveThreadCount,
                          mutex *pMutex);
+
+        void Stop();
+
     protected:
 
         void Run() override;
 
     private:
         bool                        m_bIsInitialized;
+        bool                        m_MonitorStart;
         bool                        *m_pIsStarted;
         mutex                       *m_pCheckLock;
         atomic<int>                 *m_pActiveThreadCount;

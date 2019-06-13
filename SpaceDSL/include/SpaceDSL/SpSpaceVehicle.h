@@ -129,6 +129,8 @@ namespace SpaceDSL {
 
         void                    UpdateState(const double Mjd, const Vector3d& pos, const Vector3d& vel,const double mass);
 
+        void                    Reset();
+
         /********************************************************************/
         /// Insert/Remove a Sensor Belong to The Space Vehicle
         /// @Author     Niu Zhiyong

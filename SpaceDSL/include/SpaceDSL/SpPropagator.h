@@ -98,6 +98,8 @@ namespace SpaceDSL {
 
         inline bool   GetIsUseNormalize() const                     { return m_bIsUseNormalize; }
 
+        inline void   ResetAdaptedStep()                            { m_AdaptedStep = m_InitialStep; }
+
     private:
         IntegMethodType         m_IntegMethodType;
         double                  m_InitialStep;

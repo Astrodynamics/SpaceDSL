@@ -110,7 +110,7 @@ namespace SpaceDSL {
         (*pJhead)["version"] = "1.0";
         (*pJhead)["clock"]["interval"] = intervalEpochStr;
         (*pJhead)["clock"]["currentTime"] = initialEpochStr;
-        (*pJhead)["clock"]["multiplier"] = 60;
+        (*pJhead)["clock"]["multiplier"] = 1;
         (*pJhead)["clock"]["range"] = "LOOP_STOP";
         (*pJhead)["clock"]["step"] = "SYSTEM_CLOCK_MULTIPLIER";
         m_pJsonList->push_back(*pJhead);
@@ -125,7 +125,7 @@ namespace SpaceDSL {
             json *pJvehicl = new json();
             string name = pVehicl->GetName();
             json Jcolor;
-            Jcolor["rgba"] = {bias , 255 - bias, 0, 255};
+            Jcolor["rgba"] = {bias/2.0 , 255 - bias/2.0, 0, 255};
             vehicleColorMap.insert(pair<string, json>(name, Jcolor));
 
             (*pJvehicl)["id"] = "Satellite/" + name;
@@ -154,7 +154,7 @@ namespace SpaceDSL {
             showTimePeriodList.push_back(showTimePeriod);
             (*pJvehicl)["path"]["show"]= showTimePeriodList;
             (*pJvehicl)["path"]["width"] = 1;
-            (*pJvehicl)["path"]["material"]["solidColor"]["color"]["rgba"] = {bias , 255 - bias, 0, 255};
+            (*pJvehicl)["path"]["material"]["solidColor"]["color"]["rgba"] = {bias/2.0 , 255 - bias/2.0, 0, 255};
 
             (*pJvehicl)["path"]["resolution"] = 120;
 
@@ -310,6 +310,9 @@ namespace SpaceDSL {
             ++iterAccess)
         {
             ++accessCount;
+            if (iterAccess->second.size() == 0)
+                continue;
+
             json *pJaccess = new json();
 
             string targetName = iterAccess->first.first->GetName();

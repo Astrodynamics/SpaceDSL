@@ -334,13 +334,13 @@ namespace SpaceDSL {
         m_ActiveThreadCount = 0;
         m_pMonitor = new MonitorThread();
         m_pMonitor->Initializer(&m_bIsStarted, &m_ThreadPool, &m_ThreadBuffer, &m_ActiveThreadCount, &m_CheckLock);
-        m_pMonitor->Start();
     }
 
     SpThreadPool::~SpThreadPool()
     {
         m_ThreadPool.clear();
         m_ThreadBuffer.clear();
+        m_pMonitor->Stop();
         m_pMonitor->Wait();
         delete m_pMonitor;
     }
@@ -349,6 +349,9 @@ namespace SpaceDSL {
     {
         if (m_MaxThreadCount <= 0)
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThreadPool: m_MaxThreadCount <= 0");
+
+        if (m_pMonitor->isFinished())
+            m_pMonitor->Start();
 
         lock_guard<mutex>guard(m_CheckLock);
         if ( m_ActiveThreadCount < m_MaxThreadCount)
@@ -396,6 +399,7 @@ namespace SpaceDSL {
             }
         }while(true);
 
+        m_bIsStarted = false;
         return true;
     }
 
@@ -427,6 +431,7 @@ namespace SpaceDSL {
         m_pThreadBuffer = nullptr;
         m_pCheckLock = nullptr;
         m_bIsInitialized = false;
+        m_MonitorStart = true;
     }
 
     MonitorThread::~MonitorThread()
@@ -446,6 +451,11 @@ namespace SpaceDSL {
         m_bIsInitialized = true;
     }
 
+    void MonitorThread::Stop()
+    {
+        m_MonitorStart = false;
+    }
+
     void MonitorThread::Run()
     {
         if (m_bIsInitialized == false)
@@ -453,61 +463,66 @@ namespace SpaceDSL {
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "MonitorThread Uninitialized!");
         }
 
-        while ( *m_pIsStarted == false )
+        while (m_MonitorStart == true)
         {
-            #ifdef _WIN32
-                Sleep(1);
-            #else
-                usleep(1000);
-            #endif
-            if(*m_pIsStarted == true )
-                break;
-        }
-
-        vector<SpThread *>::iterator pool_iter;
-        while ( *m_pIsStarted == true )
-        {
-            lock_guard<mutex>guard(*m_pCheckLock);
-
-            if ((*m_pThreadPool).size() == 0 &&
-                 (*m_pThreadBuffer).size() == 0)
-                break;
-
-            for(pool_iter = m_pThreadPool->begin(); pool_iter != m_pThreadPool->end();)
+            while ( *m_pIsStarted == false )
             {
-
-                if(m_pThreadPool->size() == 0)
+                #ifdef _WIN32
+                    Sleep(1);
+                #else
+                    usleep(1000);
+                #endif
+                if(*m_pIsStarted == true || m_MonitorStart == false)
                     break;
-
-                if ((*pool_iter) == nullptr || (*pool_iter)->isFinished())
-                {
-                    #ifdef _WIN32
-                        delete (*pool_iter);
-                    #endif
-                    pool_iter = (*m_pThreadPool).erase(pool_iter);
-
-                    if(m_pThreadBuffer->size() > 0)
-                    {
-                        (*m_pThreadPool).push_back(m_pThreadBuffer->front());
-                        (*m_pThreadBuffer).front()->Start();
-                        (*m_pThreadBuffer).pop_front();
-                    }
-                    else
-                    {
-                        --(*m_pActiveThreadCount);
-                    }
-
-                }
-                else
-                    ++pool_iter;
             }
 
-            #ifdef _WIN32
-                Sleep(100);
-            #else
-                usleep(100000);
-            #endif
+            vector<SpThread *>::iterator pool_iter;
+            while ( *m_pIsStarted == true )
+            {
+                lock_guard<mutex>guard(*m_pCheckLock);
+
+                if ((*m_pThreadPool).size() == 0 &&
+                     (*m_pThreadBuffer).size() == 0)
+                    break;
+
+                for(pool_iter = m_pThreadPool->begin(); pool_iter != m_pThreadPool->end();)
+                {
+
+                    if(m_pThreadPool->size() == 0)
+                        break;
+
+                    if ((*pool_iter) == nullptr || (*pool_iter)->isFinished())
+                    {
+                        #ifdef _WIN32
+                            delete (*pool_iter);
+                        #endif
+                        pool_iter = (*m_pThreadPool).erase(pool_iter);
+
+                        if(m_pThreadBuffer->size() > 0)
+                        {
+                            (*m_pThreadPool).push_back(m_pThreadBuffer->front());
+                            (*m_pThreadBuffer).front()->Start();
+                            (*m_pThreadBuffer).pop_front();
+                        }
+                        else
+                        {
+                            --(*m_pActiveThreadCount);
+                        }
+
+                    }
+                    else
+                        ++pool_iter;
+                }
+
+                #ifdef _WIN32
+                    Sleep(100);
+                #else
+                    usleep(100000);
+                #endif
+            }
+
         }
+
     }
 
 

@@ -109,6 +109,12 @@ namespace SpaceDSL {
         }
         m_ProcessDataMap.clear();
 
+        for (auto iter = m_AccessDataMap.begin();
+             iter != m_AccessDataMap.end();
+             ++iter)
+        {
+            iter->second.clear();
+        }
         m_AccessDataMap.clear();
 
         if (m_pEnvironment != nullptr)
@@ -124,7 +130,7 @@ namespace SpaceDSL {
             delete m_pAccessAnalysis;
     }
 
-    void Mission::InsertSpaceVehicle(const string &name, const CalendarTime& initialEpoch,
+    SpaceVehicle *Mission::InsertSpaceVehicle(const string &name, const CalendarTime& initialEpoch,
                                      const CartState& initialState, const double initialMass,
                                      const double dragCoef, const double dragArea,
                                      const double SRPCoef, const double SRPArea)
@@ -143,6 +149,7 @@ namespace SpaceDSL {
         vector<double *> *pOneVehicleData = new vector<double *>;
         m_ProcessDataMap.insert(pair<SpaceVehicle *, vector<double *> *>(pVehicle ,pOneVehicleData));
 
+        return pVehicle;
     }
 
     bool Mission::RemoveSpaceVehicle(const int id)
@@ -163,7 +170,7 @@ namespace SpaceDSL {
         return false;
     }
 
-    void Mission::InsertFacility(const string &name, const double longitude, const double latitude, const double altitude, const double minElevation)
+    Facility *Mission::InsertFacility(const string &name, const double longitude, const double latitude, const double altitude, const double minElevation)
     {
         if ( m_FacilityNumber != int(m_FacilityList.size()))
         {
@@ -176,6 +183,8 @@ namespace SpaceDSL {
 
         ++m_TargetNumber;
         m_TargetList.push_back(pFacility);
+
+        return pFacility;
     }
 
     bool Mission::RemoveFacility(const int id)
@@ -216,7 +225,7 @@ namespace SpaceDSL {
             return false;
     }
 
-    void Mission::InsertTarget(const string &name, const Target::TargetType type)
+    Target *Mission::InsertTarget(const string &name, const Target::TargetType type)
     {
         if (m_TargetNumber != int(m_TargetList.size()))
         {
@@ -243,6 +252,8 @@ namespace SpaceDSL {
         pTarget->SetName(name);
         ++m_TargetNumber;
         m_TargetList.push_back(pTarget);
+
+        return pTarget;
     }
 
     bool Mission::RemoveTarget(const int id)
@@ -319,11 +330,12 @@ namespace SpaceDSL {
         m_bIsPropagatorInitialized = true;
     }
 
-    void Mission::SetMissionSequence(const CalendarTime& initialEpoch, const CalendarTime& terminationEpoch)
+    void Mission::SetMissionSequence(const CalendarTime& initialEpoch, double durationSec)
     {
         m_InitialEpoch = initialEpoch;
-        m_TerminationEpoch = terminationEpoch;
-        m_DurationSec = (m_TerminationEpoch - m_InitialEpoch);
+        double Mjd0 = CalendarTimeToMjd(m_InitialEpoch);
+        MjdToCalendarTime(Mjd0 + durationSec/DayToSec, m_TerminationEpoch);
+        m_DurationSec = durationSec;
 
         m_bIsMissionSequenceInitialized = true;
     }
@@ -535,7 +547,33 @@ namespace SpaceDSL {
         m_pMissionThreadPool->WaitForDone();
     }
 
-    void Mission::Reset()
+    void Mission::ClearProcessData()
+    {
+        for (auto iter = m_ProcessDataMap.begin();
+             iter != m_ProcessDataMap.end();
+             ++iter)
+        {
+            if (iter->second != nullptr)
+            {
+                for(auto pData:(*(iter->second)))
+                {
+                    if (pData != nullptr)
+                        delete pData;
+                }
+                iter->second->clear();
+            }
+        }
+
+        for (auto iter = m_AccessDataMap.begin();
+             iter != m_AccessDataMap.end();
+             ++iter)
+        {
+            iter->second.clear();
+        }
+        m_AccessDataMap.clear();
+    }
+
+    void Mission::Clear()
     {
         m_bIsEnvironmentInitialized = false;
         m_bIsPropagatorInitialized = false;
@@ -674,9 +712,10 @@ namespace SpaceDSL {
         double  mass;
 
         if (m_SpaceVehicleIndex == -1)
-        {
+        {        
             for (auto pVehicle:(*m_pSpaceVehicleList))
             {
+                m_pPropagator->ResetAdaptedStep();
                 OrbitPredict orbit;
                 OrbitPredictConfig predictConfig;
 
@@ -705,16 +744,22 @@ namespace SpaceDSL {
                                           m_pEnvironment->GetIsUseSRP());
                 LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
                 this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
-                double step = m_pPropagator->GetInitialStep();
-                double stepNum = static_cast<int>(m_pMission->m_DurationSec/step);
-                for (int i = 0; i < stepNum; ++i)
+                double step = 0;
+                while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
                 {
+                    if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
+                    {
+                        step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
+                        m_pPropagator->SetAdaptedStep(step);
+                    }
                     predictConfig.Update(Mjd_UTC);
                     step = orbit.OrbitStep(predictConfig, m_pPropagator, mass, pos, vel);
-                    Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
+                    Mjd_UTC +=  step/DayToSec;
                     LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
                     pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
                     this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
+                    MjdToCalendarTime(Mjd_UTC, m_pMission->m_TerminationEpoch);
+
                 }
 
             }
@@ -756,14 +801,22 @@ namespace SpaceDSL {
                                       m_pEnvironment->GetIsUseSRP());
             LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
             this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
-            double step = m_pPropagator->GetInitialStep();
-            for (int i = 0; i < m_pMission->m_DurationSec/step; ++i)
+            double step = 0;
+            while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
             {
+                if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
+                {
+                    step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
+                    m_pPropagator->SetAdaptedStep(step);
+                }
                 predictConfig.Update(Mjd_UTC);
                 step = orbit.OrbitStep(predictConfig, m_pPropagator, mass, pos, vel);
-                Mjd_UTC = Mjd_UTC0 + (i+1) * step/DayToSec;
-                LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
+                Mjd_UTC +=  step/DayToSec;
+                LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
+                pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
                 this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
+                MjdToCalendarTime(Mjd_UTC, m_pMission->m_TerminationEpoch);
+
             }
 
         }
