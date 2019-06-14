@@ -712,7 +712,7 @@ namespace SpaceDSL {
         double  mass;
 
         if (m_SpaceVehicleIndex == -1)
-        {        
+        {
             for (auto pVehicle:(*m_pSpaceVehicleList))
             {
                 m_pPropagator->ResetAdaptedStep();
@@ -759,7 +759,6 @@ namespace SpaceDSL {
                     pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
                     this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
                     MjdToCalendarTime(Mjd_UTC, m_pMission->m_TerminationEpoch);
-
                 }
 
             }
@@ -820,6 +819,7 @@ namespace SpaceDSL {
             }
 
         }
+
     }
 
 

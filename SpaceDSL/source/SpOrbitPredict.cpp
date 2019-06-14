@@ -1105,7 +1105,6 @@ namespace SpaceDSL {
                                                     pPropagator->GetMinStep(), pPropagator->GetMaxStep(),
                                                     pPropagator->GetMaxStepAttempts(), pPropagator->GetAccuracy(),
                                                     pPropagator->GetStopIfAccuracyIsViolated());
-
         pPropagator->SetAdaptedStep(adaptedStep);
 
         pos(0) = result(0);     pos(1) = result(1);     pos(2) = result(2);

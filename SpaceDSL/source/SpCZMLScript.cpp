@@ -131,7 +131,7 @@ namespace SpaceDSL {
             (*pJvehicl)["id"] = "Satellite/" + name;
             (*pJvehicl)["name"] = name;
             (*pJvehicl)["availability"] = intervalEpochStr;
-            (*pJvehicl)["description"] = "<!--HTML-->\r\n<p>  Test Satellite  </p>";
+            (*pJvehicl)["description"] = "<!--HTML--><p>"+ name  +"</p>";
 
             (*pJvehicl)["billboard"]["horizontalOrigin"] = "CENTER";
             (*pJvehicl)["billboard"]["verticalOrigin"] = "CENTER";
@@ -211,7 +211,7 @@ namespace SpaceDSL {
                 (*pJfacility)["id"] = "Facility/" + name;
                 (*pJfacility)["name"] = name;
                 (*pJfacility)["availability"] = intervalEpochStr;
-                (*pJfacility)["description"] = "<!--HTML-->\r\n<p>  Test Facility  </p>";
+                (*pJfacility)["description"] = "<!--HTML--><p>"+ name  +"</p>";
 
                 (*pJfacility)["billboard"]["horizontalOrigin"] = "CENTER";
                 (*pJfacility)["billboard"]["verticalOrigin"] = "CENTER";
@@ -263,7 +263,7 @@ namespace SpaceDSL {
                     (*pJtarget)["id"] = "Target/" + name;
                     (*pJtarget)["name"] = name;
                     (*pJtarget)["availability"] = intervalEpochStr;
-                    (*pJtarget)["description"] = "<!--HTML-->\r\n<p>  Test Target  </p>";
+                    (*pJtarget)["description"] = "<!--HTML--><p>"+ name  +"</p>";
 
                     (*pJtarget)["billboard"]["horizontalOrigin"] = "CENTER";
                     (*pJtarget)["billboard"]["verticalOrigin"] = "CENTER";

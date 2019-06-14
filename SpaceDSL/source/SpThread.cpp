@@ -472,26 +472,35 @@ namespace SpaceDSL {
                 #else
                     usleep(1000);
                 #endif
-                if(*m_pIsStarted == true || m_MonitorStart == false)
+                if( *m_pIsStarted == true || m_MonitorStart == false)
+                {
                     break;
+                }
             }
 
             vector<SpThread *>::iterator pool_iter;
             while ( *m_pIsStarted == true )
             {
+                #ifdef _WIN32
+                    Sleep(10);
+                #else
+                    usleep(10000);
+                #endif
                 lock_guard<mutex>guard(*m_pCheckLock);
 
                 auto poolSize = (*m_pThreadPool).size();
                 auto buffSize = (*m_pThreadBuffer).size();
                 if ( poolSize == 0 && buffSize == 0)
+                {
                     break;
+                }
 
                 for(pool_iter = m_pThreadPool->begin(); pool_iter != m_pThreadPool->end();)
                 {
-
                     if(m_pThreadPool->size() == 0)
+                    {
                         break;
-
+                    }
                     if ((*pool_iter) == nullptr || (*pool_iter)->isFinished())
                     {
                         #ifdef _WIN32
@@ -516,9 +525,9 @@ namespace SpaceDSL {
                 }
 
                 #ifdef _WIN32
-                    Sleep(50);
+                    Sleep(100);
                 #else
-                    usleep(50000);
+                    usleep(100000);
                 #endif
             }
 
