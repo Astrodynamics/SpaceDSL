@@ -79,5 +79,19 @@ namespace SpaceDSL {
     {
 
     }
+
+    void Propagator::operator =(const Propagator &propagator)
+    {
+        m_IntegMethodType = propagator.m_IntegMethodType;
+        m_InitialStep = propagator.m_InitialStep;
+        m_AdaptedStep = propagator.m_AdaptedStep;
+        m_Accuracy = propagator.m_Accuracy;
+        m_MinStep = propagator.m_MinStep;
+        m_MaxStep = propagator.m_MaxStep;
+        m_MaxStepAttempts = propagator.m_MaxStepAttempts;
+        m_bStopIfAccuracyIsViolated = propagator.m_bStopIfAccuracyIsViolated;
+        m_bIsUseNormalize = propagator.m_bIsUseNormalize;
+    }
+
 }
 

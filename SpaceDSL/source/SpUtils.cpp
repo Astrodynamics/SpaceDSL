@@ -29,7 +29,7 @@ namespace SpaceDSL{
                 + "The Function Name is:" + (sFunc) + " \n"
                 + "The Line is:" + sLine + " \n"
                 + "The Reason is: " + (sReason) + " \n";
-        //cout << Exceptstr << endl;
+
         static const char *Exceptchar ;
         Exceptchar = Exceptstr.c_str();
         cout << "An Exception has been violated here! \n" << endl;

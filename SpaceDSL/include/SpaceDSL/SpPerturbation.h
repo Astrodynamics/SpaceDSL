@@ -170,6 +170,19 @@ namespace SpaceDSL {
 
     };
 
+    /********************************************************************/
+    /// Geomagnetic Ap to Kp
+    /// @Author	Niu Zhiyong
+    /// @Date	2019-06-14
+    /// @Input
+    /// @Param	Ap
+    /// @Return Kp
+    /********************************************************************/
+    double SPACEDSL_API GeomagneticApToKp(double Ap);
+
+    double SPACEDSL_API GeomagneticKpToAp(double Kp);
+
+
 }
 
 #endif //SPPERTURBATION_H

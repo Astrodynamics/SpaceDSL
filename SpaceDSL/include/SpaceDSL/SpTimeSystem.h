@@ -75,7 +75,7 @@ namespace SpaceDSL {
         inline void			SetMin (int min)    { m_Min = min;}
         inline void         SetSec (double sec) { m_Sec = sec;}
 
-
+        void                operator =(const CalendarTime& time);
         bool				operator==(const CalendarTime& time) const;
         bool				operator!=(const CalendarTime& time) const;
         bool				operator> (const CalendarTime& time) const;

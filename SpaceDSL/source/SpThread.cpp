@@ -347,14 +347,14 @@ namespace SpaceDSL {
 
     void SpThreadPool::Start(SpThread *thread)
     {
-        if (m_MaxThreadCount <= 0)
+        if ( m_MaxThreadCount <= 0 )
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "SpThreadPool: m_MaxThreadCount <= 0");
 
-        if (m_pMonitor->isFinished())
+        if ( m_pMonitor->isFinished() )
             m_pMonitor->Start();
 
         lock_guard<mutex>guard(m_CheckLock);
-        if ( m_ActiveThreadCount < m_MaxThreadCount)
+        if ( m_ActiveThreadCount < m_MaxThreadCount )
         {
             m_ThreadPool.push_back(thread);
             ++m_ActiveThreadCount;
@@ -400,6 +400,8 @@ namespace SpaceDSL {
         }while(true);
 
         m_bIsStarted = false;
+        m_ThreadPool.clear();
+        m_ThreadBuffer.clear();
         return true;
     }
 
@@ -448,11 +450,13 @@ namespace SpaceDSL {
         m_pThreadPool = pPool;
         m_pThreadBuffer = pBuffer;
         m_pCheckLock = pMutex;
+        m_MonitorStart = false;
         m_bIsInitialized = true;
     }
 
     void MonitorThread::Stop()
     {
+        lock_guard<mutex>guard(m_StopLock);
         m_MonitorStart = false;
     }
 
@@ -462,6 +466,10 @@ namespace SpaceDSL {
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "MonitorThread Uninitialized!");
         }
+        if (m_MonitorStart == false)
+            m_MonitorStart = true;
+        else
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "MonitorThread m_MonitorStart = true!");
 
         while (m_MonitorStart == true)
         {
@@ -472,7 +480,12 @@ namespace SpaceDSL {
                 #else
                     usleep(1000);
                 #endif
-                if( *m_pIsStarted == true || m_MonitorStart == false)
+                if( *m_pIsStarted == true )
+                {
+                    break;
+                }
+
+                if( m_MonitorStart == false)
                 {
                     break;
                 }
@@ -481,15 +494,15 @@ namespace SpaceDSL {
             vector<SpThread *>::iterator pool_iter;
             while ( *m_pIsStarted == true )
             {
-                #ifdef _WIN32
-                    Sleep(10);
-                #else
-                    usleep(10000);
-                #endif
                 lock_guard<mutex>guard(*m_pCheckLock);
+                #ifdef _WIN32
+                    Sleep(1);
+                #else
+                    usleep(1000);
+                #endif
 
-                auto poolSize = (*m_pThreadPool).size();
-                auto buffSize = (*m_pThreadBuffer).size();
+                auto poolSize = m_pThreadPool->size();
+                auto buffSize = m_pThreadBuffer->size();
                 if ( poolSize == 0 && buffSize == 0)
                 {
                     break;
@@ -501,11 +514,10 @@ namespace SpaceDSL {
                     {
                         break;
                     }
+
                     if ((*pool_iter) == nullptr || (*pool_iter)->isFinished())
                     {
-                        #ifdef _WIN32
-                            delete (*pool_iter);
-                        #endif
+                        delete (*pool_iter);
                         pool_iter = (*m_pThreadPool).erase(pool_iter);
 
                         if(m_pThreadBuffer->size() > 0)
@@ -524,11 +536,6 @@ namespace SpaceDSL {
                         ++pool_iter;
                 }
 
-                #ifdef _WIN32
-                    Sleep(100);
-                #else
-                    usleep(100000);
-                #endif
             }
 
         }

@@ -99,7 +99,7 @@ namespace SpaceDSL {
 
     double LagrangePolynomialInterpolation(const VectorXd &x, const VectorXd &y, double t)
     {
-        double result = 0;
+        double result = 0.0;
         int i;
         int j;
         int length = static_cast<int>(x.size());
@@ -133,7 +133,7 @@ namespace SpaceDSL {
         if(length != static_cast<int>(y.size()))
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "LagrangePolynomialInterpolation: x.size() != y.size()!");
 
-        double gradient = 0;
+        double gradient = 0.0;
         for ( int i = 0; i < length; ++i )
         {
             t += 0.5*step;

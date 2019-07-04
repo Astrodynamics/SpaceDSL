@@ -235,7 +235,6 @@ namespace SpaceDSL {
         GeodeticCoord lla = m_pGeodeticSystem->GetGeodeticCoord(r_ECF);
         // Atmospheric density due to AtmosphereModel::AtmosphereModelType
         double density = m_pAtmosphereModel->GetAtmosphereDensity( Mjd_UT1, lla.Altitude(), lla.Latitude() , lla.Longitude(), f107A, f107, ap);
-
         // Acceleration
         a_TOD = -0.5 * dragCoef * (area/mass) * density * v_abs * v_rel;
 
@@ -285,6 +284,100 @@ namespace SpaceDSL {
             return accel;
         }
 
+    }
+
+    /********************************************************************/
+    /// Geomagnetic Ap to Kp
+    /// @Author	Niu Zhiyong
+    /// @Date	2019-06-14
+    /// @Input
+    /// @Param	Ap
+    /// @Return Kp
+    /********************************************************************/
+    double FuncAp(double Ap)
+    {
+        return Ap + 100*(1.0 - exp(-0.08*Ap));
+    }
+
+    double FuncKp(double Kp)
+    {
+        return 28*Kp + 0.03*exp(Kp);
+    }
+
+    double GradAp(double Ap, double step)
+    {
+        long double temp = Ap;
+        long double Grad;
+        temp += 0.5*step;
+        Grad = 4* FuncAp( temp )/ ( 3* step );
+        temp -= step;
+        Grad -= 4* FuncAp( temp )/ ( 3* step );
+        temp += 3* step/ 2;
+        Grad -= FuncAp( temp )/ ( 6* step );
+        temp -= 2* step;
+        Grad += FuncAp( temp )/ ( 6* step );
+
+        return Grad;
+    }
+
+    double GradKp(double Kp, double step)
+    {
+        long double temp = Kp;
+        long double Grad;
+        temp += 0.5*step;
+        Grad = 4* FuncKp( temp )/ ( 3* step );
+        temp -= step;
+        Grad -= 4* FuncKp( temp )/ ( 3* step );
+        temp += 3* step/ 2;
+        Grad -= FuncKp( temp )/ ( 6* step );
+        temp -= 2* step;
+        Grad += FuncKp( temp )/ ( 6* step );
+
+        return Grad;
+    }
+    double GeomagneticApToKp(double Ap)
+    {
+        double c = 0.0;
+        double error = 1.0e-10;
+        double step = 1.0e-12;
+        double Kp0 = 3.0;
+
+        c = FuncAp(Ap);
+        double func,Grad;
+        do
+        {
+            func = FuncKp(Kp0);
+            if( fabs(func - c) < error )
+                break;
+            Grad = GradKp(Kp0, step);
+            Kp0 -= (func - c) / Grad;
+
+        }while( fabs(func - c) > error );
+
+        return Kp0;
+
+    }
+
+    double GeomagneticKpToAp(double Kp)
+    {
+        double c = 0.0;
+        double error = 1.0e-10;
+        double step = 1.0e-12;
+        double Ap0 = 14.9;
+
+        c = FuncKp(Kp);
+        double func,Grad;
+        do
+        {
+            func = FuncAp(Ap0);
+            if( fabs(func - c) < error )
+                break;
+            Grad = GradAp(Ap0, step);
+            Ap0 -= (func - c) / Grad;
+
+        }while( fabs(func - c) > error );
+
+        return Ap0;
     }
 
 

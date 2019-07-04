@@ -87,7 +87,7 @@ namespace SpaceDSL {
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphereModel:E_NotDefinedAtmosphereModel!");
             break;
         case E_NRLMSISE00Atmosphere:
-            altitude /= 1000;//m to km
+            altitude /= 1000.0;//m to km
             return GetNRLMSISE2000Temperature(Mjd_UT1, altitude, latitude, longitude,
                                               f107A, f107, ap, useDailyAp);
         default:
@@ -118,7 +118,7 @@ namespace SpaceDSL {
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "AtmosphereModel:E_NotDefinedAtmosphereModel!");
             break;
         case E_NRLMSISE00Atmosphere:
-            altitude /= 1000;//m to km
+            altitude /= 1000.0;//m to km
             return GetNRLMSISE2000Density(Mjd_UT1, altitude, latitude, longitude,
                                           f107A, f107, ap, useDailyAp);
         default:
@@ -136,32 +136,32 @@ namespace SpaceDSL {
     double AtmosphereModel::GetNRLMSISE2000Density(double Mjd_UT1, double altitude, double latitude, double longitude,
                                                    double f107A, double f107, double ap[], bool useDailyAp)
     {
-        struct nrlmsise_output output;
-        struct nrlmsise_input input;
-        struct nrlmsise_flags flags;
-        struct ap_array aph;
+        NRLMSISE00 nrlmsise;
+        struct NRLMSISE00::nrlmsise_output output;
+        struct NRLMSISE00::nrlmsise_input input;
+        struct NRLMSISE00::nrlmsise_flags flags;
+        struct NRLMSISE00::ap_array aph;
 
         /* input values */
         if (ap == nullptr)
         {
-            aph.a[0] = 14.9186481659685;
-            for (int i=1;i<7;i++)
+            for (int i = 0; i < 7; i++)
             {
-                aph.a[i]=0;
+                aph.a[i] = ap[i];
             }
         }
         else
         {
-            for (int i=0;i<7;i++)
+            for (int i = 0; i < 7; i++)
             {
-                aph.a[i]=ap[i];
+                aph.a[i] = ap[i];
             }
         }
 
 
-        for (int i=0;i<24;i++)
+        for (int i = 0; i < 24; i++)
         {
-            flags.switches[i]=1;
+            flags.switches[i] = 1;
         }
 
         if (useDailyAp == false)
@@ -190,7 +190,7 @@ namespace SpaceDSL {
         input.f107  = f107;
         input.ap    = aph.a[0];
         input.ap_a  = &aph;
-        gtd7d(&input, &flags, &output);
+        nrlmsise.gtd7d(&input, &flags, &output);
 
         return output.d[5];
     }
@@ -198,10 +198,11 @@ namespace SpaceDSL {
     double AtmosphereModel::GetNRLMSISE2000Temperature(double Mjd_UT1, double altitude, double latitude, double longitude,
                                                        double f107A, double f107, double ap[], bool useDailyAp)
     {
-        struct nrlmsise_output output;
-        struct nrlmsise_input input;
-        struct nrlmsise_flags flags;
-        struct ap_array aph;
+        NRLMSISE00 nrlmsise;
+        struct NRLMSISE00::nrlmsise_output output;
+        struct NRLMSISE00::nrlmsise_input input;
+        struct NRLMSISE00::nrlmsise_flags flags;
+        struct NRLMSISE00::ap_array aph;
 
         /* input values */
         if (ap == nullptr)
@@ -251,7 +252,7 @@ namespace SpaceDSL {
         input.f107  = f107;
         input.ap    = aph.a[0];
         input.ap_a  = &aph;
-        gtd7d(&input, &flags, &output);
+        nrlmsise.gtd7d(&input, &flags, &output);
 
         return output.t[1];
     }

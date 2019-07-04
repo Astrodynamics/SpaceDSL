@@ -37,8 +37,23 @@
 
 
 #include "SpaceDSL/SpEnvironment.h"
+#include "SpaceDSL/SpMath.h"
+#include "SpaceDSL/SpConst.h"
+#include "SpaceDSL/SpUtils.h"
 
+#include <type_traits>
 
+template <class T>
+
+int getArrayLen(T& array)
+
+{//使用模板定义一 个函数getArrayLen,该函数将返回数组array的长度
+
+return (sizeof(array) / sizeof(array[0]));
+
+}
+
+using namespace std;
 
 namespace SpaceDSL {
 
@@ -59,8 +74,8 @@ namespace SpaceDSL {
         m_AtmModelType =  AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel;
         m_F107A = 150;
         m_F107 = 150;
-        m_Ap = nullptr;
-
+        m_Ap.resize(7);
+        m_Ap.fill(0.0);
         m_bIsUseDrag = false;
         m_bIsUseSRP = false;
     }
@@ -69,7 +84,7 @@ namespace SpaceDSL {
                              const int maxDegree, const int maxOrder, const ThirdBodyGravitySign thirdBodyGravSign,
                              const GeodeticCoordSystem::GeodeticCoordType geodeticType,
                              const AtmosphereModel::AtmosphereModelType atmModelType,
-                             const double f107A, const double f107, double *ap,
+                             const double f107A, const double f107, VectorXd ap,
                              const bool isUseDrag, const bool isUseSRP)
     {
         m_CenterStarType = centerStarType;
@@ -81,7 +96,8 @@ namespace SpaceDSL {
         m_AtmModelType = atmModelType;
         m_F107A = f107A;
         m_F107 = f107;
-        m_Ap = ap;
+        m_Ap.resize(7);
+        this->SetGeomagneticIndex(ap);
 
         m_bIsUseDrag = isUseDrag;
         m_bIsUseSRP = isUseSRP;
@@ -90,6 +106,19 @@ namespace SpaceDSL {
     Environment::~Environment()
     {
 
+    }
+
+    void Environment::SetGeomagneticIndex(VectorXd ap)
+    {
+
+        if (  ap.size() != 7 )
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "Environment: SetGeomagneticIndex ap size is not 7 ");
+
+        for (int i = 0; i < 7; i++)
+        {
+            m_Ap(i) = ap(i);
+        }
     }
 
 	

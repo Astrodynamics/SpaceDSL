@@ -58,8 +58,8 @@ namespace SpaceDSL {
     AccessAnalysis::AccessAnalysis()
     {
         m_pMission = nullptr;                                 
-        m_pTargetList = nullptr;
-        m_pSpaceVehicleList = nullptr;
+        m_pTargetMap = nullptr;
+        m_pSpaceVehicleMap = nullptr;
         m_pInitialEpoch = nullptr;
         m_pTerminationEpoch = nullptr;
         m_pProcessDataMap = nullptr;
@@ -69,8 +69,8 @@ namespace SpaceDSL {
     AccessAnalysis::AccessAnalysis(Mission *pMission)
     {
         m_pMission = pMission;
-        m_pTargetList = &(pMission->m_TargetList);
-        m_pSpaceVehicleList = &(pMission->m_SpaceVehicleList);
+        m_pTargetMap = &(pMission->m_TargetMap);
+        m_pSpaceVehicleMap = &(pMission->m_SpaceVehicleMap);
         m_pInitialEpoch = &(pMission->m_InitialEpoch);
         m_pTerminationEpoch = &(pMission->m_TerminationEpoch);
         m_pProcessDataMap = &(pMission->m_ProcessDataMap);
@@ -85,8 +85,8 @@ namespace SpaceDSL {
     void AccessAnalysis::SetMission(Mission *pMission)
     {
         m_pMission = pMission;
-        m_pTargetList = &(pMission->m_TargetList);
-        m_pSpaceVehicleList = &(pMission->m_SpaceVehicleList);
+        m_pTargetMap = &(pMission->m_TargetMap);
+        m_pSpaceVehicleMap = &(pMission->m_SpaceVehicleMap);
         m_pInitialEpoch = &(pMission->m_InitialEpoch);
         m_pTerminationEpoch = &(pMission->m_TerminationEpoch);
         m_pProcessDataMap = &(pMission->m_ProcessDataMap);
@@ -102,7 +102,7 @@ namespace SpaceDSL {
         return m_pMission;
     }
 
-    vector<pair<UTCCalTime, UTCCalTime> > AccessAnalysis::CalTargetAccessData(const string &vehicleName, const Target *pTarget, int order, double precision)
+    vector<pair<UTCCalTime, UTCCalTime> > AccessAnalysis::CalTargetAccessData(int vehicleID, const Target *pTarget, int order, double precision)
     {
         if (m_pMission == nullptr)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -111,17 +111,17 @@ namespace SpaceDSL {
         vector<pair<UTCCalTime, UTCCalTime> > result;
 
         SpaceVehicle *pVehicle = nullptr;
-        for(auto &veh:m_pMission->GetSpaceVehicleList())
-        {
-            if (veh->GetName() == vehicleName)
-            {
-                pVehicle = veh;
-                break;
-            }
-        }
+
+        auto iter = m_pSpaceVehicleMap->find(vehicleID);
+
+        if (iter == m_pSpaceVehicleMap->end())
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "AccessAnalysis::CalTargetAccessData (Can not Find Space Vehicle in SpaceVehicleMap By ID)! ");
+
+        pVehicle = iter->second;
         if (pVehicle == nullptr)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                      "AccessAnalysis::CalTargetAccessData Can not Find Vehicle With VehicleName");
+                      "AccessAnalysis::CalTargetAccessData (Space Vehicle Ptr is NULL)! ");
 
         auto iterVehicle = m_pProcessDataMap->find(pVehicle);
 
@@ -421,8 +421,9 @@ namespace SpaceDSL {
              iterVehicle != m_pProcessDataMap->end();
              ++iterVehicle)
         {
-            for(auto &pTarget:*m_pTargetList)
+            for(auto &targetPair:*m_pTargetMap)
             {
+                Target *pTarget = targetPair.second;
                 SpaceVehicle *pVehicle = iterVehicle->first;
 
                 VectorXd startMjdList;
@@ -569,8 +570,8 @@ namespace SpaceDSL {
     void AccessAnalysis::Reset()
     {
         m_pMission = nullptr;
-        m_pTargetList = nullptr;
-        m_pSpaceVehicleList = nullptr;
+        m_pTargetMap = nullptr;
+        m_pSpaceVehicleMap = nullptr;
         m_pInitialEpoch = nullptr;
         m_pTerminationEpoch = nullptr;
         m_pProcessDataMap = nullptr;

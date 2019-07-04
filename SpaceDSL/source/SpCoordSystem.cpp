@@ -494,22 +494,24 @@ namespace SpaceDSL {
 
         if (pos.norm() == 0.0)
         {
-            throw SPException(__FILE__, __FUNCTION__, __LINE__, "invalid input in Geodetic constructor!");
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "GeodeticCoordSystem::GetGeodeticCoord invalid input in Geodetic constructor!");
         }
         else if (pos.norm() < EarthMinRadius)
         {
-            throw SPException(__FILE__, __FUNCTION__, __LINE__, "CartState is in Earth!");
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "GeodeticCoordSystem::GetGeodeticCoord CartState is in Earth!");
         }
 
         // Iteration
-        double  dZ = 0;
-        double  dZ_new = 0;
-        double  SinPhi = 0;
-        double  ZdZ = 0;
-        double  Nh = 0;
-        double  N = 0;
+        double  dZ = 0.0;
+        double  dZ_new = 0.0;
+        double  SinPhi = 0.0;
+        double  ZdZ = 0.0;
+        double  Nh = 0.0;
+        double  N = 0.0;
 
         dZ = e2 * Z;
+        if (isnan(dZ))
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "GeodeticCoordSystem::GetGeodeticCoord dZ is Nan!");
         do
         {
             ZdZ    =  Z + dZ;
@@ -517,12 +519,11 @@ namespace SpaceDSL {
             SinPhi =  ZdZ / Nh;                    // Sine of geodetic latitude
             N      =  R_equ / sqrt(1.0-e2*SinPhi*SinPhi);
             dZ_new =  N*e2*SinPhi;
-            if ( fabs(dZ-dZ_new) < epsRequ ) break;
+            if ( fabs(dZ-dZ_new) <= epsRequ ) break;
             dZ = dZ_new;
         }while (true);
 
         // Longitude, latitude, altitude
-
         lla.SetAltitude( Nh - N);
         lla.SetLatitude(atan2 ( ZdZ, sqrt(rho2) ));
         lla.SetLongitude(atan2 ( Y, X ));

@@ -80,7 +80,8 @@ namespace SpaceDSL {
         };
 
     protected:
-        static atomic<int>      TargetID;               ///< Target ID
+        static atomic<int>      TargetID;               ///< Target Global Counter
+        int                     m_ID;                   ///< Target ID
         string                  m_Name;                 ///< Target Name
         TargetType              m_TargetType;           ///< Target Type
         double                  m_MinElevation;         ///< Minimum Observation Elevations

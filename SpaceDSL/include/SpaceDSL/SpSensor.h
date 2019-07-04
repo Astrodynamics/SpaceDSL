@@ -112,7 +112,8 @@ namespace SpaceDSL {
     // Attribute.
     //
     protected:
-        static atomic<int>      SensorID;               ///< Sensor ID
+        static atomic<int>      SensorID;               ///< Sensor Global Counter
+        int                     m_ID;                   ///< Sensor ID
         string                  m_Name;                 ///< Sensor Name
         SensorType              m_SensorType;           ///< Sensor Type
         double                  m_HorizontalHalfAngle;  ///< Parallel to orbital plane , Used for Rectangular Type

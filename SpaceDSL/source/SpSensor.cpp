@@ -52,7 +52,7 @@ namespace SpaceDSL {
     atomic<int> Sensor::SensorID(0);
     Sensor::Sensor()
     {
-        ++SensorID;
+        m_ID = ++SensorID;
         m_Name = "Default";
         m_SensorType = E_NotDefinedSensor;
         m_HorizontalHalfAngle = 0;
@@ -62,7 +62,7 @@ namespace SpaceDSL {
 
     Sensor::Sensor(const string &name, const SensorType type, const double halfAngle1, const double halfAngle2)
     {
-        ++SensorID;
+        m_ID = ++SensorID;
         m_Name = name;
         m_SensorType = type;
         switch (type)

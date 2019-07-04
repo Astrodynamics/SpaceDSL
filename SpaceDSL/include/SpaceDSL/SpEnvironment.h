@@ -62,7 +62,7 @@ namespace SpaceDSL {
                     const int maxDegree , const int maxOrder , const ThirdBodyGravitySign thirdBodyGravSign,
                     const GeodeticCoordSystem::GeodeticCoordType geodeticType ,
                     const AtmosphereModel::AtmosphereModelType atmModelType ,
-                    const double f107A , const double f107, double *ap,
+                    const double f107A , const double f107, VectorXd ap,
                     const bool isUseDrag, const bool isUseSRP);
         ~Environment();
 
@@ -87,7 +87,7 @@ namespace SpaceDSL {
 
         inline  void    SetDailyF107(const double f107)                             { m_F107 = f107; }
 
-        inline  void    SetGeomagneticIndex(double *ap)                             { m_Ap = ap; }
+        void            SetGeomagneticIndex( VectorXd ap);
 
         inline  void    SetIsUseDrag(const bool isUseDrag)                          { m_bIsUseDrag = isUseDrag; }
 
@@ -113,7 +113,7 @@ namespace SpaceDSL {
 
         inline  double                          GetDailyF107() const            { return m_F107; }
 
-        inline  double                          *GetGeomagneticIndex() const    { return m_Ap; }
+        inline  VectorXd                        GetGeomagneticIndex() const     { return m_Ap; }
 
         inline  bool                            GetIsUseDrag() const            { return m_bIsUseDrag; }
 
@@ -141,7 +141,7 @@ namespace SpaceDSL {
                                     m_AtmModelType;
         double                      m_F107A;            ///< average F10.7
         double                      m_F107;             ///< daily F10.7
-        double                      *m_Ap;              ///< geomagnetic index
+        VectorXd                    m_Ap;              ///< geomagnetic index
 
         bool                        m_bIsUseDrag;
         bool                        m_bIsUseSRP;

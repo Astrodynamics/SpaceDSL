@@ -84,6 +84,12 @@ namespace SpaceDSL{
 
     }
 
+    void CartState::operator =(const CartState &state)
+    {
+        this->m_Pos = state.m_Pos;
+        this->m_Vel = state.m_Vel;
+    }
+
     const CartState CartState::operator -() const
     {
         CartState tempState(-m_Pos, -m_Vel);
@@ -146,6 +152,13 @@ namespace SpaceDSL{
 
     }
 
+    void GeodeticCoord::operator =(const GeodeticCoord &lla)
+    {
+        m_Longitude = lla.m_Longitude;
+        m_Latitude  = lla.m_Latitude;
+        m_Altitude  = lla.m_Altitude;
+    }
+
     /*************************************************
      * Class type: Classic Orbit Element
      * Author: Niu ZhiYong
@@ -175,6 +188,16 @@ namespace SpaceDSL{
     OrbitElem::~OrbitElem()
     {
 
+    }
+
+    void OrbitElem::operator =(const OrbitElem &ele)
+    {
+        this->m_SMajAx = ele.m_SMajAx;
+        this->m_Ecc = ele.m_Ecc;
+        this->m_I = ele.m_I;
+        this->m_RAAN = ele.m_RAAN;
+        this->m_ArgPeri = ele.m_ArgPeri;
+        this->m_TrueA = ele.m_TrueA;
     }
     /*************************************************
      * Class type: Modified Orbital Elements

@@ -118,12 +118,13 @@ namespace SpaceDSL {
         // Space Vehicle Data
         int colorStep = int(255/(m_pMission->GetSpaceVehicleNumber()+1));
         int vehiclCount = 0;
-        for(auto pVehicl:m_pMission->GetSpaceVehicleList())
+        for(auto &vehiclPair:m_pMission->GetSpaceVehicleMap())
         {
+            SpaceVehicle *pVehicle = vehiclPair.second;
             ++vehiclCount;
             int bias = colorStep * vehiclCount;
             json *pJvehicl = new json();
-            string name = pVehicl->GetName();
+            string name = pVehicle->GetName();
             json Jcolor;
             Jcolor["rgba"] = {bias/2.0 , 255 - bias/2.0, 0, 255};
             vehicleColorMap.insert(pair<string, json>(name, Jcolor));
@@ -158,7 +159,7 @@ namespace SpaceDSL {
 
             (*pJvehicl)["path"]["resolution"] = 120;
 
-            double T = m_pMission->GetAverageOrbitalPeriod(name);
+            double T = m_pMission->GetAverageOrbitalPeriod(pVehicle->GetID());
 
             (*pJvehicl)["path"]["leadTime"] = T;
             (*pJvehicl)["path"]["trailTime"] = 0.0;
@@ -167,7 +168,7 @@ namespace SpaceDSL {
             (*pJvehicl)["position"]["referenceFrame"] = "INERTIAL";
             (*pJvehicl)["position"]["epoch"] = initialEpochStr;
             auto pProcessDataMap = m_pMission->GetProcessDataMap();
-            auto iter = pProcessDataMap->find(pVehicl);
+            auto iter = pProcessDataMap->find(pVehicle);
             if (iter == pProcessDataMap->end())
                 throw SPException(__FILE__, __FUNCTION__, __LINE__,
                           "MissionThread::SaveProcessDataLine Cant Find ProcessData!");
@@ -197,8 +198,9 @@ namespace SpaceDSL {
         {
             colorStep = int(255/(facilityNumber + 1));
             int facilityCount = 0;
-            for(auto pFacility:m_pMission->GetFacilityList())
+            for(auto &facilityPair:m_pMission->GetFacilityMap())
             {
+                Facility *pFacility = facilityPair.second;
                 ++facilityCount;
                 int bias = colorStep * facilityCount;
                 json *pJfacility = new json();
@@ -241,8 +243,9 @@ namespace SpaceDSL {
         {
             colorStep = int(255/(targetWithoutFacilityNum + 1));
             int targetWithoutFacilityCount = 0;
-            for(auto pTarget:m_pMission->GetTargetList())
+            for(auto &targetPair:m_pMission->GetTargetMap())
             {
+                Target *pTarget = targetPair.second;
                 auto targetType = pTarget->GetTargetType();
                 if ( targetType == Target::E_Facility)
                     continue;

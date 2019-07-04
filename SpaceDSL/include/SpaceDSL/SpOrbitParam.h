@@ -88,6 +88,7 @@ namespace SpaceDSL {
                 this->m_Vel[2] = zVel;
             }
 
+            void                operator =(const CartState& state);
             const CartState		operator -() const;
             const CartState		operator +(const CartState& state) const;
             const CartState     operator -(const CartState& state) const;
@@ -115,13 +116,15 @@ namespace SpaceDSL {
             GeodeticCoord(const double longitude, const double latitude, const double altitude);
             virtual ~GeodeticCoord();
 
-            inline double Longitude()   const {return m_Longitude;}
-            inline double Latitude()    const {return m_Latitude;}
-            inline double Altitude()    const {return m_Altitude;}
+            void            operator =(const GeodeticCoord& lla);
 
-            inline void   SetLongitude(const double longitude)  { m_Longitude = longitude;}
-            inline void   SetLatitude(const double latitude)    { m_Latitude  = latitude;}
-            inline void   SetAltitude(const double altitude)    { m_Altitude = altitude;}
+            inline double   Longitude()   const {return m_Longitude;}
+            inline double   Latitude()    const {return m_Latitude;}
+            inline double   Altitude()    const {return m_Altitude;}
+
+            inline void     SetLongitude(const double longitude)  { m_Longitude = longitude;}
+            inline void     SetLatitude(const double latitude)    { m_Latitude  = latitude;}
+            inline void     SetAltitude(const double altitude)    { m_Altitude = altitude;}
 
             inline void   SetGeodeticCoord(double longitude, double latitude, double altitude)
             {
@@ -150,6 +153,7 @@ namespace SpaceDSL {
             OrbitElem(const double sMajAx, const double ecc, const double i, const double raan, const double argPeri, const double trueA);
             virtual ~OrbitElem();
 
+            void              operator =(const OrbitElem& ele);
             inline double     SMajAx()  const {return m_SMajAx;}
             inline double     Ecc()     const {return m_Ecc;}
             inline double     I()       const {return m_I;}

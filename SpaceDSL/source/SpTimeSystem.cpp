@@ -72,6 +72,17 @@ namespace SpaceDSL{
             free (m_pTimeStr);
     }
 
+    void CalendarTime::operator =(const CalendarTime &time)
+    {
+        this->m_Year = time.m_Year;
+        this->m_Mon = time.m_Mon;
+        this->m_Day = time.m_Day;
+        this->m_Hour = time.m_Hour;
+        this->m_Min = time.m_Min;
+        this->m_Sec = time.m_Sec;
+        this->m_pTimeStr = time.m_pTimeStr;
+    }
+
     bool CalendarTime::operator==(const CalendarTime &time) const
     {
         if (this->m_Year != time.Year())

@@ -64,12 +64,12 @@ namespace SpaceDSL {
         m_FacilityNumber = 0;
         m_TargetNumber = 0;
 
-        m_SpaceVehicleList.clear();
-        m_FacilityList.clear();
-        m_TargetList.clear();
+        m_SpaceVehicleMap.clear();
+        m_FacilityMap.clear();
+        m_TargetMap.clear();
 
         m_pEnvironment = nullptr;
-        m_pPropagator = nullptr;
+        m_pInitialPropagator = nullptr;
         m_pMissionThreadPool = new SpThreadPool();
         m_pAccessAnalysis = new AccessAnalysis(this);
 
@@ -79,19 +79,21 @@ namespace SpaceDSL {
 
     Mission::~Mission()
     {
-        for (auto pVehicle:m_SpaceVehicleList)
+        for (auto &vehiclePair:m_SpaceVehicleMap)
         {
-            if (pVehicle != nullptr)
-                delete pVehicle;
+            if (vehiclePair.second != nullptr)
+                delete vehiclePair.second;
         }
-        m_SpaceVehicleList.clear();
+        m_SpaceVehicleMap.clear();
 
-        for (auto pTarget:m_TargetList)
+        for (auto &targetPair:m_TargetMap)
         {
-            if (pTarget != nullptr)
-                delete pTarget;
+            if (targetPair.second != nullptr)
+                delete targetPair.second;
         }
-        m_TargetList.clear();
+        m_TargetMap.clear();
+
+        m_FacilityMap.clear();
 
         for (auto iter = m_ProcessDataMap.begin();
              iter != m_ProcessDataMap.end();
@@ -120,8 +122,8 @@ namespace SpaceDSL {
         if (m_pEnvironment != nullptr)
             delete m_pEnvironment;
 
-        if (m_pPropagator != nullptr)
-            delete m_pPropagator;
+        if (m_pInitialPropagator != nullptr)
+            delete m_pInitialPropagator;
 
         if (m_pMissionThreadPool != nullptr)
             delete m_pMissionThreadPool;
@@ -135,7 +137,7 @@ namespace SpaceDSL {
                                      const double dragCoef, const double dragArea,
                                      const double SRPCoef, const double SRPArea)
     {
-        if (m_SpaceVehicleNumber != int(m_SpaceVehicleList.size()))
+        if (m_SpaceVehicleNumber != int(m_SpaceVehicleMap.size()))
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::InsertSpaceVehicle (SpaceVehicleNumber) != (SpaceVehicleList.Size)! ");
@@ -144,8 +146,13 @@ namespace SpaceDSL {
                                                     initialState,   initialMass,
                                                     dragCoef,       dragArea,
                                                     SRPCoef,        SRPArea);
+        int vehicleID = pVehicle->GetID();
         ++m_SpaceVehicleNumber;
-        m_SpaceVehicleList.push_back(pVehicle);
+        m_SpaceVehicleMap.insert(pair<int, SpaceVehicle *>(vehicleID, pVehicle));
+
+        Propagator * pPropagator = new Propagator();
+        m_SpaceVehiclPropagatorMap.insert(pair<int, Propagator *>(vehicleID, pPropagator));
+
         vector<double *> *pOneVehicleData = new vector<double *>;
         m_ProcessDataMap.insert(pair<SpaceVehicle *, vector<double *> *>(pVehicle ,pOneVehicleData));
 
@@ -154,80 +161,82 @@ namespace SpaceDSL {
 
     bool Mission::RemoveSpaceVehicle(const int id)
     {
-        for(auto iter = m_SpaceVehicleList.begin();
-            iter != m_SpaceVehicleList.end();
-            ++iter)
+        auto iterVehicle = m_SpaceVehicleMap.find(id);
+        auto iterVehiclPropagator = m_SpaceVehiclPropagatorMap.find(id);
+        if (iterVehicle != m_SpaceVehicleMap.end() && iterVehiclPropagator != m_SpaceVehiclPropagatorMap.end())
         {
-            if ((*iter)->GetID() == id)
-            {
-                delete *iter;
-                m_SpaceVehicleList.erase(iter);
-                --m_SpaceVehicleNumber;
-                return true;
-            }
-
+            delete iterVehicle->second;
+            delete iterVehiclPropagator->second;
+            m_SpaceVehicleMap.erase(iterVehicle);
+            m_SpaceVehiclPropagatorMap.erase(iterVehiclPropagator);
+            --m_SpaceVehicleNumber;
+            return true;
         }
+        else if (iterVehicle == m_SpaceVehicleMap.end() && iterVehiclPropagator != m_SpaceVehiclPropagatorMap.end())
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::RemoveSpaceVehicle iterVehicle == m_SpaceVehicleMap.end() && iterVehiclPropagator != m_SpaceVehiclPropagatorMap.end() ");
+        }
+        else if (iterVehicle != m_SpaceVehicleMap.end() && iterVehiclPropagator == m_SpaceVehiclPropagatorMap.end())
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::RemoveSpaceVehicle iterVehicle != m_SpaceVehicleMap.end() && iterVehiclPropagator == m_SpaceVehiclPropagatorMap.end() ");
+        }
+
         return false;
+
     }
 
     Facility *Mission::InsertFacility(const string &name, const double longitude, const double latitude, const double altitude, const double minElevation)
     {
-        if ( m_FacilityNumber != int(m_FacilityList.size()))
+        if ( m_FacilityNumber != int(m_FacilityMap.size()))
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::InsertFacility (FacilityNumber) != (FacilityList.Size)! ");
         }
         Facility *pFacility = new Facility(name, longitude, latitude, altitude, minElevation);
+
+        int targetID = pFacility->GetID();
         ++m_FacilityNumber;
-        m_FacilityList.push_back(pFacility);
+        m_FacilityMap.insert(pair<int, Facility *>(targetID, pFacility));
 
         ++m_TargetNumber;
-        m_TargetList.push_back(pFacility);
+        m_TargetMap.insert(pair<int, Target *>(targetID, pFacility));
 
         return pFacility;
     }
 
     bool Mission::RemoveFacility(const int id)
     {
-        bool bRemoveFacilityList = false;
-        bool bRemoveTargetList = false;
-
-        for(auto iter = m_FacilityList.begin();
-            iter != m_FacilityList.end();
-            ++iter)
+        auto iterFacility = m_FacilityMap.find(id);
+        auto iterTarget = m_TargetMap.find(id);
+        if (iterFacility != m_FacilityMap.end() && iterTarget != m_TargetMap.end())
         {
-            if ((*iter)->GetID() == id)
-            {
-                delete *iter;
-                m_FacilityList.erase(iter);
-                --m_FacilityNumber;
-                bRemoveFacilityList = true;
-            }
-
-        }
-
-        for(auto iter = m_TargetList.begin();
-            iter != m_TargetList.end();
-            ++iter)
-        {
-            if ((*iter)->GetID() == id)
-            {
-                delete *iter;
-                m_TargetList.erase(iter);
-                --m_TargetNumber;
-                bRemoveTargetList = true;
-            }
-        }
-
-        if (bRemoveTargetList && bRemoveFacilityList)
+            delete iterFacility->second;
+            m_FacilityMap.erase(iterFacility);
+            m_TargetMap.erase(iterTarget);
+            --m_FacilityNumber;
+            --m_TargetNumber;
             return true;
-        else
-            return false;
+        }
+        else if (iterFacility == m_FacilityMap.end() && iterTarget != m_TargetMap.end())
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::RemoveFacility iterFacility == m_FacilityMap.end() && iterTarget != m_TargetMap.end() ");
+        }
+        else if (iterFacility != m_FacilityMap.end() && iterTarget == m_TargetMap.end())
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::RemoveFacility iterFacility != m_FacilityMap.end() && iterTarget == m_TargetMap.end() ");
+        }
+
+        return false;
+
     }
 
     Target *Mission::InsertTarget(const string &name, const Target::TargetType type)
     {
-        if (m_TargetNumber != int(m_TargetList.size()))
+        if (m_TargetNumber != int(m_TargetMap.size()))
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::InsertTarget (SpaceVehicleNumber) != (SpaceVehicleList.Size)! ");
@@ -250,27 +259,40 @@ namespace SpaceDSL {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,"Undefined Target Type!");
         }
         pTarget->SetName(name);
+
+        int targetID = pTarget->GetID();
         ++m_TargetNumber;
-        m_TargetList.push_back(pTarget);
+        m_TargetMap.insert(pair<int, Target *>(targetID, pTarget));
 
         return pTarget;
     }
 
     bool Mission::RemoveTarget(const int id)
     {
-        for(auto iter = m_TargetList.begin();
-            iter != m_TargetList.end();
-            ++iter)
+        auto iterFacility = m_FacilityMap.find(id);
+        auto iterTarget = m_TargetMap.find(id);
+        if (iterFacility != m_FacilityMap.end() && iterTarget != m_TargetMap.end())
         {
-            if ((*iter)->GetID() == id)
-            {
-                delete *iter;
-                m_TargetList.erase(iter);
-                --m_TargetNumber;
-                return true;
-            }
-
+            delete iterFacility->second;
+            m_FacilityMap.erase(iterFacility);
+            m_TargetMap.erase(iterTarget);
+            --m_FacilityNumber;
+            --m_TargetNumber;
+            return true;
         }
+        else if (iterFacility == m_FacilityMap.end() && iterTarget != m_TargetMap.end())
+        {
+            delete iterTarget->second;
+            m_TargetMap.erase(iterTarget);
+            --m_TargetNumber;
+            return true;
+        }
+        else if (iterFacility != m_FacilityMap.end() && iterTarget == m_TargetMap.end())
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::RemoveTarget iterFacility != m_FacilityMap.end() && iterTarget == m_TargetMap.end() ");
+        }
+
         return false;
     }
 
@@ -278,7 +300,7 @@ namespace SpaceDSL {
                                  const int maxDegree , const int maxOrder , const ThirdBodyGravitySign thirdBodyGravSign,
                                  const GeodeticCoordSystem::GeodeticCoordType geodeticType ,
                                  const AtmosphereModel::AtmosphereModelType atmModelType ,
-                                 const double f107A , const double f107, double ap[],
+                                 const double f107A , const double f107, VectorXd ap,
                                  bool isUseDrag, bool isUseSRP)
     {
         if (m_pEnvironment == nullptr)
@@ -310,22 +332,22 @@ namespace SpaceDSL {
                                 const double minStep, const double maxStep, const int maxStepAttempts,
                                 const bool bStopIfAccuracyIsViolated, const bool isUseNormalize)
     {
-        if (m_pPropagator == nullptr)
+        if (m_pInitialPropagator == nullptr)
         {
-            m_pPropagator = new Propagator( integMethodType,  initialStep,  accuracy,
+            m_pInitialPropagator = new Propagator( integMethodType,  initialStep,  accuracy,
                                             minStep,   maxStep,    maxStepAttempts,
                                             bStopIfAccuracyIsViolated,  isUseNormalize );
         }
         else
         {
-            m_pPropagator->SetIntegMethodType(integMethodType);
-            m_pPropagator->SetInitialStep(initialStep);
-            m_pPropagator->SetAccuracy(accuracy);
-            m_pPropagator->SetMinStep(minStep);
-            m_pPropagator->SetMaxStep(maxStep) ;
-            m_pPropagator->SetMaxStepAttempts(maxStepAttempts)  ;
-            m_pPropagator->SetStopIfAccuracyIsViolated(bStopIfAccuracyIsViolated);
-            m_pPropagator->SetIsUseNormalize(isUseNormalize) ;
+            m_pInitialPropagator->SetIntegMethodType(integMethodType);
+            m_pInitialPropagator->SetInitialStep(initialStep);
+            m_pInitialPropagator->SetAccuracy(accuracy);
+            m_pInitialPropagator->SetMinStep(minStep);
+            m_pInitialPropagator->SetMaxStep(maxStep) ;
+            m_pInitialPropagator->SetMaxStepAttempts(maxStepAttempts)  ;
+            m_pInitialPropagator->SetStopIfAccuracyIsViolated(bStopIfAccuracyIsViolated);
+            m_pInitialPropagator->SetIsUseNormalize(isUseNormalize) ;
         }
         m_bIsPropagatorInitialized = true;
     }
@@ -340,20 +362,20 @@ namespace SpaceDSL {
         m_bIsMissionSequenceInitialized = true;
     }
 
-    const vector<SpaceVehicle *> &Mission::GetSpaceVehicleList() const
+    const map<int, SpaceVehicle *> &Mission::GetSpaceVehicleMap() const
     {
-        if (m_SpaceVehicleNumber != int(m_SpaceVehicleList.size())
+        if (m_SpaceVehicleNumber != int(m_SpaceVehicleMap.size())
            || m_SpaceVehicleNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::GetSpaceVehicleList (Space Vehicle Initialise Error)! ");
         }
-        return m_SpaceVehicleList;
+        return m_SpaceVehicleMap;
     }
 
     int Mission::GetSpaceVehicleNumber() const
     {
-        if (m_SpaceVehicleNumber != int(m_SpaceVehicleList.size())
+        if (m_SpaceVehicleNumber != int(m_SpaceVehicleMap.size())
            || m_SpaceVehicleNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -362,20 +384,20 @@ namespace SpaceDSL {
         return m_SpaceVehicleNumber;
     }
 
-    const vector<Facility *> &Mission::GetFacilityList() const
+    const map<int, Facility *> &Mission::GetFacilityMap() const
     {
-        if (m_FacilityNumber != int(m_FacilityList.size())
+        if (m_FacilityNumber != int(m_FacilityMap.size())
            || m_FacilityNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::GetFacilityList (Facility Initialise Error)! ");
         }
-        return m_FacilityList;
+        return m_FacilityMap;
     }
 
     int Mission::GetFacilityNumber() const
     {
-        if (m_FacilityNumber != int(m_FacilityList.size())
+        if (m_FacilityNumber != int(m_FacilityMap.size())
            || m_FacilityNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -384,20 +406,20 @@ namespace SpaceDSL {
         return m_FacilityNumber;
     }
 
-    const vector<Target *> &Mission::GetTargetList() const
+    const map<int, Target *> &Mission::GetTargetMap() const
     {
-        if (m_TargetNumber != int(m_TargetList.size())
+        if (m_TargetNumber != int(m_TargetMap.size())
            || m_TargetNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::GetTargetList (Target Initialise Error)! ");
         }
-        return m_TargetList;
+        return m_TargetMap;
     }
 
     int Mission::GetTargetNumber() const
     {
-        if (m_TargetNumber != int(m_TargetList.size())
+        if (m_TargetNumber != int(m_TargetMap.size())
            || m_TargetNumber < 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -416,14 +438,14 @@ namespace SpaceDSL {
         return m_pEnvironment;
     }
 
-    Propagator *SpaceDSL::Mission::GetPropagator() const
+    Propagator *SpaceDSL::Mission::GetInitialPropagator() const
     {
         if (m_bIsPropagatorInitialized == false)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::Start (Propagator Uninitialised)! ");
         }
-        return m_pPropagator;
+        return m_pInitialPropagator;
     }
 
     const CalendarTime &Mission::GetInitialEpoch() const
@@ -456,24 +478,21 @@ namespace SpaceDSL {
         return m_DurationSec;
     }
 
-    double Mission::GetAverageOrbitalPeriod(const string &name) const
+    double Mission::GetAverageOrbitalPeriod(int vehicleID) const
     {
         OrbitElem elem;
         SpaceVehicle *pVehicle = nullptr;
-        int count = 0;
-        for(auto &veh:m_SpaceVehicleList)
-        {
-            if (veh->GetName() == name)
-            {
-                pVehicle = veh;
-                break;
-            }
-            ++count;
-        }
 
+        auto iter = m_SpaceVehicleMap.find(vehicleID);
+
+        if (iter == m_SpaceVehicleMap.end())
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::GetAverageOrbitalPeriod (Can not Find Space Vehicle in SpaceVehicleMap By ID)! ");
+
+        pVehicle = iter->second;
         if (pVehicle == nullptr)
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                      "Mission::GetAverageOrbitalPeriod (Can not Find  Input Space Vehicle Name)! ");
+                      "Mission::GetAverageOrbitalPeriod (Space Vehicle Ptr is NULL)! ");
 
         CartToOrbitElem (pVehicle->GetInitialCartState(), GM_Earth, elem);
         double T0 = 2*PI*sqrt(pow(elem.SMajAx(),3)/GM_Earth);
@@ -484,9 +503,9 @@ namespace SpaceDSL {
         return (Tt + T0)/2;
     }
 
-    vector<pair<UTCCalTime, UTCCalTime> > Mission::CalTargetAccessData(const string &vehicleName, const Target *target, int order, double precision)
+    vector<pair<UTCCalTime, UTCCalTime> > Mission::CalTargetAccessData(int vehicleID, const Target *target, int order, double precision)
     {
-        return m_pAccessAnalysis->CalTargetAccessData(vehicleName, target, order, precision);
+        return m_pAccessAnalysis->CalTargetAccessData(vehicleID, target, order, precision);
     }
 
     map<SpaceVehicle *, vector<pair<UTCCalTime, UTCCalTime> > > Mission::CalTargetAccessData(const Target *target, int order, double precision)
@@ -502,7 +521,7 @@ namespace SpaceDSL {
     void Mission::Start(bool bIsMultThread)
     {
         m_bIsMultThread = bIsMultThread;
-        if (m_SpaceVehicleNumber != int(m_SpaceVehicleList.size())
+        if (m_SpaceVehicleNumber != int(m_SpaceVehicleMap.size())
            || m_SpaceVehicleNumber <= 0)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
@@ -533,14 +552,16 @@ namespace SpaceDSL {
         if (m_bIsMultThread == false)
         {
             auto pMissionThread = new MissionThread(this);
+            pMissionThread->SetPriority(SpThread::Priority::HighestPriority);
             m_pMissionThreadPool->Start(pMissionThread);
         }
         else
         {
-            for (int id = 0; id < int(m_SpaceVehicleList.size()); ++id)
+            for (auto &vehiclePari:m_SpaceVehicleMap)
             {
                 auto pMissionThread = new MissionThread(this);
-                pMissionThread->SetSpaceVehicleIndex(id);
+                pMissionThread->SetPriority(SpThread::Priority::HighestPriority);
+                pMissionThread->SetSpaceVehicleIndex(vehiclePari.first);
                 m_pMissionThreadPool->Start(pMissionThread);
             }
         }
@@ -583,12 +604,21 @@ namespace SpaceDSL {
         m_SpaceVehicleNumber = 0;
         m_DurationSec = 0;
 
-        for (auto pVehicle:m_SpaceVehicleList)
+        for (auto &vehiclePair:m_SpaceVehicleMap)
         {
-            if (pVehicle != nullptr)
-                delete pVehicle;
+            if (vehiclePair.second != nullptr)
+                delete vehiclePair.second;
         }
-        m_SpaceVehicleList.clear();
+        m_SpaceVehicleMap.clear();
+
+        for (auto &targetPair:m_TargetMap)
+        {
+            if (targetPair.second != nullptr)
+                delete targetPair.second;
+        }
+        m_TargetMap.clear();
+
+        m_FacilityMap.clear();
 
         for (auto iter = m_ProcessDataMap.begin();
              iter != m_ProcessDataMap.end();
@@ -612,10 +642,10 @@ namespace SpaceDSL {
             m_pEnvironment = nullptr;
         }
 
-        if (m_pPropagator != nullptr)
+        if (m_pInitialPropagator != nullptr)
         {
-            delete m_pPropagator;
-            m_pPropagator = nullptr;
+            delete m_pInitialPropagator;
+            m_pInitialPropagator = nullptr;
         }
     }
 
@@ -640,9 +670,10 @@ namespace SpaceDSL {
     {
         m_SpaceVehicleIndex = -1;
         m_pMission = nullptr;
-        m_pSpaceVehicleList = nullptr;
+        m_pSpaceVehicleMap = nullptr;
         m_pEnvironment = nullptr;
-        m_pPropagator = nullptr;
+        m_pInitialPropagator = nullptr;
+        m_pSpaceVehiclPropagatorMap = nullptr;
         m_pProcessDataMap = nullptr;
     }
 
@@ -650,9 +681,10 @@ namespace SpaceDSL {
     {
         m_SpaceVehicleIndex = -1;
         m_pMission = pMission;
-        m_pSpaceVehicleList = &(pMission->m_SpaceVehicleList);
+        m_pSpaceVehicleMap = &(pMission->m_SpaceVehicleMap);
         m_pEnvironment = pMission->m_pEnvironment;
-        m_pPropagator = pMission->m_pPropagator;
+        m_pInitialPropagator = pMission->m_pInitialPropagator;
+        m_pSpaceVehiclPropagatorMap = &(pMission->m_SpaceVehiclPropagatorMap);
         m_pProcessDataMap = &(pMission->m_ProcessDataMap);
     }
 
@@ -665,9 +697,10 @@ namespace SpaceDSL {
     {
         m_SpaceVehicleIndex = -1;
         m_pMission = pMission;
-        m_pSpaceVehicleList = &(pMission->m_SpaceVehicleList);
+        m_pSpaceVehicleMap = &(pMission->m_SpaceVehicleMap);
         m_pEnvironment = pMission->m_pEnvironment;
-        m_pPropagator = pMission->m_pPropagator;
+        m_pInitialPropagator = pMission->m_pInitialPropagator;
+        m_pSpaceVehiclPropagatorMap = &(pMission->m_SpaceVehiclPropagatorMap);
         m_pProcessDataMap = &(pMission->m_ProcessDataMap);
     }
 
@@ -713,9 +746,11 @@ namespace SpaceDSL {
 
         if (m_SpaceVehicleIndex == -1)
         {
-            for (auto pVehicle:(*m_pSpaceVehicleList))
+            for (auto &vehiclePair:(*m_pSpaceVehicleMap))
             {
-                m_pPropagator->ResetAdaptedStep();
+                SpaceVehicle *pVehicle = vehiclePair.second;
+                Propagator * pPropagator = m_pSpaceVehiclPropagatorMap->find(pVehicle->GetID())->second;
+                *pPropagator = *m_pInitialPropagator;
                 OrbitPredict orbit;
                 OrbitPredictConfig predictConfig;
 
@@ -725,8 +760,12 @@ namespace SpaceDSL {
                 vel = pVehicle->GetCartState().Vel();
                 mass = pVehicle->GetMass();
 
+                auto Ap = m_pEnvironment->GetGeomagneticIndex();
+                double *ap = new double[7];
+                memcpy(ap, &Ap[0], 7*sizeof(double));
+
                 predictConfig.Initializer(Mjd_UTC0, m_pEnvironment->GetCenterStarType(),
-                                          m_pPropagator->GetIsUseNormalize(),
+                                          pPropagator->GetIsUseNormalize(),
                                           m_pEnvironment->GetGravModelType(),
                                           m_pEnvironment->GetGravMaxDegree() ,
                                           m_pEnvironment->GetGravMaxOrder(),
@@ -737,23 +776,23 @@ namespace SpaceDSL {
                                           pVehicle->GetDragArea(),
                                           m_pEnvironment->GetAverageF107(),
                                           m_pEnvironment->GetDailyF107(),
-                                          m_pEnvironment->GetGeomagneticIndex(),
+                                          ap,
                                           pVehicle->GetSRPCoef(),
                                           pVehicle->GetSRPArea(),
                                           m_pEnvironment->GetIsUseDrag(),
                                           m_pEnvironment->GetIsUseSRP());
                 LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
                 this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
-                double step = 0;
+                double step = 0.0;
                 while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
                 {
                     if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
                     {
                         step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
-                        m_pPropagator->SetAdaptedStep(step);
+                        pPropagator->SetAdaptedStep(step);
                     }
                     predictConfig.Update(Mjd_UTC);
-                    step = orbit.OrbitStep(predictConfig, m_pPropagator, mass, pos, vel);
+                    step = orbit.OrbitStep(predictConfig, pPropagator, mass, pos, vel);
                     Mjd_UTC +=  step/DayToSec;
                     LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
                     pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
@@ -761,16 +800,21 @@ namespace SpaceDSL {
                     MjdToCalendarTime(Mjd_UTC, m_pMission->m_TerminationEpoch);
                 }
 
+                delete [] ap;
             }
 
         }
         else
         {
-            if (m_SpaceVehicleIndex >= int(m_pSpaceVehicleList->size()))
-                throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                          "MissionThread::Run (m_SpaceVehicleIndex >= m_pSpaceVehicleList->size())");
+            auto iter = m_pSpaceVehicleMap->find(m_SpaceVehicleIndex);
 
-            auto pVehicle = (*m_pSpaceVehicleList)[m_SpaceVehicleIndex];
+            if (iter == m_pSpaceVehicleMap->end())
+                throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                          "MissionThread::Run (Can Find Vehicle in SpaceVehicleMap by index ID)");
+
+            SpaceVehicle *pVehicle = iter->second;
+            Propagator * pPropagator = m_pSpaceVehiclPropagatorMap->find(pVehicle->GetID())->second;
+            *pPropagator = *m_pInitialPropagator;
 
             OrbitPredict orbit;
             OrbitPredictConfig predictConfig;
@@ -781,8 +825,12 @@ namespace SpaceDSL {
             vel = pVehicle->GetCartState().Vel();
             mass = pVehicle->GetMass();
 
+            auto Ap = m_pEnvironment->GetGeomagneticIndex();
+            double *ap = new double[7];
+            memcpy(ap, &Ap[0], 7*sizeof(double));
+
             predictConfig.Initializer(Mjd_UTC0, m_pEnvironment->GetCenterStarType(),
-                                      m_pPropagator->GetIsUseNormalize(),
+                                      pPropagator->GetIsUseNormalize(),
                                       m_pEnvironment->GetGravModelType(),
                                       m_pEnvironment->GetGravMaxDegree() ,
                                       m_pEnvironment->GetGravMaxOrder(),
@@ -793,31 +841,31 @@ namespace SpaceDSL {
                                       pVehicle->GetDragArea(),
                                       m_pEnvironment->GetAverageF107(),
                                       m_pEnvironment->GetDailyF107(),
-                                      m_pEnvironment->GetGeomagneticIndex(),
+                                      ap,
                                       pVehicle->GetSRPCoef(),
                                       pVehicle->GetSRPArea(),
                                       m_pEnvironment->GetIsUseDrag(),
                                       m_pEnvironment->GetIsUseSRP());
             LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
             this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
-            double step = 0;
+            double step = 0.0;
             while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
             {
                 if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
                 {
                     step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
-                    m_pPropagator->SetAdaptedStep(step);
+                    pPropagator->SetAdaptedStep(step);
                 }
                 predictConfig.Update(Mjd_UTC);
-                step = orbit.OrbitStep(predictConfig, m_pPropagator, mass, pos, vel);
+                step = orbit.OrbitStep(predictConfig, pPropagator, mass, pos, vel);
                 Mjd_UTC +=  step/DayToSec;
                 LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
                 pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
                 this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
                 MjdToCalendarTime(Mjd_UTC, m_pMission->m_TerminationEpoch);
-
             }
 
+            delete [] ap;
         }
 
     }

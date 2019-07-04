@@ -101,7 +101,7 @@ namespace SpaceDSL {
 
         inline void     SetSRPArea(const double SRPArea)                { m_SRPArea = SRPArea; }
 
-        inline int              GetID() const                       { return VehicleID; }
+        inline int              GetID() const                       { return m_ID; }
 
         inline const string&    GetName() const                     { return m_Name; }
 
@@ -149,7 +149,8 @@ namespace SpaceDSL {
 	// Attribute.
 	//
 	protected:
-        static atomic<int>      VehicleID;          ///< Aircraft ID
+        static atomic<int>      VehicleID;          ///< Aircraft Global Counter
+        int                     m_ID;               ///< Aircraft ID
         string                  m_Name;				///< Aircraft name
         double                  m_InitialEpoch;		///< Initial MJD Epoch of Aircraft
         double                  m_InitialMass;		///< Initial Mass of Aircraft
@@ -169,8 +170,7 @@ namespace SpaceDSL {
 
         //Sensor on Space Vehicle
         int                     m_SensorNumber;
-        vector<Sensor *>        m_SensorList;
-
+        vector<Sensor *>        m_SensorList;      
 
     };
 	

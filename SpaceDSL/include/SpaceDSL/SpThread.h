@@ -332,6 +332,7 @@ namespace SpaceDSL {
         void Run() override;
 
     private:
+        mutex                       m_StopLock;
         bool                        m_bIsInitialized;
         bool                        m_MonitorStart;
         bool                        *m_pIsStarted;

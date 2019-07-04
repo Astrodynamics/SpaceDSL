@@ -53,7 +53,7 @@ namespace SpaceDSL {
     atomic<int> SpaceVehicle::VehicleID(0);
     SpaceVehicle::SpaceVehicle()
     {
-        ++VehicleID;
+        m_ID = ++VehicleID;
         m_Name = "Default";
         m_InitialCartState = CartState();
         m_InitialEpoch = 0.0;
@@ -74,7 +74,7 @@ namespace SpaceDSL {
                                const double dragCoef, const double dragArea,
                                const double SRPCoef, const double SRPArea)
     {
-        ++VehicleID;
+        m_ID = ++VehicleID;
         m_Name = name;
         m_InitialCartState = initialState;
         m_InitialEpoch = CalendarTimeToMjd(initialEpoch);
@@ -95,7 +95,7 @@ namespace SpaceDSL {
                                const double dragCoef, const double dragArea,
                                const double SRPCoef, const double SRPArea)
     {
-        ++VehicleID;
+        m_ID = ++VehicleID;
         m_Name = name;
         m_InitialCartState = initialState;
         m_InitialEpoch = initialEpoch;

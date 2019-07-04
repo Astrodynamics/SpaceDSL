@@ -53,7 +53,7 @@ namespace SpaceDSL {
     atomic<int> Target::TargetID(0);
     Target::Target()
     {
-        ++TargetID;
+        m_ID = ++TargetID;
         m_TargetType = E_NotDefindTargetType;
     }
 

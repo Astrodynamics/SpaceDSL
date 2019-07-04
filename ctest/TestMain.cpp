@@ -34,10 +34,11 @@ int main(int argc, char *argv[])
         ThirdBodyGravitySign thirdGravSign;
         thirdGravSign.bIsUseSunGrav = true;
         thirdGravSign.bIsUseMoonGrav = true;
-        double ap[7];
-        for (int i = 0; i < 7; ++i)
-            ap[i] = 0;
-        ap[0] = 14.9186481659685;
+        double kp = 3.0;
+        VectorXd ap;
+        ap.resize(7);
+        ap.fill(0.0);
+        ap(0) = GeomagneticKpToAp(kp);
         pMission->SetEnvironment(E_Earth, GravityModel::GravModelType::E_EGM08Model,
                                  20 , 20, thirdGravSign,
                                  GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,
@@ -47,9 +48,9 @@ int main(int argc, char *argv[])
         pMission->SetPropagator(E_RungeKutta4, 60);
         //pMission->SetPropagator(E_RungeKutta78, 60, 0.01, 1, 120, 100);
         pMission->SetMissionSequence(initial_time, 86123);
-        pMission->Start();
+        pMission->Start(true);
 
-        cout<<"------First Calculation ------"<<endl;
+        cout<<"------First Calculation Finished ------"<<endl;
         pMission->CalMissionAccessData();
         auto accessListMap = pMission->GetAccessData();
         for (auto iterMap = accessListMap->begin();
@@ -74,7 +75,7 @@ int main(int argc, char *argv[])
         pMission->Start();
 
         pMission->CalMissionAccessData();
-        cout<<"------Second Calculation ------"<<endl;
+        cout<<"------Second Calculation Finished ------"<<endl;
         accessListMap = pMission->GetAccessData();
         for (auto iterMap = accessListMap->begin();
              iterMap != accessListMap->end();

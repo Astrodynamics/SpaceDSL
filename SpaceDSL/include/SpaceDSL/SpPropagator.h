@@ -61,6 +61,8 @@ namespace SpaceDSL {
                    const bool bStopIfAccuracyIsViolated = true, const bool isUseNormalize = false);
         ~Propagator();
 
+        void            operator =(const Propagator& propagator);
+
     public:
         inline void     SetIntegMethodType(const IntegMethodType  integMethodType)        { m_IntegMethodType = integMethodType; }
 

@@ -86,8 +86,7 @@ namespace SpaceDSL {
         /// @Author     Niu Zhiyong
         /// @Date       2018-07-27
         /// @Input
-        /// @Param  halfAngle1    	Cone Half Angle/Horizontal Half Angle
-        /// @Param	halfAngle2		Vertical Half Angle
+        /// @Param      initialState[m,m/s] initialMass[kg]
         /// @Output
         /// @Param
         /// @Return SpaceVehicle *  The SpaceVehicle Point Which Insert into The Mission
@@ -104,8 +103,7 @@ namespace SpaceDSL {
         /// @Author     Niu Zhiyong
         /// @Date       2018-12-26
         /// @Input
-        /// @Param  halfAngle1    	Cone Half Angle/Horizontal Half Angle
-        /// @Param	halfAngle2		Vertical Half Angle
+        /// @Param      Longitude [rad] Latitude [rad] Altitude [m] minElevation [rad]
         /// @Output
         /// @Param
         /// @Return Facility *      The Facility Point Which Insert into The Mission
@@ -133,7 +131,7 @@ namespace SpaceDSL {
                                        const int maxDegree , const int maxOrder , const ThirdBodyGravitySign thirdBodyGravSign,
                                        const GeodeticCoordSystem::GeodeticCoordType geodeticType ,
                                        const AtmosphereModel::AtmosphereModelType atmModelType ,
-                                       const double f107A , const double f107, double ap[],
+                                       const double f107A , const double f107, VectorXd ap,
                                        bool isUseDrag, bool isUseSRP);
 
         void            SetPropagator(const IntegMethodType integMethodType, const double initialStep, const double accuracy = 0,
@@ -144,21 +142,21 @@ namespace SpaceDSL {
 
         void            SetMissionSequence(const CalendarTime& initialEpoch,  double durationSec);
 
-        const vector<SpaceVehicle *>            &GetSpaceVehicleList() const;
+        const map<int, SpaceVehicle *>          &GetSpaceVehicleMap() const;
 
         int                                     GetSpaceVehicleNumber() const;
 
-        const vector<Facility *>                &GetFacilityList() const;
+        const map<int, Facility *>              &GetFacilityMap() const;
 
         int                                     GetFacilityNumber() const;
 
-        const vector<Target *>                  &GetTargetList() const;
+        const map<int, Target *>                &GetTargetMap() const;
 
         int                                     GetTargetNumber() const;
 
         Environment                             *GetEnvironment() const;
 
-        Propagator                              *GetPropagator() const;
+        Propagator                              *GetInitialPropagator() const;
 
         const CalendarTime                      &GetInitialEpoch() const;
 
@@ -166,7 +164,7 @@ namespace SpaceDSL {
 
         double                                  GetDurationTime() const;
 
-        double                                  GetAverageOrbitalPeriod(const string &name)  const;
+        double                                  GetAverageOrbitalPeriod(int vehicleID)  const;
 
 
         /********************************************************************/
@@ -181,7 +179,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return     List<Start Mjd, End Mjd >
         /**********************************************************************/
-        vector<pair<UTCCalTime, UTCCalTime > >                      CalTargetAccessData(const string &vehicleName, const Target *target,
+        vector<pair<UTCCalTime, UTCCalTime > >                      CalTargetAccessData(int vehicleID, const Target *target,
                                                                                         int order = 5, double precision = 0.01);
 
         /********************************************************************/
@@ -208,15 +206,38 @@ namespace SpaceDSL {
         /// @Output
         /// @Return
         /**********************************************************************/
-        void                                            CalMissionAccessData(int order = 5, double precision = 0.01);
+        void    CalMissionAccessData(int order = 5, double precision = 0.01);
 
+        /********************************************************************/
+        /// Start Mission Calculation
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-01-04
+        /// @Input
+        /// @Param      bIsMultThread       If bIsMultThread = true ,Every Vehicle has a Thread
+        /// @Output
+        /// @Return
+        /**********************************************************************/
+        void    Start(bool bIsMultThread = false);
 
+        /********************************************************************/
+        /// Clear All Process Data in Mission
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-01-04
+        /// @Input
+        /// @Output
+        /// @Return
+        /**********************************************************************/
+        void    ClearProcessData();
 
-        void                                            Start(bool bIsMultThread = false);
-
-        void                                            ClearProcessData();
-
-        void                                            Clear();
+        /********************************************************************/
+        /// Clear All Data in Mission
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-01-04
+        /// @Input
+        /// @Output
+        /// @Return
+        /**********************************************************************/
+        void    Clear();
 
         const map<SpaceVehicle *, vector<double *> *>                                       *GetProcessDataMap() const;
 
@@ -231,14 +252,16 @@ namespace SpaceDSL {
         bool                                    m_bIsMultThread;
 
         int                                     m_SpaceVehicleNumber;
-        vector<SpaceVehicle *>                  m_SpaceVehicleList;
+        map<int, SpaceVehicle *>                m_SpaceVehicleMap;
+        map<int, Propagator *>                  m_SpaceVehiclPropagatorMap;        ///< Each Spacecraft has its own Propagator to
+                                                                                   ///< Support Adaptive Step-Size Parallel Computing
         int                                     m_FacilityNumber;
-        vector<Facility *>                      m_FacilityList;                     ///< m_FacilityList is Subaggregate of m_TargetList
+        map<int, Facility *>                    m_FacilityMap;                     ///< m_FacilityList is Subaggregate of m_TargetList
         int                                     m_TargetNumber;
-        vector<Target *>                        m_TargetList;
+        map<int, Target *>                      m_TargetMap;
 
         Environment                             *m_pEnvironment;
-        Propagator                              *m_pPropagator;
+        Propagator                              *m_pInitialPropagator;
 
         CalendarTime                            m_InitialEpoch;
         CalendarTime                            m_TerminationEpoch;
@@ -273,6 +296,20 @@ namespace SpaceDSL {
         void    SetSpaceVehicleIndex(int index);
 
     protected:
+        /********************************************************************/
+        /// Save Data Line for a SpaceVehicle
+        /// @Author     Niu Zhiyong
+        /// @Date       2019-01-04
+        /// @Input
+        /// @Param      pVehicle      Data owner
+        /// @Param      Mjd
+        /// @Param      pos
+        /// @Param      vel
+        /// @Param      LLA           Lat, Lon, Alt
+        /// @Param      mass
+        /// @Output
+        /// @Return
+        /**********************************************************************/
         void    SaveProcessDataLine(SpaceVehicle *pVehicle, const double Mjd,
                                     const Vector3d &pos, const Vector3d &vel,
                                     const GeodeticCoord &LLA, const double mass);
@@ -283,9 +320,10 @@ namespace SpaceDSL {
     private:
         int                                 m_SpaceVehicleIndex;
         Mission                             *m_pMission;
-        vector<SpaceVehicle *>              *m_pSpaceVehicleList;
+        map<int, SpaceVehicle *>            *m_pSpaceVehicleMap;
         Environment                         *m_pEnvironment;
-        Propagator                          *m_pPropagator;
+        map<int, Propagator *>              *m_pSpaceVehiclPropagatorMap;
+        Propagator                          *m_pInitialPropagator;
 
         ///< [Vehicle, [Mjd_UTC, pos(3), vel(3), LLA(3), mass]]
         map<SpaceVehicle *, vector<double *> *>     *m_pProcessDataMap;

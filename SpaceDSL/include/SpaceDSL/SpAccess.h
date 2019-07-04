@@ -94,7 +94,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return     List<Start Mjd, End Mjd >
         /**********************************************************************/
-        vector<pair<UTCCalTime, UTCCalTime> > CalTargetAccessData(const string &vehicleName, const Target *target,
+        vector<pair<UTCCalTime, UTCCalTime> > CalTargetAccessData(int vehicleID, const Target *target,
                                                                   int order = 5, double precision = 0.01);
 
         /********************************************************************/
@@ -146,8 +146,8 @@ namespace SpaceDSL {
     //
     protected:
         Mission                                     *m_pMission;
-        vector<Target *>                            *m_pTargetList;
-        vector<SpaceVehicle *>                      *m_pSpaceVehicleList;
+        map<int, Target *>                          *m_pTargetMap;
+        map<int, SpaceVehicle *>                    *m_pSpaceVehicleMap;
         CalendarTime                                *m_pInitialEpoch;
         CalendarTime                                *m_pTerminationEpoch;
 

@@ -938,18 +938,20 @@ namespace SpaceDSL {
     {
         double Mjd_TT = t * SecToDay;
         Vector3d acceleration;
-        acceleration.fill(0);
+        acceleration.fill(0.0);
         Vector3d pos;
         pos(0) = x(0);  pos(1) = x(1);  pos(2) = x(2);
         Vector3d vel;
         vel(0) = x(3);  vel(1) = x(4);  vel(2) = x(5);
+        double mass = x(6);
         double Mjd_UTC = Mjd_TT - m_pOrbitPredictConfig->GetTT_UTC()/DayToSec;
         Matrix3d J2000toECFMtx = GeodeticCoordSystem::GetJ2000ToECFMtx(Mjd_UTC);
 
         /// Harmonic Gravity
         acceleration += m_pGravityModel->AccelHarmonicGravity(pos, J2000toECFMtx,
                                                             m_pOrbitPredictConfig->GetGravMaxDegree(),
-                                                            m_pOrbitPredictConfig->GetGravMaxOrder());
+                                                           m_pOrbitPredictConfig->GetGravMaxOrder());
+
         /// Atmospheric Drag
         if (m_pOrbitPredictConfig->IsUseDrag())
         {
@@ -959,11 +961,10 @@ namespace SpaceDSL {
                                                                             pos, vel,
                                                                             m_pOrbitPredictConfig->GetDragArea(),
                                                                             m_pOrbitPredictConfig->GetDragCoef(),
-                                                                            x(6),
+                                                                            mass,
                                                                             m_pOrbitPredictConfig->GetAverageF107(),
                                                                             m_pOrbitPredictConfig->GetDailyF107(),
                                                                             m_pOrbitPredictConfig->GetGeomagneticIndex());
-            //cout<<Mjd_UTC<<"  "<<dragAccel(0)<<"  "<<dragAccel(1)<<"  "<<dragAccel(2)<<endl;
             acceleration += dragAccel;
         }
 
@@ -973,7 +974,7 @@ namespace SpaceDSL {
             acceleration += m_pSolarRadPressure->AccelSolarRad( Mjd_TT, pos,
                                                                 m_pOrbitPredictConfig->GetSRPArea(),
                                                                 m_pOrbitPredictConfig->GetDragCoef(),
-                                                                x(6));
+                                                                mass);
         }
 
         /// Third Body Gravity
@@ -1053,6 +1054,7 @@ namespace SpaceDSL {
         {
             result(i) = vel(i);
         }
+
         result(3) = acceleration(0);
         result(4) = acceleration(1);
         result(5) = acceleration(2);
@@ -1099,7 +1101,6 @@ namespace SpaceDSL {
 
         if (m_pRungeKutta == nullptr)
             m_pRungeKutta = new RungeKutta(pPropagator->GetIntegMethodType());
-
 
         double adaptedStep = m_pRungeKutta->OneStep(m_pRightFunc, Mjd_TT*DayToSec ,x, pPropagator->GetAdaptedStep(), result,
                                                     pPropagator->GetMinStep(), pPropagator->GetMaxStep(),
