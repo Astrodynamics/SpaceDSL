@@ -174,7 +174,13 @@ namespace SpaceDSL {
                 {
                     for (int i = midNum; i > 0; --i)
                     {
-                        auto dataTemp = (*(iterVehicle->second))[count - i];
+                        int i_temp;
+                        if (count - i < 0)
+                            i_temp = 0;
+                        else
+                            i_temp = count - i;
+
+                        auto dataTemp = (*(iterVehicle->second))[i_temp];
                         startMjdList(midNum - i) = dataTemp[0];
                         Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                         Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);
@@ -208,7 +214,13 @@ namespace SpaceDSL {
 
                 for (int i = midNum; i > 0; --i)
                 {
-                    auto dataTemp = (*(iterVehicle->second))[count - i];
+                    int i_temp;
+                    if (count - i < 0)
+                        i_temp = 0;
+                    else
+                        i_temp = count - i;
+
+                    auto dataTemp = (*(iterVehicle->second))[i_temp];
                     endMjdList(midNum - i) = dataTemp[0];
                     Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                     Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);
@@ -322,7 +334,13 @@ namespace SpaceDSL {
                     {
                         for (int i = midNum; i > 0; --i)
                         {
-                            auto dataTemp = (*(iterVehicle->second))[count - i];
+                            int i_temp;
+                            if (count - i < 0)
+                                i_temp = 0;
+                            else
+                                i_temp = count - i;
+
+                            auto dataTemp = (*(iterVehicle->second))[i_temp];
                             startMjdList(midNum - i) = dataTemp[0];
                             Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                             Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);
@@ -356,7 +374,13 @@ namespace SpaceDSL {
 
                     for (int i = midNum; i > 0; --i)
                     {
-                        auto dataTemp = (*(iterVehicle->second))[count - i];
+                        int i_temp;
+                        if (count - i < 0)
+                            i_temp = 0;
+                        else
+                            i_temp = count - i;
+
+                        auto dataTemp = (*(iterVehicle->second))[i_temp];
                         endMjdList(midNum - i) = dataTemp[0];
                         Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                         Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);
@@ -478,7 +502,13 @@ namespace SpaceDSL {
                         {
                             for (int i = midNum; i > 0; --i)
                             {
-                                auto dataTemp = (*(iterVehicle->second))[count - i];
+                                int i_temp;
+                                if (count - i < 0)
+                                    i_temp = 0;
+                                else
+                                    i_temp = count - i;
+
+                                auto dataTemp = (*(iterVehicle->second))[i_temp];
                                 startMjdList(midNum - i) = dataTemp[0];
                                 Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                                 Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);
@@ -512,7 +542,13 @@ namespace SpaceDSL {
 
                         for (int i = midNum; i > 0; --i)
                         {
-                            auto dataTemp = (*(iterVehicle->second))[count - i];
+                            int i_temp;
+                            if (count - i < 0)
+                                i_temp = 0;
+                            else
+                                i_temp = count - i;
+
+                            auto dataTemp = (*(iterVehicle->second))[i_temp];
                             endMjdList(midNum - i) = dataTemp[0];
                             Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                             Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);
