@@ -70,7 +70,6 @@ endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "#CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
-    target_link_libraries(${TargetName} ${OPENSSL_LIBRARIES})
 else()
     message(STATUS "#CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
     target_link_libraries(${TargetName} pthread)

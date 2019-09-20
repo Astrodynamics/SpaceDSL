@@ -21,6 +21,9 @@ set(BUILD_SHARED_LIBS ON)
 set(CMAKE_DEBUG_POSTFIX "_d")
 
 # Set if build With OpenSSL or not
+option(BUILD_PYTHON "Build Python Library." TRUE)
+
+# Set if build With OpenSSL or not
 option(USE_OPENSSL "Build With OpenSSL." FALSE)
 
 # Set folder in project dir
@@ -30,11 +33,12 @@ add_subdirectory(Dependence)
 add_subdirectory(SpaceDSL)
 add_subdirectory(NLOpt)
 add_subdirectory(ElectronVisualizer)
+add_subdirectory(Python)
 
 # Set Data File path
 SET(AstroData_DIR ${PROJECT_SOURCE_DIR}/astrodata)
 # Set Dependence path
-SET(Dependence_DIR ${PROJECT_SOURCE_DIR}/Dependence/Eigen)
+SET(Dependence_DIR ${PROJECT_SOURCE_DIR}/Dependence)
 
 # Set if build test file or not
 option(BUILD_TESTS "Build Tests." TRUE)
@@ -44,6 +48,7 @@ if (BUILD_TESTS)
 endif()
 
 FILE(COPY ${AstroData_DIR} DESTINATION ${ALL_OUTPUT_PATH})
+FILE(COPY ${Dependence_DIR} DESTINATION ${ALL_OUTPUT_PATH})
 
 # Make Install File
 INSTALL(DIRECTORY ${AstroData_DIR} DESTINATION ${ALL_OUTPUT_PATH}/Install)
