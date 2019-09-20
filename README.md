@@ -6,7 +6,7 @@
 The purpose is to provide an open framework for astronaut dynamics enthusiasts, and more freely to achieve astrodynamics simulation. 
 The project is open under the `MIT` protocol, and it is also for freer purposes. 
 The project is built with CMake and can be used on `Windows`, `Linux` and `Mac OS`. 
-This library can compiled into `static library` or `dynamic library`. Of course, it can also be used directly.
+This library can compiled into `static library`, `dynamic library` and `python library`. Of course, it can also be used directly.
 
 ## Core features
 

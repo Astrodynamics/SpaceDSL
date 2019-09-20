@@ -11,12 +11,18 @@ project(PySpaceDSL)
 # Set  C++ standard version
 set(CMAKE_CXX_STANDARD 14)
 
+# Find Python
+if (NOT BUILD_PYTHON)
+    return()
+endif()
+
 # Set src file list
 aux_source_directory (${PROJECT_SOURCE_DIR}/../SpaceDSL/source/ SRC_LIST)
 aux_source_directory (${PROJECT_SOURCE_DIR}/../SpaceDSL/source/jpl SRC_LIST)
 aux_source_directory (${PROJECT_SOURCE_DIR}/../SpaceDSL/source/nrlmsise00 SRC_LIST)
 aux_source_directory (${PROJECT_SOURCE_DIR}/../SpaceDSL/source/gsoap SRC_LIST)
 aux_source_directory (${PROJECT_SOURCE_DIR}/../SpaceDSL/source/sxp SRC_LIST)
+aux_source_directory (${PROJECT_SOURCE_DIR} SRC_LIST)
 
 # Set Include h file path
 list(APPEND PYLIB_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/../Dependence)
@@ -24,12 +30,12 @@ list(APPEND PYLIB_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/../SpaceDSL/include)
 list(APPEND PYLIB_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/../SpaceDSL/include/SpaceDSL)
 
 
-# Set if build With Python or not
-if (BUILD_PYTHON)
-    find_package(PythonLibs REQUIRED)
-    message(STATUS "#PYTHON_INCLUDE_DIR = ${PYTHON_INCLUDE_DIR}")
-    list(APPEND PYLIB_INCLUDE_DIRS ${PYTHON_INCLUDE_DIR})
-endif()
+message(STATUS "#PYTHON_INCLUDE_DIRS = ${PYTHON_INCLUDE_DIRS}")
+message(STATUS "#PYTHON_LIBRARIES = ${PYTHON_LIBRARIES}")
+message(STATUS "#PYTHON_DEBUG_LIBRARIES = ${PYTHON_DEBUG_LIBRARIES}")
+message(STATUS "#PYTHON_EXECUTABLE = ${PYTHON_EXECUTABLE}")
+message(STATUS "#PYTHON_MODULE_PREFIX = ${PYTHON_MODULE_PREFIX}")
+message(STATUS "#PYTHON_MODULE_EXTENSION = ${PYTHON_MODULE_EXTENSION}")
 
 # Set if build With OpenSSL or not
 if (USE_OPENSSL)
@@ -50,10 +56,11 @@ set(LIBRARY_OUTPUT_PATH  ${ALL_OUTPUT_PATH})
 message(STATUS "#ALL_OUTPUT_PATH=${ALL_OUTPUT_PATH}")
 
 
-ADD_DEFINITIONS(-DSPACEDSL_SHARED_LIBRARY)
+#ADD_DEFINITIONS(-DSPACEDSL_SHARED_LIBRARY)
+ADD_DEFINITIONS(-DSPACEDSL_STATIC_LIBRARY)
 SET(TargetName PySpaceDSL)
 # Set the build postfix extension according to what configuration is being built.
-ADD_LIBRARY(${TargetName} SHARED ${SRC_LIST})
+pybind11_add_module(${TargetName} ${SRC_LIST})
 
 #target_link_libraries(${TargetName} PRIVATE pybind11::module)
 SET_TARGET_PROPERTIES(${TargetName} PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}"
@@ -66,11 +73,6 @@ else()
     message(STATUS "#CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
     target_link_libraries(${TargetName} pthread)
 endif()
-
-
-message(STATUS "#Target Link PYTHON_LIBRARIES_DIR = ${PYTHON_LIBRARIES}")
-target_link_libraries(${TargetName} ${PYTHON_LIBRARIES})
-
 
 if(OPENSSL_FOUND)
     message(STATUS "#Target Link OPENSSL_LIBRARIES_DIR = ${OPENSSL_LIBRARIES}")
