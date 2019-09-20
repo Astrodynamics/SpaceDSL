@@ -36,6 +36,7 @@ This library can compiled into `static library` or `dynamic library`. Of course,
 - [Eigen3 library](http://eigen.tuxfamily.org): a C++ template library for linear algebra.`Be careful！ The library must be recompiled when using SpaceDSL dynamic library`.
 All the files of the Eigen3.3.7 have been included in the project.
 - [JSON for Modern C++ V3.6.1](https://github.com/nlohmann/json): a headonly JSON lib, Used the c++11 standard and Support STL.
+- [pybind11 V2.4.0](https://github.com/pybind/pybind11): pybind11 is a lightweight header-only library that exposes C++ types in Python and vice versa, mainly to create Python bindings of existing C++ code.
 - [OpenSSL](https://www.openssl.org/):OpenSSL is a robust, commercial-grade, and full-featured toolkit for the Transport Layer Security (TLS) and Secure Sockets Layer (SSL) protocols.
 If you want to use IERS Web Service, this library must be Precompiled.
 
