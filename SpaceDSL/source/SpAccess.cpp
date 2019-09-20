@@ -194,7 +194,15 @@ namespace SpaceDSL {
                     {
                         if (midNum + i < order)
                         {
-                            auto dataTemp = (*(iterVehicle->second))[count + i];
+                            int dataSize = (*(iterVehicle->second)).size();
+                            int i_temp;
+                            if ( count + i >=  dataSize)
+                                i_temp = dataSize - 1;
+                            else
+                                i_temp = count + i;
+
+                            auto dataTemp = (*(iterVehicle->second))[i_temp];
+
                             startMjdList(midNum + i) = dataTemp[0];
                             Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                             Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);
@@ -234,7 +242,14 @@ namespace SpaceDSL {
                 {
                     if (midNum + i < order)
                     {
-                        auto dataTemp = (*(iterVehicle->second))[count + i];
+                        int dataSize = (*(iterVehicle->second)).size();
+                        int i_temp;
+                        if ( count + i >=  dataSize)
+                            i_temp = dataSize - 1;
+                        else
+                            i_temp = count + i;
+
+                        auto dataTemp = (*(iterVehicle->second))[i_temp];
                         endMjdList(midNum + i) = dataTemp[0];
                         Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                         Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);
@@ -394,7 +409,14 @@ namespace SpaceDSL {
                     {
                         if (midNum + i < order)
                         {
-                            auto dataTemp = (*(iterVehicle->second))[count + i];
+                            int dataSize = (*(iterVehicle->second)).size();
+                            int i_temp;
+                            if ( count + i >=  dataSize)
+                                i_temp = dataSize - 1;
+                            else
+                                i_temp = count + i;
+
+                            auto dataTemp = (*(iterVehicle->second))[i_temp];
                             endMjdList(midNum + i) = dataTemp[0];
                             Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                             Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);
@@ -562,7 +584,14 @@ namespace SpaceDSL {
                         {
                             if (midNum + i < order)
                             {
-                                auto dataTemp = (*(iterVehicle->second))[count + i];
+                                int dataSize = (*(iterVehicle->second)).size();
+                                int i_temp;
+                                if ( count + i >=  dataSize)
+                                    i_temp = dataSize - 1;
+                                else
+                                    i_temp = count + i;
+
+                                auto dataTemp = (*(iterVehicle->second))[i_temp];
                                 endMjdList(midNum + i) = dataTemp[0];
                                 Vector3d posTemp(dataTemp[1], dataTemp[2], dataTemp[3]);
                                 Vector3d velTemp(dataTemp[4], dataTemp[5], dataTemp[6]);

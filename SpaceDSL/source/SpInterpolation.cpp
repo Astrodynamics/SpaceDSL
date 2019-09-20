@@ -133,6 +133,9 @@ namespace SpaceDSL {
         if(length != static_cast<int>(y.size()))
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "LagrangePolynomialInterpolation: x.size() != y.size()!");
 
+        if(fabs(x(length - 1) - x(0))/length <= step)
+            throw SPException(__FILE__, __FUNCTION__, __LINE__, "LagrangePolynomialInterpolation: step >= dx");
+
         double gradient = 0.0;
         for ( int i = 0; i < length; ++i )
         {
