@@ -128,7 +128,7 @@ namespace SpaceDSL {
     /**********************************************************************/
     bool SPACEDSL_API CalObservation(const double Mjd, const CartState &cart, Target *target, Observation &result);
 
-    bool SPACEDSL_API _CalObservation(const double Mjd, const CartState &cart, Target *target, Observation &result);
+    bool SPACEDSL_API CalObservationAll(const double Mjd, const CartState &cart, Target *target, Observation &result);
 
     /********************************************************************/
     /// Calculate Sun Observation Param From Point Target

@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        //_CalObservation();
+        //CalObservationAll();
 
         cout<<"Calculation Finished!"<<endl;
 

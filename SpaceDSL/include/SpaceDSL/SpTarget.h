@@ -117,9 +117,9 @@ namespace SpaceDSL {
         virtual ~PointTarget();
 
     public:
-        inline void		SetGeodeticCoord (const GeodeticCoord &LLA);
+        void SetGeodeticCoord (const GeodeticCoord &LLA);
 
-        inline void		SetGeodeticCoord (const double longitude, const double latitude, const double altitude);
+        void SetGeodeticCoord (const double longitude, const double latitude, const double altitude);
 
         inline const GeodeticCoord& GetGeodeticCoord() const            { return m_LonLatAltitude; }
 

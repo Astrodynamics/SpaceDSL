@@ -205,7 +205,7 @@ namespace SpaceDSL {
         return (arg*arg);
     }
 
-    bool _CalObservation(const double Mjd, const CartState &cart, Target *target, Observation &result)
+    bool CalObservationAll(const double Mjd, const CartState &cart, Target *target, Observation &result)
     {
         switch (target->GetTargetType())
         {
@@ -238,88 +238,88 @@ namespace SpaceDSL {
         /* incorporating atmospheric refraction.                              */
 
 
-            Vector3d obs_pos;
-            Vector3d obs_vel;
-            Vector3d range;
-            Vector3d rgvel;
+        Vector3d obs_pos;
+        Vector3d obs_vel;
+        Vector3d range;
+        Vector3d rgvel;
 
-            double lat = pointTarget->GetGeodeticCoord().Latitude();
-            double lon = pointTarget->GetGeodeticCoord().Longitude();
-            double alt = pointTarget->GetGeodeticCoord().Altitude() / 1000.0;
-            double theta = 0.0;
+        double lat = pointTarget->GetGeodeticCoord().Latitude();
+        double lon = pointTarget->GetGeodeticCoord().Longitude();
+        double alt = pointTarget->GetGeodeticCoord().Altitude() / 1000.0;
+        double theta = 0.0;
 
-            double c, sq, achcp;
-            double jd =Mjd + MJDOffset;
-            theta=FMod2p(ThetaG_JD(jd)+lon); /* LMST */
+        double c, sq, achcp;
+        double jd =Mjd + MJDOffset;
+        theta=FMod2p(ThetaG_JD(jd)+lon); /* LMST */
 
-            c=1/sqrt(1+EarthFlatFact*(EarthFlatFact-2)*Sqr(sin(lat)));
-            sq=Sqr(1-EarthFlatFact)*c;
-            achcp=(EarthRadius*c+alt)*cos(lat);
-            obs_pos[0] = (achcp*cos(theta)); /* kilometers */
-            obs_pos[1] = (achcp*sin(theta));
-            obs_pos[2] = ((EarthRadius*sq+alt)*sin(lat));
-            obs_vel[0] = (-EarthAngVel*obs_pos[1]); /* kilometers/second */
-            obs_vel[1] = (EarthAngVel*obs_pos[0]);
-            obs_vel[2] = (0);
-            //Calculate_User_PosVel(time, &geodetic, obs_pos, obs_vel);
+        c=1/sqrt(1+EarthFlatFact*(EarthFlatFact-2)*Sqr(sin(lat)));
+        sq=Sqr(1-EarthFlatFact)*c;
+        achcp=(EarthRadius*c+alt)*cos(lat);
+        obs_pos[0] = (achcp*cos(theta)); /* kilometers */
+        obs_pos[1] = (achcp*sin(theta));
+        obs_pos[2] = ((EarthRadius*sq+alt)*sin(lat));
+        obs_vel[0] = (-EarthAngVel*obs_pos[1]); /* kilometers/second */
+        obs_vel[1] = (EarthAngVel*obs_pos[0]);
+        obs_vel[2] = (0);
+        //Calculate_User_PosVel(time, &geodetic, obs_pos, obs_vel);
 
-            //vec3_sub(pos, obs_pos, range);
-            //vec3_sub(vel, obs_vel, rgvel);
-            range = cart.Pos() - obs_pos;
-            rgvel = cart.Vel() - obs_vel;
-
-
-            double range_length = range.norm();
-            double range_rate_length = range.dot(rgvel) / range_length;
-
-            double theta_dot = 2*PI*EarthRPSDay/DayToSec;
-            double sin_lat = sin(lat);
-            double cos_lat = cos(lat);
-            double sin_theta = sin(theta);
-            double cos_theta = cos(theta);
-
-            double top_s = sin_lat*cos_theta*range[0] + sin_lat*sin_theta*range[1] - cos_lat*range[2];
-            double top_e = -sin_theta*range[0] + cos_theta*range[1];
-            double top_z = cos_lat*cos_theta*range[0] + cos_lat*sin_theta*range[1] + sin_lat*range[2];
+        //vec3_sub(pos, obs_pos, range);
+        //vec3_sub(vel, obs_vel, rgvel);
+        range = cart.Pos() - obs_pos;
+        rgvel = cart.Vel() - obs_vel;
 
 
-            double top_s_dot = sin_lat*(cos_theta*rgvel[0] - sin_theta*range[0]*theta_dot) +
-                                sin_lat*(sin_theta*rgvel[1] + cos_theta*range[1]*theta_dot) -
-                                cos_lat*rgvel[2];
-            double top_e_dot = - (sin_theta*rgvel[0] + cos_theta*range[0]*theta_dot) +
-                                (cos_theta*rgvel[1] - sin_theta*range[1]*theta_dot);
+        double range_length = range.norm();
+        double range_rate_length = range.dot(rgvel) / range_length;
 
-            double top_z_dot = cos_lat * ( cos_theta*(rgvel[0] + range[1]*theta_dot) +
-                                        sin_theta*(rgvel[1] - range[0]*theta_dot) ) +
-                                        sin_lat*rgvel[2];
+        double theta_dot = 2*PI*EarthRPSDay/DayToSec;
+        double sin_lat = sin(lat);
+        double cos_lat = cos(lat);
+        double sin_theta = sin(theta);
+        double cos_theta = cos(theta);
 
-            // Azimut
-            double y = -top_e / top_s;
-            double az = atan(-top_e / top_s);
+        double top_s = sin_lat*cos_theta*range[0] + sin_lat*sin_theta*range[1] - cos_lat*range[2];
+        double top_e = -sin_theta*range[0] + cos_theta*range[1];
+        double top_z = cos_lat*cos_theta*range[0] + cos_lat*sin_theta*range[1] + sin_lat*range[2];
 
-            if (top_s > 0.0) az = az + PI;
-            if (az < 0.0) az = az + 2*PI;
 
-            // Azimut rate
-            double y_dot = - (top_e_dot*top_s - top_s_dot*top_e) / (top_s*top_s);
-            double az_dot = y_dot / (1 + y*y);
+        double top_s_dot = sin_lat*(cos_theta*rgvel[0] - sin_theta*range[0]*theta_dot) +
+                            sin_lat*(sin_theta*rgvel[1] + cos_theta*range[1]*theta_dot) -
+                            cos_lat*rgvel[2];
+        double top_e_dot = - (sin_theta*rgvel[0] + cos_theta*range[0]*theta_dot) +
+                            (cos_theta*rgvel[1] - sin_theta*range[1]*theta_dot);
 
-            // Elevation
-            double x = top_z / range_length;
-            double el = asin(x < -1.0 ? -1.0 : (x > 1.0 ? 1.0 : x));
+        double top_z_dot = cos_lat * ( cos_theta*(rgvel[0] + range[1]*theta_dot) +
+                                    sin_theta*(rgvel[1] - range[0]*theta_dot) ) +
+                                    sin_lat*rgvel[2];
 
-            // Elevation rate
-            double x_dot = (top_z_dot*range_length - range_rate_length*top_z) / (range_length * range_length);
-            double el_dot = x_dot / sqrt( 1 - x*x );
+        // Azimut
+        double y = -top_e / top_s;
+        double az = atan(-top_e / top_s);
 
-            result.SetAzimuth(az);
-            result.SetAzimuthRate(az_dot);
-            result.SetElevation(el);
-            result.SetElevationRate(el_dot);
-            result.SetRelativePosECF(range);
-            result.SetRelativeVelECF(rgvel);
+        if (top_s > 0.0) az = az + PI;
+        if (az < 0.0) az = az + 2*PI;
 
-            return true;
+        // Azimut rate
+        double y_dot = - (top_e_dot*top_s - top_s_dot*top_e) / (top_s*top_s);
+        double az_dot = y_dot / (1 + y*y);
+
+        // Elevation
+        double x = top_z / range_length;
+        double el = asin(x < -1.0 ? -1.0 : (x > 1.0 ? 1.0 : x));
+
+        // Elevation rate
+        double x_dot = (top_z_dot*range_length - range_rate_length*top_z) / (range_length * range_length);
+        double el_dot = x_dot / sqrt( 1 - x*x );
+
+        result.SetAzimuth(az);
+        result.SetAzimuthRate(az_dot);
+        result.SetElevation(el);
+        result.SetElevationRate(el_dot);
+        result.SetRelativePosECF(range);
+        result.SetRelativeVelECF(rgvel);
+
+        return true;
     }
 
 

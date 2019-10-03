@@ -53,7 +53,7 @@ namespace SpaceDSL {
 
     class Mission;
     /*************************************************
-     * Class type: The class of SpaceDSL Moderator
+     * Class type: The class of SpaceDSL CZML File Operation
      * Author: Niu ZhiYong
      * Date:2018-07-27
      * Description:
