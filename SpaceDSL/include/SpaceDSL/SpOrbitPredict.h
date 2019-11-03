@@ -93,14 +93,14 @@ namespace SpaceDSL {
 
     public:
         /// Initializer() function must run before OrbitPredictConfig using!!!
-        void        Initializer(double Mjd_UTC = 0, SolarSysStarType centerStarType = E_Earth, bool isUseNormalize = false,
+        void        Initializer(double Mjd_UTC = 0.0, SolarSysStarType centerStarType = E_Earth, bool isUseNormalize = false,
                                 GravityModel::GravModelType gravModelType = GravityModel::GravModelType::E_NotDefinedGravModel,
                                 int maxDegree = 0, int maxOrder = 0,
                                 ThirdBodyGravitySign thirdBodyGravSign = DefaultThirdBodySign,
                                 GeodeticCoordSystem::GeodeticCoordType geodeticType = GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,
                                 AtmosphereModel::AtmosphereModelType atmModelType = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel,
-                                double dragCoef = 0, double dragArea = 0, double f107A = 150, double f107 = 150, double ap[] = nullptr,
-                                double SRPCoef = 0, double SRPArea = 0, bool isUseDrag = false, bool isUseSRP = false);
+                                double dragCoef = 0.0, double dragArea = 0.0, double f107A = 150.0, double f107 = 150.0, double ap[] = nullptr,
+                                double SRPCoef = 0.0, double SRPArea = 0.0, bool isUseDrag = false, bool isUseSRP = false);
 
         bool                        IsInitialized() const;
 
@@ -482,7 +482,7 @@ namespace SpaceDSL {
         virtual ~TLEOrbitPredict();
 
     public:
-        inline  void            SetTLEString(const string &tleLine1, const string &tleLine2);
+        inline  void            SetTLEString(const string &tleLine1, const string &tleLine2) { m_TLELine1 = tleLine1; m_TLELine2 = tleLine2; }
 
         inline  void            GetTLEString(string &tleLine1, string &tleLine2) const      { tleLine1 = m_TLELine1; tleLine2 = m_TLELine2; }
 

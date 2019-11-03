@@ -124,7 +124,7 @@ namespace SpaceDSL {
         //********************************************************************
         Vector3d    AccelAtmosphericDrag(double Mjd_UTC, double Mjd_UT1, const Vector3d& pos, const Vector3d& vel,
                                          double area, double dragCoef, double mass,
-                                         double f107A = 150, double f107 = 160, double ap[] = nullptr);
+                                         double f107A = 150, double f107 = 150, double ap[] = nullptr);
 
     protected:
 

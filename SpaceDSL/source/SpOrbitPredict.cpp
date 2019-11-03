@@ -1450,12 +1450,6 @@ namespace SpaceDSL {
 
     }
 
-    void TLEOrbitPredict::SetTLEString(const string &tleLine1, const string &tleLine2)
-    {
-        m_TLELine1 = tleLine1;
-        m_TLELine2 = tleLine2;
-    }
-
     void TLEOrbitPredict::OrbitStep(const double Mjd, Vector3d &pos, Vector3d &vel)
     {
         double mjd0;

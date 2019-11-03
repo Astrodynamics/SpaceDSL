@@ -37,6 +37,10 @@
 
 #include <pybind11/pybind11.h>
 #include <pybind11/operators.h>
+#include <pybind11/stl.h>
+#include <pybind11/stl.h>
+#include <pybind11/functional.h>
+#include <pybind11/chrono.h>
 #include <pybind11/eigen.h>
 #include <SpaceDSL/SpaceDSL.h>
 
@@ -55,7 +59,192 @@ PYBIND11_MODULE(PySpaceDSL, m) {
         This library can compiled into static library, dynamic library and Python library.
     )pbdoc";
     // **************************SpConst.h**************************
+    m.def("EPS",[](){return EPS;});
+    m.def("PI",[](){return PI;});
+    m.def("TwoPI",[](){return TwoPI;});
+    m.def("FourPI",[](){return FourPI;});
+    m.def("HalfPI",[](){return HalfPI;});
+    m.def("ThirdPI",[](){return ThirdPI;});
+    m.def("QuarterPI",[](){return QuarterPI;});
+    m.def("SqrPI",[](){return SqrPI;});
+
+    m.def("MJDOffset",[](){return MJDOffset;});
+    m.def("TTMinusTAI",[](){return TTMinusTAI;});
+
+    m.def("B1950Epoch",[](){return B1950Epoch;});
+    m.def("J2000Epoch",[](){return J2000Epoch;});
+    m.def("MJD_J2000",[](){return MJD_J2000;});
+
+    m.def("EarthSiderealDay",[](){return EarthSiderealDay;});
+    m.def("EarthSiderealYear",[](){return EarthSiderealYear;});
+
+    m.def("Grav",[](){return Grav;});
     m.def("GM_Earth",[](){return GM_Earth;});
+    m.def("AU",[](){return AU;});
+    m.def("EarthRadius",[](){return EarthRadius;});
+    m.def("EarthFlatFact",[](){return EarthFlatFact;});
+    m.def("LightSpeed",[](){return LightSpeed;});
+    m.def("EarthAngVel",[](){return EarthAngVel;});
+    m.def("EarthMeanMotion",[](){return EarthMeanMotion;});
+    m.def("EarthRPSDay",[](){return EarthRPSDay;});
+
+    m.def("Earth_J2",[](){return Earth_J2;});
+    m.def("Earth_J3",[](){return Earth_J3;});
+    m.def("Earth_J4",[](){return Earth_J4;});
+
+    m.def("WGS84RE",[](){return WGS84RE;});
+    m.def("WGS84RP",[](){return WGS84RP;});
+    m.def("WGS84F",[](){return WGS84F;});
+    m.def("WGS84GM",[](){return WGS84GM;});
+    m.def("WGS84WR",[](){return WGS84WR;});
+    m.def("WGS84WR_INERTIAL",[](){return WGS84WR_INERTIAL;});
+    m.def("WGS84SRE",[](){return WGS84SRE;});
+
+    m.def("GM_Moon",[](){return GM_Moon;});
+    m.def("MoonRadius",[](){return MoonRadius;});
+    m.def("MoonMinRadius",[](){return MoonMinRadius;});
+    m.def("Moon_J2",[](){return Moon_J2;});
+
+    m.def("GM_Jupiter",[](){return GM_Jupiter;});
+    m.def("JupiterRadius",[](){return JupiterRadius;});
+    m.def("JupiterMinRadius",[](){return JupiterMinRadius;});
+    m.def("Jupiter_J2",[](){return Jupiter_J2;});
+
+    m.def("GM_Mars",[](){return GM_Mars;});
+    m.def("MarsRadius",[](){return MarsRadius;});
+    m.def("MarsMinRadius",[](){return MarsMinRadius;});
+    m.def("Mars_J2",[](){return Mars_J2;});
+
+    m.def("GM_Mercury",[](){return GM_Mercury;});
+    m.def("MercuryRadius",[](){return MercuryRadius;});
+    m.def("MercuryMinRadius",[](){return MercuryMinRadius;});
+    m.def("Mercury_J2",[](){return Mercury_J2;});
+
+    m.def("GM_Neptune",[](){return GM_Neptune;});
+    m.def("NeptuneRadius",[](){return NeptuneRadius;});
+    m.def("NeptuneMinRadius",[](){return NeptuneMinRadius;});
+    m.def("Neptune_J2",[](){return Neptune_J2;});
+
+    m.def("GM_Pluto",[](){return GM_Pluto;});
+    m.def("PlutoRadius",[](){return PlutoRadius;});
+    m.def("PlutoMinRadius",[](){return PlutoMinRadius;});
+    m.def("Pluto_J2",[](){return Pluto_J2;});
+
+    m.def("GM_Saturn",[](){return GM_Saturn;});
+    m.def("SaturnRadius",[](){return SaturnRadius;});
+    m.def("SaturnMinRadius",[](){return SaturnMinRadius;});
+    m.def("Saturn_J2",[](){return Saturn_J2;});
+
+    m.def("GM_Sun",[](){return GM_Sun;});
+    m.def("SunRadius",[](){return SunRadius;});
+    m.def("SunMinRadius",[](){return SunMinRadius;});
+    m.def("SolarRadPreAtAU",[](){return SolarRadPreAtAU;});
+    m.def("Sun_J2",[](){return Sun_J2;});
+
+    m.def("GM_Uranus",[](){return GM_Uranus;});
+    m.def("UranusRadius",[](){return UranusRadius;});
+    m.def("UranusMinRadius",[](){return UranusMinRadius;});
+    m.def("Uranus_J2",[](){return Uranus_J2;});
+
+    m.def("GM_Venus",[](){return GM_Venus;});
+    m.def("VenusRadius",[](){return VenusRadius;});
+    m.def("VenusMinRadius",[](){return VenusMinRadius;});
+    m.def("Venus_J2",[](){return Venus_J2;});
+
+    m.def("MeterToFeet",[](){return MeterToFeet;});
+    m.def("MeterToStatMi",[](){return MeterToStatMi;});
+    m.def("MeterToNautMi",[](){return MeterToNautMi;});
+    m.def("MeterToKilometer",[](){return MeterToKilometer;});
+    m.def("MeterToKiloFeet",[](){return MeterToKiloFeet;});
+
+    m.def("FeetToMeter",[](){return FeetToMeter;});
+    m.def("StatMiToMeter",[](){return StatMiToMeter;});
+    m.def("NautMiToMeter",[](){return NautMiToMeter;});
+    m.def("KilometerToMeter",[](){return KilometerToMeter;});
+    m.def("KiloFeetToMeter",[](){return KiloFeetToMeter;});
+
+    m.def("MeterToInch",[](){return MeterToInch;});
+    m.def("MeterToCentimeter",[](){return MeterToCentimeter;});
+    m.def("MeterToMillimeter",[](){return MeterToMillimeter;});
+    m.def("MeterToMicron",[](){return MeterToMicron;});
+    m.def("MeterToNanometer",[](){return MeterToNanometer;});
+
+    m.def("InchToMeter",[](){return InchToMeter;});
+    m.def("CentimeterToMeter",[](){return CentimeterToMeter;});
+    m.def("MillimeterToMeter",[](){return MillimeterToMeter;});
+    m.def("MicronToMeter",[](){return MicronToMeter;});
+    m.def("NanometerToMeter",[](){return NanometerToMeter;});
+
+    m.def("SecToMin",[](){return SecToMin;});
+    m.def("SecToHour",[](){return SecToHour;});
+    m.def("SecToDay",[](){return SecToDay;});
+    m.def("SecToCenday",[](){return SecToCenday;});
+    m.def("SecToEarthTU",[](){return SecToEarthTU;});
+    m.def("SecToSunTU",[](){return SecToSunTU;});
+
+    m.def("MinToSec",[](){return MinToSec;});
+    m.def("MinToHour",[](){return MinToHour;});
+    m.def("MinToDay",[](){return MinToDay;});
+
+    m.def("HourToSec",[](){return HourToSec;});
+    m.def("HourToMin",[](){return HourToMin;});
+    m.def("HourToDay",[](){return HourToDay;});
+
+    m.def("DayToSec",[](){return DayToSec;});
+    m.def("DayToMin",[](){return DayToMin;});
+    m.def("DayToHour",[](){return DayToHour;});
+
+    m.def("CendayToSec",[](){return CendayToSec;});
+    m.def("EarthTUToSec",[](){return EarthTUToSec;});
+    m.def("SunTUToSec",[](){return SunTUToSec;});
+    m.def("AUPerDay",[](){return AUPerDay;});
+
+    m.def("MilliSecToSec",[](){return MilliSecToSec;});
+    m.def("MicroSecToSec",[](){return MicroSecToSec;});
+    m.def("NanoSecToSec",[](){return NanoSecToSec;});
+    m.def("PicoSecToSec",[](){return PicoSecToSec;});
+
+    m.def("SecToMilliSec",[](){return SecToMilliSec;});
+    m.def("SecToMicroSec",[](){return SecToMicroSec;});
+    m.def("SecToNanoSec",[](){return SecToNanoSec;});
+    m.def("SecToPicoSec",[](){return SecToPicoSec;});
+
+    m.def("RadToDeg",[](){return RadToDeg;});
+    m.def("RadToArcSec",[](){return RadToArcSec;});
+    m.def("RadToArcMin",[](){return RadToArcMin;});
+    m.def("RadToSecArc",[](){return RadToSecArc;});
+
+    m.def("DegToRad",[](){return DegToRad;});
+    m.def("ArcSecToRad",[](){return ArcSecToRad;});
+    m.def("ArcMinToRad",[](){return ArcMinToRad;});
+    m.def("SecArcToRad",[](){return SecArcToRad;});
+    m.def("MinArcToRad",[](){return MinArcToRad;});
+
+    m.def("KilogramToSlug",[](){return KilogramToSlug;});
+    m.def("KilogramToPound",[](){return KilogramToPound;});
+
+    m.def("SlugToKilogram",[](){return SlugToKilogram;});
+    m.def("PoundToKilogram",[](){return PoundToKilogram;});
+
+    m.def("WattToMilliwatt",[](){return WattToMilliwatt;});
+    m.def("WattToKilowatt",[](){return WattToKilowatt;});
+    m.def("WattToMegawatt",[](){return WattToMegawatt;});
+    m.def("WattToGigawatt",[](){return WattToGigawatt;});
+
+    m.def("MilliwattToWatt",[](){return MilliwattToWatt;});
+    m.def("KilowattToWatt",[](){return KilowattToWatt;});
+    m.def("MegawattToWatt",[](){return MegawattToWatt;});
+    m.def("GigawattToWatt",[](){return GigawattToWatt;});
+
+    m.def("HertzToKilohertz",[](){return HertzToKilohertz;});
+    m.def("HertzToMegahertz",[](){return HertzToMegahertz;});
+    m.def("HertzToGigahertz",[](){return HertzToGigahertz;});
+    m.def("HertzToTerahertz",[](){return HertzToTerahertz;});
+
+    m.def("KilohertzToHertz",[](){return KilohertzToHertz;});
+    m.def("MegahertzToHertz",[](){return MegahertzToHertz;});
+    m.def("GigahertzToHertz",[](){return GigahertzToHertz;});
+    m.def("TerahertzToHertz",[](){return TerahertzToHertz;});
 
     //**************************SpMath.h**************************
     m       .def("Fraction", &Fraction)
@@ -271,7 +460,9 @@ PYBIND11_MODULE(PySpaceDSL, m) {
             .def(py::init<>())
             .def(py::init<const string &, const double, const double, const double, const double>())
             .def(py::init<const string &, const GeodeticCoord &, const double>())
-            .def("InsertSensor", &Facility::InsertSensor)
+            .def("InsertSensor", &Facility::InsertSensor,
+                 py::arg("name"), py::arg("type"),
+                 py::arg("halfAngle1"), py::arg("halfAngle2") = 0)
             .def("RemoveSensor", &Facility::RemoveSensor);
 
     //**************************SpSpaceVehicle.h**************************
@@ -313,7 +504,9 @@ PYBIND11_MODULE(PySpaceDSL, m) {
             .def("UpdateState", py::overload_cast<const double, const CartState&, const double>(&SpaceVehicle::UpdateState))
             .def("UpdateState", py::overload_cast<const double, const Vector3d&, const Vector3d&,const double>(&SpaceVehicle::UpdateState))
             .def("Reset", &SpaceVehicle::Reset)
-            .def("InsertSensor", &SpaceVehicle::InsertSensor)
+            .def("InsertSensor", &SpaceVehicle::InsertSensor,
+                 py::arg("name"), py::arg("type"),
+                 py::arg("halfAngle1"), py::arg("halfAngle2") = 0)
             .def("RemoveSensor", &SpaceVehicle::RemoveSensor);
 
     //**************************SpCoordSystem.h**************************
@@ -347,9 +540,11 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                                                Computation of the Equation of the Equinoxes
                                                )pbdoc");
 
-    m.def("PrecessMatrix", &PrecessMatrix, R"pbdoc(
-                                           Precession Transformation of Equatorial Coordinates
-                                           )pbdoc");
+    m.def("PrecessMatrix", &PrecessMatrix,
+          py::arg("Mjd_TT2"), py::arg("Mjd_TT1") = MJD_J2000,
+          R"pbdoc(
+          Precession Transformation of Equatorial Coordinates
+          )pbdoc");
 
     m.def("NutationMatrix", &NutationMatrix, R"pbdoc(
                                              Transformation from Mean to True Equator and Equinox
@@ -387,20 +582,26 @@ PYBIND11_MODULE(PySpaceDSL, m) {
     geoCoordSys
             .def(py::init<>())
             .def(py::init<GeodeticCoordSystem::GeodeticCoordType>())
-            .def("GetJ2000ToECFMtx", &GeodeticCoordSystem::GetJ2000ToECFMtx)
-            .def("GetECFToJ2000Mtx", &GeodeticCoordSystem::GetECFToJ2000Mtx)
-            .def("GetJ2000ToTODMtx", &GeodeticCoordSystem::GetJ2000ToTODMtx)
-            .def("GetTODToJ2000Mtx", &GeodeticCoordSystem::GetTODToJ2000Mtx)
-            .def("GetGeodeticCoord", py::overload_cast<const Vector3d &>(&GeodeticCoordSystem::GetGeodeticCoord),
+            .def_static("GetJ2000ToECFMtx", &GeodeticCoordSystem::GetJ2000ToECFMtx,
+                        py::arg("Mjd_UTC2"), py::arg("Mjd_UTC1") = MJD_J2000)
+            .def_static("GetECFToJ2000Mtx", &GeodeticCoordSystem::GetECFToJ2000Mtx,
+                        py::arg("Mjd_UTC2"), py::arg("Mjd_UTC1") = MJD_J2000)
+            .def_static("GetJ2000ToTODMtx", &GeodeticCoordSystem::GetJ2000ToTODMtx,
+                        py::arg("Mjd_UTC2"), py::arg("Mjd_UTC1") = MJD_J2000)
+            .def_static("GetTODToJ2000Mtx", &GeodeticCoordSystem::GetTODToJ2000Mtx,
+                        py::arg("Mjd_UTC2"), py::arg("Mjd_UTC1") = MJD_J2000)
+            .def("GetGeodeticCoord", py::overload_cast<const Vector3d &>(&GeodeticCoordSystem::GetGeodeticCoord), py::arg("pos"),
                  R"pbdoc(Conversion From ECF(Earth Centered Fixed) Position to the Geodetic Coordinate.)pbdoc")
-            .def("GetPosition", py::overload_cast<const GeodeticCoord &>(&GeodeticCoordSystem::GetPosition),
+            .def("GetPosition", py::overload_cast<const GeodeticCoord &>(&GeodeticCoordSystem::GetPosition), py::arg("lla"),
                  R"pbdoc(Conversion From the Geodetic Coordinate to ECF(Earth Centered Fixed) Position.)pbdoc")
 
             .def("GetGeodeticCoord", py::overload_cast<const Vector3d &, double, double>(&GeodeticCoordSystem::GetGeodeticCoord),
+                 py::arg("pos"), py::arg("Mjd_UTC2"), py::arg("Mjd_UTC1") = MJD_J2000,
                  R"pbdoc(Conversion From the J2000 Position to the Geodetic Coordinate.)pbdoc")
             .def("GetPosition", py::overload_cast<const GeodeticCoord &, double, double>(&GeodeticCoordSystem::GetPosition),
+                 py::arg("lla"), py::arg("Mjd_UTC2"), py::arg("Mjd_UTC1") = MJD_J2000,
                  R"pbdoc(Conversion From the Geodetic Coordinate to the J2000 Position.)pbdoc")
-            .def("GetGroundVelocity", &GeodeticCoordSystem::GetGroundVelocity);
+            .def("GetGroundVelocity", &GeodeticCoordSystem::GetGroundVelocity, py::arg("lla"));
 
     py::enum_<GeodeticCoordSystem::GeodeticCoordType>(geoCoordSys, "GeodeticCoordType")
             .value("E_NotDefinedGeodeticType", GeodeticCoordSystem::GeodeticCoordType::E_NotDefinedGeodeticType)
@@ -491,9 +692,21 @@ PYBIND11_MODULE(PySpaceDSL, m) {
             .def(py::init<AtmosphereModel::AtmosphereModelType>())
             .def("SetAtmosphereModelType", &AtmosphereModel::SetAtmosphereModelType)
             .def("GetAtmosphereModelType", &AtmosphereModel::GetAtmosphereModelType)
-            .def("GetAtmosphereTemperature", &AtmosphereModel::GetAtmosphereTemperature)
-            .def("GetAtmospherePressure", &AtmosphereModel::GetAtmospherePressure)
-            .def("GetAtmosphereDensity", &AtmosphereModel::GetAtmosphereDensity);
+            .def("GetAtmosphereTemperature", &AtmosphereModel::GetAtmosphereTemperature,
+                 py::arg("Mjd_UT1"), py::arg("altitude"),
+                 py::arg("latitude") = 0, py::arg("longitude") = 0,
+                 py::arg("f107A") = 150, py::arg("f107") = 150,
+                 py::arg("ap") = nullptr, py::arg("useDailyAp") = true)
+            .def("GetAtmospherePressure", &AtmosphereModel::GetAtmospherePressure,
+                 py::arg("Mjd_UT1"), py::arg("altitude"),
+                 py::arg("latitude") = 0, py::arg("longitude") = 0,
+                 py::arg("f107A") = 150, py::arg("f107") = 150,
+                 py::arg("ap") = nullptr, py::arg("useDailyAp") = true)
+            .def("GetAtmosphereDensity", &AtmosphereModel::GetAtmosphereDensity,
+                 py::arg("Mjd_UT1"), py::arg("altitude"),
+                 py::arg("latitude") = 0, py::arg("longitude") = 0,
+                 py::arg("f107A") = 150, py::arg("f107") = 150,
+                 py::arg("ap") = nullptr, py::arg("useDailyAp") = true);
 
     py::enum_<AtmosphereModel::AtmosphereModelType>(atmosphereModel, "AtmosphereModelType")
             .value("E_NotDefinedAtmosphereModel", AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel)
@@ -516,7 +729,13 @@ PYBIND11_MODULE(PySpaceDSL, m) {
             .def("SetCenterStar", &ThirdBodyGravity::SetCenterStar)
             .def("GetThirdBodyStar", &ThirdBodyGravity::GetThirdBodyStar)
             .def("GetCenterStar", &ThirdBodyGravity::GetCenterStar)
-            .def("AccelPointMassGravity", &ThirdBodyGravity::AccelPointMassGravity);
+            .def("AccelPointMassGravity", &ThirdBodyGravity::AccelPointMassGravity,
+                 R"pbdoc(
+                 @Input
+                 @Param	Mjd_TT          Terrestrial Time (Modified Julian Date)
+                 @Param	pos             Satellite Position Vector in the inertial system
+                 @Return Acceleration
+                )pbdoc");
 
     py::class_<AtmosphericDrag>(m, "AtmosphericDrag",
                                      R"pbdoc(
@@ -524,14 +743,39 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                                     )pbdoc")
             .def(py::init<>())
             .def(py::init<AtmosphereModel::AtmosphereModelType, GeodeticCoordSystem *>())
-            .def("AccelAtmosphericDrag", &AtmosphericDrag::AccelAtmosphericDrag);
+            .def("AccelAtmosphericDrag", &AtmosphericDrag::AccelAtmosphericDrag,
+                 py::arg("Mjd_UTC"), py::arg("Mjd_UT1"),
+                 py::arg("pos"), py::arg("vel"),
+                 py::arg("area"), py::arg("dragCoef"), py::arg("mass"),
+                 py::arg("f107A") = 150.0, py::arg("f107") = 150.0,
+                 py::arg("ap") = nullptr,
+                 R"pbdoc(
+                 @Input
+                 @Param  Mjd_TT          Terrestrial Time (Modified Julian Date)
+                 @Param  pos             Satellite position vector in the inertial system [m]
+                 @Param  vel             Satellite velocity vector in the inertial system [m/s]
+                 @Param  ECIToTODMtx     Transformation matrix to true-of-date inertial system
+                 @Param  area            Cross-section [m^2]
+                 @Param  mass            Spacecraft mass [kg]
+                 @Param  dragCoef        Drag coefficient
+                 @Return Acceleration
+                )pbdoc");
 
     py::class_<SolarRadPressure>(m, "SolarRadPressure",
                                      R"pbdoc(
                                         The class of Solar Radiation Pressure
                                     )pbdoc")
             .def(py::init<>())
-            .def("AccelSolarRad", &SolarRadPressure::AccelSolarRad);
+            .def("AccelSolarRad", &SolarRadPressure::AccelSolarRad,
+                 R"pbdoc(
+                 @Input
+                 @Param  Mjd_TT          Terrestrial Time (Modified Julian Date)
+                 @Param  pos             Satellite position vector in the inertial system [m]
+                 @Param  area            Cross-section [m^2]
+                 @Param  mass            Spacecraft mass [kg]
+                 @Param  solarCoef       Solar radiation pressure coefficient
+                 @Return Acceleration
+                )pbdoc");
 
     m.def("GeomagneticApToKp", &GeomagneticApToKp, R"pbdoc(Geomagnetic Ap to Kp)pbdoc");
 
@@ -554,6 +798,12 @@ PYBIND11_MODULE(PySpaceDSL, m) {
             .def("SetRelativeErrorThreshold", &RungeKutta::SetRelativeErrorThreshold)
             .def("GetRelativeErrorThreshold", &RungeKutta::GetRelativeErrorThreshold)
             .def("OneStep", &RungeKutta::OneStep,
+                 py::arg("rightFunc"), py::arg("t"), py::arg("x"),
+                 py::arg("initialStep"), py::arg("result"),
+                 py::arg("minStep") = 0.0, py::arg("maxStep") = 0.0,
+                 py::arg("maxStepAttempts") = 0.0,
+                 py::arg("accuracyThreshold") = 0.0,
+                 py::arg("bStopIfAccuracyIsViolated") = true,
                  R"pbdoc(
                  @Input
                  @Param  func            Right Function of ODE
@@ -569,6 +819,12 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                  @Param  result  Integral Step
                 )pbdoc")
             .def("MultStep", &RungeKutta::MultStep,
+                 py::arg("rightFunc"), py::arg("t0"), py::arg("x"),
+                 py::arg("initialStep"), py::arg("t"), py::arg("result"),
+                 py::arg("minStep") = 0.0, py::arg("maxStep") = 0.0,
+                 py::arg("maxStepAttempts") = 0.0,
+                 py::arg("accuracyThreshold") = 0.0,
+                 py::arg("bStopIfAccuracyIsViolated") = true,
                  R"pbdoc(
                  @Input
                  @Param  func            Right Function of ODE
@@ -625,6 +881,8 @@ PYBIND11_MODULE(PySpaceDSL, m) {
           )pbdoc");
 
     m.def("LagrangePolynomialInterpolationGradient", &LagrangePolynomialInterpolationGradient,
+          py::arg("x"), py::arg("y"),
+          py::arg("t"), py::arg("step") = 0.01,
           R"pbdoc(
           @Input
           @Param    x    	Independent Variable Array
@@ -791,6 +1049,172 @@ PYBIND11_MODULE(PySpaceDSL, m) {
           @Output
           @Return     result      Observation Param
           )pbdoc");
+    //**************************SpRightFunction.h**************************
+//    template <class RightFuncBase = RightFunc> class PyRightFunc : public RightFuncBase {
+//    public:
+//        using RightFuncBase::RightFuncBase; // Inherit constructors
+//        void operator()(double t, const VectorXd &x, VectorXd&result)
+//        {
+//            PYBIND11_OVERLOAD_PURE(void, RightFunc, (), t, x, result);
+//        }
+//    };
+
+
+//    py::class_<RightFunc, PyRightFunc<>> rightFunc(m, "RightFunc");
+
+
+    //**************************SpOrbitPredict.h**************************
+    py::class_<NormalizeParameter>(m, "NormalizeParameter",
+                                     R"pbdoc(
+                                        The class of Normalization Parameter
+                                     )pbdoc")
+            .def(py::init<>())
+            .def("GetLengthPara", &NormalizeParameter::GetLengthPara)
+            .def("GetSpeedPara", &NormalizeParameter::GetSpeedPara)
+            .def("GetTimePara", &NormalizeParameter::GetTimePara)
+            .def("GetThrustPara", &NormalizeParameter::GetThrustPara);
+
+    py::class_<OrbitPredictConfig>(m, "OrbitPredictConfig",
+                                     R"pbdoc(
+                                        The class of Orbit Prediction Parameters
+                                     )pbdoc")
+            .def(py::init<>())
+            .def_readwrite_static("DefaultThirdBodySign", &OrbitPredictConfig::DefaultThirdBodySign)
+            .def("Initializer", &OrbitPredictConfig::Initializer,
+                 py::arg("Mjd_UTC") = 0.0, py::arg("centerStarType") = E_Earth,
+                 py::arg("isUseNormalize") = false,
+                 py::arg("gravModelType") = GravityModel::GravModelType::E_NotDefinedGravModel,
+                 py::arg("maxDegree") = 0, py::arg("maxOrder") = 0,
+                 py::arg("thirdBodyGravSign") = OrbitPredictConfig::DefaultThirdBodySign,
+                 py::arg("geodeticType") = GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,
+                 py::arg("atmModelType") = AtmosphereModel::AtmosphereModelType::E_NotDefinedAtmosphereModel,
+                 py::arg("dragCoef") = 0.0, py::arg("dragArea") = 0.0, py::arg("f107A") = 0.0,
+                 py::arg("f107") = 0.0, py::arg("ap") = nullptr, py::arg("SRPCoef") = 0.0,
+                 py::arg("SRPArea") = 0.0, py::arg("isUseDrag") = false, py::arg("isUseSRP") = false)
+            .def("IsInitialized", &OrbitPredictConfig::IsInitialized)
+            .def("Update", &OrbitPredictConfig::Update)
+            .def("SetCenterStarType", &OrbitPredictConfig::SetCenterStarType)
+            .def("GetCenterStarType", &OrbitPredictConfig::GetCenterStarType)
+            .def("GetCenterStarGM", &OrbitPredictConfig::IsInitialized)
+            .def("GetCenterStarJ2", &OrbitPredictConfig::GetCenterStarJ2)
+            .def("GetCenterStarRadius", &OrbitPredictConfig::GetCenterStarRadius)
+            .def("SetMJD_UTC", &OrbitPredictConfig::SetMJD_UTC)
+            .def("GetMJD_UTC", &OrbitPredictConfig::GetMJD_UTC)
+            .def("GetMJD_UT1", &OrbitPredictConfig::GetMJD_UT1)
+            .def("GetMJD_TT", &OrbitPredictConfig::GetMJD_TT)
+            .def("GetMJD_TAI", &OrbitPredictConfig::GetMJD_TAI)
+            .def("GetTAI_UTC", &OrbitPredictConfig::GetTAI_UTC)
+            .def("GetUT1_UTC", &OrbitPredictConfig::GetUT1_UTC)
+            .def("GetTT_UTC", &OrbitPredictConfig::GetTT_UTC)
+            .def("GetX_Pole", &OrbitPredictConfig::GetX_Pole)
+            .def("GetY_Pole", &OrbitPredictConfig::GetY_Pole)
+            .def("SetGravModelType", &OrbitPredictConfig::SetGravModelType)
+            .def("GetGravModelType", &OrbitPredictConfig::GetGravModelType)
+            .def("SetGravMaxDegree", &OrbitPredictConfig::SetGravMaxDegree)
+            .def("GetGravMaxDegree", &OrbitPredictConfig::GetGravMaxDegree)
+            .def("SetGravMaxOrder", &OrbitPredictConfig::SetGravMaxOrder)
+            .def("GetGravMaxOrder", &OrbitPredictConfig::GetGravMaxOrder)
+            .def("SetAtmosphereModelType", &OrbitPredictConfig::SetAtmosphereModelType)
+            .def("GetAtmosphereModelType", &OrbitPredictConfig::GetAtmosphereModelType)
+            .def("SetDragCoef", &OrbitPredictConfig::SetDragCoef)
+            .def("GetDragCoef", &OrbitPredictConfig::GetDragCoef)
+            .def("SetDragArea", &OrbitPredictConfig::SetDragArea)
+            .def("GetDragArea", &OrbitPredictConfig::GetDragArea)
+            .def("SetAverageF107", &OrbitPredictConfig::SetAverageF107)
+            .def("GetAverageF107", &OrbitPredictConfig::GetAverageF107)
+            .def("SetDailyF107", &OrbitPredictConfig::SetDailyF107)
+            .def("GetDailyF107", &OrbitPredictConfig::GetDailyF107)
+            .def("SetGeomagneticIndex", &OrbitPredictConfig::SetGeomagneticIndex)
+            .def("GetGeomagneticIndex", &OrbitPredictConfig::GetGeomagneticIndex)
+            .def("SetSRPCoef", &OrbitPredictConfig::SetSRPCoef)
+            .def("GetSRPCoef", &OrbitPredictConfig::GetSRPCoef)
+            .def("SetSRPArea", &OrbitPredictConfig::SetSRPArea)
+            .def("GetSRPArea", &OrbitPredictConfig::GetSRPArea)
+            .def("SetThirdBodySign", &OrbitPredictConfig::SetThirdBodySign)
+            .def("GetThirdBodySign", &OrbitPredictConfig::GetThirdBodySign)
+            .def("SetGeodeticCoordType", &OrbitPredictConfig::SetGeodeticCoordType)
+            .def("GetGeodeticCoordType", &OrbitPredictConfig::GetGeodeticCoordType)
+            .def("IsUseThirdBodyGravity", &OrbitPredictConfig::IsUseThirdBodyGravity)
+            .def("IsUseSRP", &OrbitPredictConfig::IsUseSRP)
+            .def("IsUseDrag", &OrbitPredictConfig::IsUseDrag)
+            .def("IsUseNormalize", &OrbitPredictConfig::IsUseNormalize)
+            .def("GetGravityModel", &OrbitPredictConfig::GetGravityModel)
+            .def("GetGeodeticCoordSystem", &OrbitPredictConfig::GetGeodeticCoordSystem)
+            .def("GetThirdBodyGravity", &OrbitPredictConfig::GetThirdBodyGravity)
+            .def("GetAtmosphericDrag", &OrbitPredictConfig::GetAtmosphericDrag)
+            .def("GetSolarRadPressure", &OrbitPredictConfig::GetSolarRadPressure);
+
+    py::class_<OrbitPredict>(m, "OrbitPredict",
+                                     R"pbdoc(
+                                        The class of Orbit Prediction
+                                     )pbdoc")
+            .def(py::init<>())
+            .def("OrbitStep", &OrbitPredict::OrbitStep,
+                 R"pbdoc(
+                 @Input
+                 @Param  predictConfig       Orbit Prediction Parameters
+                 @Param	pPropagator         Propagator
+                 @In/Out
+                 @Param	mass                kg
+                 @Param	pos                 m
+                 @Param	vel                 m/s
+                 @Output
+                 @Return adaptedStep         sec
+                 )pbdoc");
+
+    py::class_<TwoBodyOrbitPredict>(m, "TwoBodyOrbitPredict",
+                                     R"pbdoc(
+                                        The class of Tow Body Orbit Prediction
+                                     )pbdoc")
+            .def(py::init<>())
+            .def("OrbitStep", &TwoBodyOrbitPredict::OrbitStep,
+                 R"pbdoc(
+                 @Input
+                 @Param  predictConfig       Orbit Prediction Parameters
+                 @Param	pPropagator         Propagator
+                 @In/Out
+                 @Param	mass                kg
+                 @Param	pos                 m
+                 @Param	vel                 m/s
+                 @Output
+                 @Return adaptedStep         sec
+                 )pbdoc");
+
+    py::class_<J2OrbitPredict>(m, "J2OrbitPredict",
+                                     R"pbdoc(
+                                        J2 Orbit Prediction
+                                     )pbdoc")
+            .def(py::init<>())
+            .def("OrbitStep", &J2OrbitPredict::OrbitStep,
+                 R"pbdoc(
+                 @Input
+                 @Param  predictConfig       Orbit Prediction Parameters
+                 @Param	pPropagator         Propagator
+                 @In/Out
+                 @Param	mass                kg
+                 @Param	pos                 m
+                 @Param	vel                 m/s
+                 @Output
+                 @Return adaptedStep         sec
+                 )pbdoc");
+
+    py::class_<TLEOrbitPredict>(m, "TLEOrbitPredict",
+                                     R"pbdoc(
+                                        SGP4/SDP4 Orbit Prediction with TLE
+                                     )pbdoc")
+            .def(py::init<>())
+            .def("SetTLEString", &TLEOrbitPredict::SetTLEString)
+            .def("GetTLEString", &TLEOrbitPredict::GetTLEString)
+            .def("OrbitStep", &TLEOrbitPredict::OrbitStep,
+                 R"pbdoc(
+                 @Input
+                 @Param  Mjd      Modified Julian date of UTC
+                 @Output
+                 @Param	pos      m
+                 @Param	vel      m/s
+                 @Return
+                 )pbdoc");
+
 
     //**************************SpAccess.h**************************
     py::class_<AccessAnalysis>(m, "AccessAnalysis",
@@ -802,6 +1226,8 @@ PYBIND11_MODULE(PySpaceDSL, m) {
             .def("SetMission", &AccessAnalysis::SetMission)
             .def("GetMission", &AccessAnalysis::GetMission, py::return_value_policy::reference_internal)
             .def("CalTargetAccessData", py::overload_cast<int, const Target *, int , double>(&AccessAnalysis::CalTargetAccessData),
+                 py::arg("vehicleID"), py::arg("target"),
+                 py::arg("order") = 5, py::arg("precision") = 0.01,
                  R"pbdoc(
                  @Input
                  @Param      vehicleName         Vehicle Name
@@ -811,7 +1237,8 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                  @Output
                  @Return     List<Start Mjd, End Mjd >
                  )pbdoc")
-            .def("SetMission", py::overload_cast<const Target *, int, double>(&AccessAnalysis::CalTargetAccessData),
+            .def("CalTargetAccessData", py::overload_cast<const Target *, int, double>(&AccessAnalysis::CalTargetAccessData),
+                 py::arg("target"), py::arg("order") = 5, py::arg("precision") = 0.01,
                  R"pbdoc(
                  @Input
                  @Param      target              Point Target Object Point
@@ -821,6 +1248,7 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                  @Return     {Vehicle, List<Start Mjd, End Mjd >}
                  )pbdoc")
             .def("CalMissionAccessData", &AccessAnalysis::CalMissionAccessData,
+                 py::arg("order") = 5, py::arg("precision") = 0.01,
                  R"pbdoc(
                  @Input
                  @Param      order               Lagrange Polynomial Interpolation Order
@@ -883,6 +1311,10 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                  bool isUseSRP
                  )pbdoc")
             .def("SetPropagator", &Mission::SetPropagator,
+                 py::arg("integMethodType"), py::arg("initialStep"),
+                 py::arg("accuracy") = 0.0, py::arg("minStep") = 0.0, py::arg("maxStep") = 0.0,
+                 py::arg("maxStepAttempts") = 0, py::arg("bStopIfAccuracyIsViolated") = true,
+                 py::arg("isUseNormalize") = false,
                  R"pbdoc(
                  @Input
                  const IntegMethodType integMethodType,
@@ -912,6 +1344,8 @@ PYBIND11_MODULE(PySpaceDSL, m) {
             .def("GetDurationTime", &Mission::GetDurationTime)
             .def("GetAverageOrbitalPeriod", &Mission::GetAverageOrbitalPeriod)
             .def("CalTargetAccessData", py::overload_cast<int, const Target *, int, double>(&Mission::CalTargetAccessData),
+                 py::arg("vehicleID"), py::arg("target"),
+                 py::arg("order") = 5, py::arg("precision") = 0.01,
                  R"pbdoc(
                  @Input
                  @Param      vehicleName         Vehicle Name
@@ -922,6 +1356,7 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                  @Return     List<Start Mjd, End Mjd >
                  )pbdoc")
             .def("CalTargetAccessData", py::overload_cast<const Target *, int, double>(&Mission::CalTargetAccessData),
+                 py::arg("target"), py::arg("order") = 5, py::arg("precision") = 0.01,
                  R"pbdoc(
                  @Input
                  @Param      target              Point Target Object Point
@@ -929,6 +1364,15 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                  @Param      precision           Iterative precision (unit: sec)
                  @Output
                  @Return     {Vehicle Name, List<Start Mjd, End Mjd >}
+                 )pbdoc")
+            .def("CalMissionAccessData", &Mission::CalMissionAccessData,
+                 py::arg("order") = 5, py::arg("precision") = 0.01,
+                 R"pbdoc(
+                 @Input
+                 @Param      order               Lagrange Polynomial Interpolation Order
+                 @Param      precision           Iterative precision (unit: sec)
+                 @Output
+                 @Return
                  )pbdoc")
             .def("Start", &Mission::Start, py::arg("bIsMultThread") = false)
             .def("ClearProcessData", &Mission::ClearProcessData)
@@ -943,6 +1387,7 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                                 )pbdoc")
             .def(py::init<>())
             .def("Initializer", &CZMLScript::Initializer,
+                 py::arg("filePath"), py::arg("pMission"), py::arg("step") = 300,
                  R"pbdoc(
                  @Input
                  const string &filePath,

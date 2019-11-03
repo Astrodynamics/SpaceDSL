@@ -134,8 +134,8 @@ namespace SpaceDSL {
                                        const double f107A , const double f107, VectorXd ap,
                                        bool isUseDrag, bool isUseSRP);
 
-        void            SetPropagator(const IntegMethodType integMethodType, const double initialStep, const double accuracy = 0,
-                                      const double  minStep = 0, const double  maxStep = 0, const int maxStepAttempts = 0,
+        void            SetPropagator(const IntegMethodType integMethodType, const double initialStep, const double accuracy = 0.0,
+                                      const double  minStep = 0.0, const double  maxStep = 0.0, const int maxStepAttempts = 0,
                                       const bool bStopIfAccuracyIsViolated = true, const bool isUseNormalize = false);
 
         void            SetOptimization();
