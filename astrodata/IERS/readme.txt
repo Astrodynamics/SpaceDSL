@@ -1,6 +1,6 @@
 "EOP_2000A.dat" 
 from the file comes from USNO series 7 / IERS 2000 Bulletin A. 
-From 2018-01-01 to 2019-05-18
+From 2019-11-01 to 2020-11-07
 
 MJD     x    error     y    error   UT1-UTC   error
 
