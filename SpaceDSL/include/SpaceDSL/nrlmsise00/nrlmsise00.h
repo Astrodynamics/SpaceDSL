@@ -18,6 +18,7 @@
 
 #include "SpaceDSL/SpaceDSL_Global.h"
 
+#include <math.h>
 
 /// All the functions are in the namespace SpaceDSL
 ///
