@@ -281,7 +281,10 @@ namespace SpaceDSL {
             else
                 return false;
         #else
-            int exitCode;
+            int exitCode = -1;
+            if (m_Thread_t == 0)// Not Start is Not Running
+                return false;
+
             exitCode = pthread_kill(m_Thread_t, 0);
             if(exitCode == ESRCH)
                 return false;
@@ -306,6 +309,9 @@ namespace SpaceDSL {
                 return true;
         #else
             int exitCode = -1;
+            if (m_Thread_t == 0)// Not Start is Finished
+                return true;
+
             exitCode = pthread_kill(m_Thread_t, 0);
             if(exitCode == ESRCH)
                 return true;
