@@ -71,12 +71,12 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "#CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
 else()
     message(STATUS "#CMAKE_SYSTEM_NAME = ${CMAKE_SYSTEM_NAME}")
-    target_link_libraries(${TargetName} pthread)
+    target_link_libraries(${TargetName} PUBLIC pthread)
 endif()
 
 if(OPENSSL_FOUND)
     message(STATUS "#Target Link OPENSSL_LIBRARIES_DIR = ${OPENSSL_LIBRARIES}")
-    target_link_libraries(${TargetName} ${OPENSSL_LIBRARIES})
+    target_link_libraries(${TargetName} PUBLIC ${OPENSSL_LIBRARIES})
 endif()
 #
 
