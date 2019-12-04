@@ -48,6 +48,7 @@
 
 #include <map>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -127,6 +128,11 @@ namespace SpaceDSL {
 
         bool            RemoveTarget(const int id);
 
+        /********************************************************************/
+        /// Configure Space Environment Parameters of Mission
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-12-26
+        /**********************************************************************/
         void            SetEnvironment(const SolarSysStarType centerStarType, const GravityModel::GravModelType gravModelType ,
                                        const int maxDegree , const int maxOrder , const ThirdBodyGravitySign thirdBodyGravSign,
                                        const GeodeticCoordSystem::GeodeticCoordType geodeticType ,
@@ -134,13 +140,27 @@ namespace SpaceDSL {
                                        const double f107A , const double f107, VectorXd ap,
                                        bool isUseDrag, bool isUseSRP);
 
+        /********************************************************************/
+        /// Configure Integration Method and Parameters of Mission
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-12-26
+        /**********************************************************************/
         void            SetPropagator(const IntegMethodType integMethodType, const double initialStep, const double accuracy = 0.0,
                                       const double  minStep = 0.0, const double  maxStep = 0.0, const int maxStepAttempts = 0,
                                       const bool bStopIfAccuracyIsViolated = true, const bool isUseNormalize = false);
 
         void            SetOptimization();
 
-        void            SetMissionSequence(const CalendarTime& initialEpoch,  double durationSec);
+        /********************************************************************/
+        /// Configure Time Sequence of Mission
+        /// @Author     Niu Zhiyong
+        /// @Date       2018-12-26
+        /**********************************************************************/
+        void            SetMissionSequence(const CalendarTime& startEpochDate,  double durationSec);
+
+        void            SetMissionSequence(const CalendarTime& startEpochDate,  const CalendarTime& endEpochDate);
+
+        void            SetMissionSequence(double startEpochMjd,  double endEpochMjd);
 
         const map<int, SpaceVehicle *>          &GetSpaceVehicleMap() const;
 
@@ -158,9 +178,17 @@ namespace SpaceDSL {
 
         Propagator                              *GetInitialPropagator() const;
 
-        const CalendarTime                      &GetInitialEpoch() const;
+        CalendarTime                            GetStartEpochDate() const;
 
-        const CalendarTime                      &GetTerminationEpoch() const;
+        CalendarTime                            GetEndEpochDate() const;
+
+        CalendarTime                            GetTerminationEpochDate() const;
+
+        double                                  GetStartEpoch() const;
+
+        double                                  GetEndEpoch() const;
+
+        double                                  GetTerminationEpoch() const;
 
         double                                  GetDurationTime() const;
 
@@ -263,8 +291,9 @@ namespace SpaceDSL {
         Environment                             *m_pEnvironment;
         Propagator                              *m_pInitialPropagator;
 
-        CalendarTime                            m_InitialEpoch;
-        CalendarTime                            m_TerminationEpoch;
+        double                                  m_StartEpoch;                     ///< MJD Epoch of Mission Start Time
+        double                                  m_EndEpoch;                         ///< MJD Epoch of Mission Start Time
+        double                                  m_TerminationEpoch;                 ///< MJD Epoch of Mission Termination Time
         double                                  m_DurationSec;
 
         SpThreadPool                            *m_pMissionThreadPool;
@@ -301,18 +330,22 @@ namespace SpaceDSL {
         /// @Author     Niu Zhiyong
         /// @Date       2019-01-04
         /// @Input
-        /// @Param      pVehicle      Data owner
+        /// @Param      processDataList         Data Container
         /// @Param      Mjd
         /// @Param      pos
         /// @Param      vel
-        /// @Param      LLA           Lat, Lon, Alt
+        /// @Param      LLA                     Lat, Lon, Alt
         /// @Param      mass
         /// @Output
         /// @Return
         /**********************************************************************/
-        void    SaveProcessDataLine(SpaceVehicle *pVehicle, const double Mjd,
+        void    SaveProcessDataLine(vector<double *> &processDataList, const double Mjd,
                                     const Vector3d &pos, const Vector3d &vel,
                                     const GeodeticCoord &LLA, const double mass);
+
+        vector<double *> IntegralToStartEpoch(SpaceVehicle *pVehicle, double startEpoch);
+
+        vector<double *> IntegralToEndEpoch(SpaceVehicle *pVehicle, double endEpoch);
 
         void    Run() override;
 

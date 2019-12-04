@@ -62,12 +62,12 @@ namespace SpaceDSL {
 	public:
         explicit SpaceVehicle();
 
-        SpaceVehicle(const string &name, const CalendarTime& initialEpoch,
+        SpaceVehicle(const string &name, const CalendarTime& initialEpochDate,
                      const CartState& initialState, const double initialMass,
                      const double dragCoef, const double dragArea,
                      const double SRPCoef, const double SRPArea);
 
-        SpaceVehicle(const string &name, const double initialEpoch,
+        SpaceVehicle(const string &name, const double initialEpochMjd,
                      const CartState& initialState, const double initialMass,
                      const double dragCoef, const double dragArea,
                      const double SRPCoef, const double SRPArea);

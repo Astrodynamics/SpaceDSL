@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
         Mission *pMission = new Mission();
         auto pVehicle1 = pMission->InsertSpaceVehicle(vehicle_name1,initial_time,vehicle1_cart0,vehicle1_mass, 2.2, 3, 1.0, 3);
         auto pVehicle2 = pMission->InsertSpaceVehicle(vehicle_name2,initial_time,vehicle2_cart0,vehicle2_mass, 2.2, 6, 1.0, 6);
+        pMission->RemoveSpaceVehicle(pVehicle2->GetID());
         pMission->InsertFacility(targetName1,-75.5966*DegToRad, 40.0386*DegToRad, 0, 10*DegToRad);
         ThirdBodyGravitySign thirdGravSign;
         thirdGravSign.bIsUseSunGrav = true;
@@ -70,7 +71,6 @@ int main(int argc, char *argv[])
         }
 
         pVehicle1->Reset();
-        pVehicle2->Reset();
         pMission->ClearProcessData();
         pMission->Start();
 

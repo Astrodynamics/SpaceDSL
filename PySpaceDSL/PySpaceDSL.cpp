@@ -1326,11 +1326,24 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                  const bool bStopIfAccuracyIsViolated = true,
                  const bool isUseNormalize = false
                  )pbdoc")
-            .def("SetMissionSequence", &Mission::SetMissionSequence,
+            .def("SetMissionSequence", py::overload_cast<const CalendarTime&,  double>(&Mission::SetMissionSequence),
                  R"pbdoc(
                  @Input
-                 const CalendarTime& initialEpoch,
+                 const CalendarTime& initialEpochDate,
                  double durationSec
+                 )pbdoc")
+            .def("SetMissionSequence", py::overload_cast<const CalendarTime& ,  const CalendarTime&>(&Mission::SetMissionSequence),
+                 R"pbdoc(
+                 @Input
+                 const CalendarTime& initialEpochDate,
+                 const CalendarTime& terminationEpochDate,
+                 double durationSec
+                 )pbdoc")
+            .def("SetMissionSequence", py::overload_cast<double,  double>(&Mission::SetMissionSequence),
+                 R"pbdoc(
+                 @Input
+                 double initialEpochMjd,
+                 double terminationEpochMjd
                  )pbdoc")
             .def("GetSpaceVehicleMap", &Mission::GetSpaceVehicleMap, py::return_value_policy::reference_internal)
             .def("GetSpaceVehicleNumber", &Mission::GetSpaceVehicleNumber)
@@ -1340,7 +1353,12 @@ PYBIND11_MODULE(PySpaceDSL, m) {
             .def("GetTargetNumber", &Mission::GetTargetNumber)
             .def("GetEnvironment", &Mission::GetEnvironment, py::return_value_policy::reference_internal)
             .def("GetInitialPropagator", &Mission::GetInitialPropagator, py::return_value_policy::reference_internal)
-            .def("GetTerminationEpoch", &Mission::GetTerminationEpoch, py::return_value_policy::reference_internal)
+            .def("GetStartEpochDate", &Mission::GetStartEpochDate)
+            .def("GetEndEpochDate", &Mission::GetEndEpochDate)
+            .def("GetTerminationEpochDate", &Mission::GetTerminationEpochDate)
+            .def("GetStartEpoch", &Mission::GetStartEpoch)
+            .def("GetEndEpoch", &Mission::GetEndEpoch)
+            .def("GetTerminationEpoch", &Mission::GetTerminationEpoch)
             .def("GetDurationTime", &Mission::GetDurationTime)
             .def("GetAverageOrbitalPeriod", &Mission::GetAverageOrbitalPeriod)
             .def("CalTargetAccessData", py::overload_cast<int, const Target *, int, double>(&Mission::CalTargetAccessData),

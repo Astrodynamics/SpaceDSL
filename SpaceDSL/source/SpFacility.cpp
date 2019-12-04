@@ -55,6 +55,7 @@ namespace SpaceDSL {
         m_Name = "Default";
         m_TargetType = E_Facility;
         m_SensorNumber = 0;
+        m_SensorList.clear();
         m_LonLatAltitude.SetLongitude(0);
         m_LonLatAltitude.SetLatitude(0);
         m_LonLatAltitude.SetAltitude(0);
@@ -66,6 +67,7 @@ namespace SpaceDSL {
         m_Name = name;
         m_TargetType = E_Facility;
         m_SensorNumber = 0;
+        m_SensorList.clear();
         m_LonLatAltitude.SetLongitude(longitude);
         m_LonLatAltitude.SetLatitude(latitude);
         m_LonLatAltitude.SetAltitude(altitude);
@@ -77,6 +79,7 @@ namespace SpaceDSL {
         m_Name = name;
         m_TargetType = E_Facility;
         m_SensorNumber = 0;
+        m_SensorList.clear();
         m_LonLatAltitude = LLA;
         m_MinElevation = minElevation;
     }

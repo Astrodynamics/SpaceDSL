@@ -148,8 +148,9 @@ namespace SpaceDSL {
         Mission                                     *m_pMission;
         map<int, Target *>                          *m_pTargetMap;
         map<int, SpaceVehicle *>                    *m_pSpaceVehicleMap;
-        CalendarTime                                *m_pInitialEpoch;
-        CalendarTime                                *m_pTerminationEpoch;
+        double                                      *m_pStartEpoch;
+        double                                      *m_pEndEpoch;
+        double                                      *m_pTerminationEpoch;
 
         ///< [Vehicle, [Mjd_UTC, pos(3), vel(3), LLA(3), mass]]
         map<SpaceVehicle *, vector<double *> *>                                         *m_pProcessDataMap;

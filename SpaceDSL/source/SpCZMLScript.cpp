@@ -91,8 +91,8 @@ namespace SpaceDSL {
         if (m_bIsInitialized != true)
             throw SPException(__FILE__, __FUNCTION__, __LINE__, "CZMLScript Uninitialized!");
 
-        auto initialEpoch = m_pMission->GetInitialEpoch();
-        auto terminationEpoch = m_pMission->GetTerminationEpoch();
+        auto initialEpoch = m_pMission->GetStartEpochDate();
+        auto terminationEpoch = m_pMission->GetTerminationEpochDate();
         string initialEpochStr = FormTimeStr(initialEpoch.Year(),initialEpoch.Mon(),initialEpoch.Day(),
                                              initialEpoch.Hour(),initialEpoch.Min(),initialEpoch.Sec());
         string intervalEpochStr = FormTimeIntervalStr(initialEpoch.Year(),initialEpoch.Mon(),initialEpoch.Day(),

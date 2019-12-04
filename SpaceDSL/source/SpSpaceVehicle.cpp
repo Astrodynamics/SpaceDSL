@@ -69,7 +69,7 @@ namespace SpaceDSL {
         m_SRPArea = 0.0;
     }
 
-    SpaceVehicle::SpaceVehicle(const string &name, const CalendarTime &initialEpoch,
+    SpaceVehicle::SpaceVehicle(const string &name, const CalendarTime &initialEpochDate,
                                const CartState &initialState, const double initialMass,
                                const double dragCoef, const double dragArea,
                                const double SRPCoef, const double SRPArea)
@@ -77,7 +77,7 @@ namespace SpaceDSL {
         m_ID = ++VehicleID;
         m_Name = name;
         m_InitialCartState = initialState;
-        m_InitialEpoch = CalendarTimeToMjd(initialEpoch);
+        m_InitialEpoch = CalendarTimeToMjd(initialEpochDate);
         m_InitialMass = initialMass;
 
         m_Epoch = m_InitialEpoch;
@@ -90,7 +90,7 @@ namespace SpaceDSL {
         m_SRPArea = SRPArea;
     }
 
-    SpaceVehicle::SpaceVehicle(const string &name, const double initialEpoch,
+    SpaceVehicle::SpaceVehicle(const string &name, const double initialEpochMjd,
                                const CartState &initialState, const double initialMass,
                                const double dragCoef, const double dragArea,
                                const double SRPCoef, const double SRPArea)
@@ -98,7 +98,7 @@ namespace SpaceDSL {
         m_ID = ++VehicleID;
         m_Name = name;
         m_InitialCartState = initialState;
-        m_InitialEpoch = initialEpoch;
+        m_InitialEpoch = initialEpochMjd;
         m_InitialMass = initialMass;
 
         m_Epoch = m_InitialEpoch;

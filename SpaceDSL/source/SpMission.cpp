@@ -64,6 +64,10 @@ namespace SpaceDSL {
         m_FacilityNumber = 0;
         m_TargetNumber = 0;
 
+        m_StartEpoch = 0;
+        m_EndEpoch = 0;
+        m_TerminationEpoch = 0;
+
         m_SpaceVehicleMap.clear();
         m_FacilityMap.clear();
         m_TargetMap.clear();
@@ -92,7 +96,6 @@ namespace SpaceDSL {
                 delete targetPair.second;
         }
         m_TargetMap.clear();
-
         m_FacilityMap.clear();
 
         for (auto iter = m_ProcessDataMap.begin();
@@ -163,10 +166,24 @@ namespace SpaceDSL {
     {
         auto iterVehicle = m_SpaceVehicleMap.find(id);
         auto iterVehiclPropagator = m_SpaceVehiclPropagatorMap.find(id);
+
         if (iterVehicle != m_SpaceVehicleMap.end() && iterVehiclPropagator != m_SpaceVehiclPropagatorMap.end())
         {
+            auto iterVehiclProcessData = m_ProcessDataMap.find(iterVehicle->second);
+            if (iterVehiclProcessData == m_ProcessDataMap.end())
+            {
+                throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                          "Mission::RemoveSpaceVehicle iterVehiclProcessData == m_ProcessDataMap.end()");
+            }
+            for(auto pData:(*(iterVehiclProcessData->second)))
+            {
+                if (pData != nullptr)
+                    delete pData;
+            }
+            delete iterVehiclProcessData->second;
             delete iterVehicle->second;
             delete iterVehiclPropagator->second;
+            m_ProcessDataMap.erase(iterVehiclProcessData);
             m_SpaceVehicleMap.erase(iterVehicle);
             m_SpaceVehiclPropagatorMap.erase(iterVehiclPropagator);
             --m_SpaceVehicleNumber;
@@ -352,13 +369,43 @@ namespace SpaceDSL {
         m_bIsPropagatorInitialized = true;
     }
 
-    void Mission::SetMissionSequence(const CalendarTime& initialEpoch, double durationSec)
+    void Mission::SetMissionSequence(const CalendarTime& startEpochDate, double durationSec)
     {
-        m_InitialEpoch = initialEpoch;
-        double Mjd0 = CalendarTimeToMjd(m_InitialEpoch);
-        MjdToCalendarTime(Mjd0 + durationSec/DayToSec, m_TerminationEpoch);
+        if (durationSec <= 0)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::SetMissionSequence (durationSec <= 0)! ");
+        }
+        m_StartEpoch = CalendarTimeToMjd(startEpochDate);
+        m_EndEpoch = m_StartEpoch + durationSec/DayToSec;
         m_DurationSec = durationSec;
 
+        m_bIsMissionSequenceInitialized = true;
+    }
+
+    void Mission::SetMissionSequence(const CalendarTime &startEpochDate, const CalendarTime &endEpochDate)
+    {
+        m_StartEpoch = CalendarTimeToMjd(startEpochDate);
+        m_EndEpoch =  CalendarTimeToMjd(endEpochDate);
+        m_DurationSec = (m_EndEpoch - m_StartEpoch) * DayToSec;
+        if (m_DurationSec <= 0)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::SetMissionSequence (m_DurationSec <= 0)! ");
+        }
+        m_bIsMissionSequenceInitialized = true;
+    }
+
+    void Mission::SetMissionSequence(double initialEpochMjd, double terminationEpochMjd)
+    {
+        m_StartEpoch = initialEpochMjd;
+        m_EndEpoch = terminationEpochMjd;
+        m_DurationSec = (m_EndEpoch - m_StartEpoch) * DayToSec;
+        if (m_DurationSec <= 0)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::SetMissionSequence (m_DurationSec <= 0)! ");
+        }
         m_bIsMissionSequenceInitialized = true;
     }
 
@@ -448,17 +495,63 @@ namespace SpaceDSL {
         return m_pInitialPropagator;
     }
 
-    const CalendarTime &Mission::GetInitialEpoch() const
+    CalendarTime Mission::GetStartEpochDate() const
     {
         if (m_bIsMissionSequenceInitialized == false)
         {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::Start (Mission Sequence Uninitialised)! ");
         }
-        return m_InitialEpoch;
+        CalendarTime dateTime;
+        MjdToCalendarTime(m_StartEpoch, dateTime);
+        return dateTime;
     }
 
-    const CalendarTime &Mission::GetTerminationEpoch() const
+    CalendarTime Mission::GetEndEpochDate() const
+    {
+        if (m_bIsMissionSequenceInitialized == false)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::Start (Mission Sequence Uninitialised)! ");
+        }
+        CalendarTime dateTime;
+        MjdToCalendarTime(m_EndEpoch, dateTime);
+        return dateTime;
+    }
+
+    CalendarTime Mission::GetTerminationEpochDate() const
+    {
+        if (m_bIsMissionSequenceInitialized == false)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::Start (Mission Sequence Uninitialised)! ");
+        }
+        CalendarTime dateTime;
+        MjdToCalendarTime(m_TerminationEpoch, dateTime);
+        return dateTime;
+    }
+
+    double Mission::GetStartEpoch() const
+    {
+        if (m_bIsMissionSequenceInitialized == false)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::Start (Mission Sequence Uninitialised)! ");
+        }
+        return m_StartEpoch;
+    }
+
+    double Mission::GetEndEpoch() const
+    {
+        if (m_bIsMissionSequenceInitialized == false)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::Start (Mission Sequence Uninitialised)! ");
+        }
+        return m_EndEpoch;
+    }
+
+    double Mission::GetTerminationEpoch() const
     {
         if (m_bIsMissionSequenceInitialized == false)
         {
@@ -709,17 +802,11 @@ namespace SpaceDSL {
         m_SpaceVehicleIndex = index;
     }
 
-    void MissionThread::SaveProcessDataLine(SpaceVehicle *pVehicle, const double Mjd,
-                                            const Vector3d &pos, const Vector3d &vel,
-                                            const GeodeticCoord &LLA, const double mass)
+    void MissionThread::SaveProcessDataLine(vector<double *> &processDataList, const double Mjd,
+                                             const Vector3d &pos, const Vector3d &vel,
+                                             const GeodeticCoord &LLA, const double mass)
     {
-        auto iter = m_pProcessDataMap->find(pVehicle);
-        if (iter == m_pProcessDataMap->end())
-            throw SPException(__FILE__, __FUNCTION__, __LINE__,
-                      "MissionThread::SaveProcessDataLine Cant Find ProcessData!");
-
         double *processData = new double[11];
-        auto processDataList = iter->second;
 
         processData[0] = Mjd;
         processData[1] = pos(0);   processData[2] = pos(1);   processData[3] = pos(2);
@@ -728,7 +815,149 @@ namespace SpaceDSL {
         processData[8] = LLA.Latitude();
         processData[9] = LLA.Altitude();
         processData[10] = mass;
-        processDataList->push_back(processData);
+        processDataList.push_back(processData);
+    }
+
+    vector<double *> MissionThread::IntegralToStartEpoch(SpaceVehicle * pVehicle, double startEpoch)
+    {
+        vector<double *> processDataList;
+        GeodeticCoordSystem GEO(GeodeticCoordSystem::GeodeticCoordType::E_WGS84System);
+        GeodeticCoord LLA;
+        double Mjd_UTC0 ;
+        double Mjd_UTC;
+        Vector3d pos,vel;
+        double  mass;
+
+        Propagator * pPropagator = m_pSpaceVehiclPropagatorMap->find(pVehicle->GetID())->second;
+        *pPropagator = *m_pInitialPropagator;
+
+        OrbitPredict orbit;
+        OrbitPredictConfig predictConfig;
+
+        Mjd_UTC0 = pVehicle->GetEpoch();
+        Mjd_UTC = Mjd_UTC0;
+        // If StartEpoch is earlier than Vehicle Epoch, InitialStep Should Reset to Negative.
+        if(startEpoch < Mjd_UTC0)
+            pPropagator->SetInitialStep(-pPropagator->GetInitialStep());
+
+        pos = pVehicle->GetCartState().Pos();
+        vel = pVehicle->GetCartState().Vel();
+        mass = pVehicle->GetMass();
+
+        auto Ap = m_pEnvironment->GetGeomagneticIndex();
+        double *ap = new double[7];
+        memcpy(ap, &Ap[0], 7*sizeof(double));
+
+        predictConfig.Initializer(Mjd_UTC0, m_pEnvironment->GetCenterStarType(),
+                                  pPropagator->GetIsUseNormalize(),
+                                  m_pEnvironment->GetGravModelType(),
+                                  m_pEnvironment->GetGravMaxDegree() ,
+                                  m_pEnvironment->GetGravMaxOrder(),
+                                  m_pEnvironment->GetThirdBodySign(),
+                                  m_pEnvironment->GetGeodeticCoordType(),
+                                  m_pEnvironment->GetAtmosphereModelType(),
+                                  pVehicle->GetDragCoef(),
+                                  pVehicle->GetDragArea(),
+                                  m_pEnvironment->GetAverageF107(),
+                                  m_pEnvironment->GetDailyF107(),
+                                  ap,
+                                  pVehicle->GetSRPCoef(),
+                                  pVehicle->GetSRPArea(),
+                                  m_pEnvironment->GetIsUseDrag(),
+                                  m_pEnvironment->GetIsUseSRP());
+        LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
+        this->SaveProcessDataLine(processDataList, Mjd_UTC, pos, vel, LLA, mass);
+        double step = 0.0;
+        while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
+        {
+            if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
+            {
+                step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
+                pPropagator->SetAdaptedStep(step);
+            }
+            predictConfig.Update(Mjd_UTC);
+            step = orbit.OrbitStep(predictConfig, pPropagator, mass, pos, vel);
+            Mjd_UTC +=  step/DayToSec;
+            LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
+            pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
+            this->SaveProcessDataLine(processDataList, Mjd_UTC, pos, vel, LLA, mass);
+            m_pMission->m_TerminationEpoch = Mjd_UTC;
+        }
+
+        delete [] ap;
+
+        return processDataList;
+    }
+
+    vector<double *> MissionThread::IntegralToEndEpoch(SpaceVehicle *pVehicle, double endEpoch)
+    {
+        vector<double *> processDataList;
+        GeodeticCoordSystem GEO(GeodeticCoordSystem::GeodeticCoordType::E_WGS84System);
+        GeodeticCoord LLA;
+        double Mjd_UTC0 ;
+        double Mjd_UTC;
+        Vector3d pos,vel;
+        double  mass;
+
+        Propagator * pPropagator = m_pSpaceVehiclPropagatorMap->find(pVehicle->GetID())->second;
+        *pPropagator = *m_pInitialPropagator;
+
+        OrbitPredict orbit;
+        OrbitPredictConfig predictConfig;
+
+        Mjd_UTC0 = pVehicle->GetEpoch();
+        Mjd_UTC = Mjd_UTC0;
+        // If EndEpoch is earlier than Vehicle Epoch, InitialStep Should Reset to Negative.
+        if(endEpoch < Mjd_UTC0)
+            pPropagator->SetInitialStep(-pPropagator->GetInitialStep());
+
+        pos = pVehicle->GetCartState().Pos();
+        vel = pVehicle->GetCartState().Vel();
+        mass = pVehicle->GetMass();
+
+        auto Ap = m_pEnvironment->GetGeomagneticIndex();
+        double *ap = new double[7];
+        memcpy(ap, &Ap[0], 7*sizeof(double));
+
+        predictConfig.Initializer(Mjd_UTC0, m_pEnvironment->GetCenterStarType(),
+                                  pPropagator->GetIsUseNormalize(),
+                                  m_pEnvironment->GetGravModelType(),
+                                  m_pEnvironment->GetGravMaxDegree() ,
+                                  m_pEnvironment->GetGravMaxOrder(),
+                                  m_pEnvironment->GetThirdBodySign(),
+                                  m_pEnvironment->GetGeodeticCoordType(),
+                                  m_pEnvironment->GetAtmosphereModelType(),
+                                  pVehicle->GetDragCoef(),
+                                  pVehicle->GetDragArea(),
+                                  m_pEnvironment->GetAverageF107(),
+                                  m_pEnvironment->GetDailyF107(),
+                                  ap,
+                                  pVehicle->GetSRPCoef(),
+                                  pVehicle->GetSRPArea(),
+                                  m_pEnvironment->GetIsUseDrag(),
+                                  m_pEnvironment->GetIsUseSRP());
+        LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
+        this->SaveProcessDataLine(processDataList, Mjd_UTC, pos, vel, LLA, mass);
+        double step = 0.0;
+        while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
+        {
+            if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
+            {
+                step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
+                pPropagator->SetAdaptedStep(step);
+            }
+            predictConfig.Update(Mjd_UTC);
+            step = orbit.OrbitStep(predictConfig, pPropagator, mass, pos, vel);
+            Mjd_UTC +=  step/DayToSec;
+            LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
+            pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
+            this->SaveProcessDataLine(processDataList, Mjd_UTC, pos, vel, LLA, mass);
+            m_pMission->m_TerminationEpoch = Mjd_UTC;
+        }
+
+        delete [] ap;
+
+        return processDataList;
     }
 
     void MissionThread::Run()
@@ -749,58 +978,70 @@ namespace SpaceDSL {
             for (auto &vehiclePair:(*m_pSpaceVehicleMap))
             {
                 SpaceVehicle *pVehicle = vehiclePair.second;
-                Propagator * pPropagator = m_pSpaceVehiclPropagatorMap->find(pVehicle->GetID())->second;
-                *pPropagator = *m_pInitialPropagator;
-                OrbitPredict orbit;
-                OrbitPredictConfig predictConfig;
-
-                Mjd_UTC0 = pVehicle->GetEpoch();
-                Mjd_UTC = Mjd_UTC0;
-                pos = pVehicle->GetCartState().Pos();
-                vel = pVehicle->GetCartState().Vel();
-                mass = pVehicle->GetMass();
-
-                auto Ap = m_pEnvironment->GetGeomagneticIndex();
-                double *ap = new double[7];
-                memcpy(ap, &Ap[0], 7*sizeof(double));
-
-                predictConfig.Initializer(Mjd_UTC0, m_pEnvironment->GetCenterStarType(),
-                                          pPropagator->GetIsUseNormalize(),
-                                          m_pEnvironment->GetGravModelType(),
-                                          m_pEnvironment->GetGravMaxDegree() ,
-                                          m_pEnvironment->GetGravMaxOrder(),
-                                          m_pEnvironment->GetThirdBodySign(),
-                                          m_pEnvironment->GetGeodeticCoordType(),
-                                          m_pEnvironment->GetAtmosphereModelType(),
-                                          pVehicle->GetDragCoef(),
-                                          pVehicle->GetDragArea(),
-                                          m_pEnvironment->GetAverageF107(),
-                                          m_pEnvironment->GetDailyF107(),
-                                          ap,
-                                          pVehicle->GetSRPCoef(),
-                                          pVehicle->GetSRPArea(),
-                                          m_pEnvironment->GetIsUseDrag(),
-                                          m_pEnvironment->GetIsUseSRP());
-                LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
-                this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
-                double step = 0.0;
-                while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
+                double vehicleEpoch = pVehicle->GetEpoch();
+                double startEpoch = m_pMission->GetStartEpoch();
+                double endEpoch = m_pMission->GetEndEpoch();
+                //StartTime - EndTime - VehicleEpoch
+                if(vehicleEpoch > startEpoch && vehicleEpoch >= endEpoch)
                 {
-                    if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
+                    auto dataList = this->IntegralToStartEpoch(pVehicle, startEpoch);
+                    reverse(dataList.begin(), dataList.end());
+                    auto iter = m_pProcessDataMap->find(pVehicle);
+                    if (iter == m_pProcessDataMap->end())
+                        throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                                  "MissionThread::Run Can not Find ProcessData!");
+                    auto processDataList = iter->second;
+                    for(auto pData:dataList)
                     {
-                        step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
-                        pPropagator->SetAdaptedStep(step);
+                        if (pData[0] >= startEpoch && pData[0] <= endEpoch)
+                            processDataList->push_back(pData);
                     }
-                    predictConfig.Update(Mjd_UTC);
-                    step = orbit.OrbitStep(predictConfig, pPropagator, mass, pos, vel);
-                    Mjd_UTC +=  step/DayToSec;
-                    LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
-                    pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
-                    this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
-                    MjdToCalendarTime(Mjd_UTC, m_pMission->m_TerminationEpoch);
                 }
+                //StartTime - Epoch - EndTime
+                else if (vehicleEpoch > startEpoch && vehicleEpoch < endEpoch)
+                {
+                    auto iter = m_pProcessDataMap->find(pVehicle);
+                    if (iter == m_pProcessDataMap->end())
+                        throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                                  "MissionThread::Run Can not Find ProcessData!");
+                    auto processDataList = iter->second;
 
-                delete [] ap;
+                    auto dataList1 = this->IntegralToStartEpoch(pVehicle, startEpoch);
+                    reverse(dataList1.begin(), dataList1.end());
+                    for(auto pData:dataList1)
+                    {
+                        if (pData[0] >= startEpoch && pData[0] <= vehicleEpoch)
+                            processDataList->push_back(pData);
+                    }
+
+                    auto dataList2 = this->IntegralToEndEpoch(pVehicle, endEpoch);
+                    for(auto pData:dataList2)
+                    {
+                        if (pData[0] > vehicleEpoch && pData[0] <= endEpoch)
+                            processDataList->push_back(pData);
+                    }
+                }
+                //Epoch - StartTime - EndTime
+                else if (vehicleEpoch <= startEpoch && vehicleEpoch < endEpoch)
+                {
+                    auto dataList = this->IntegralToEndEpoch(pVehicle, endEpoch);
+
+                    auto iter = m_pProcessDataMap->find(pVehicle);
+                    if (iter == m_pProcessDataMap->end())
+                        throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                                  "MissionThread::Run Can not Find ProcessData!");
+                    auto processDataList = iter->second;
+                    for(auto pData:dataList)
+                    {
+                        if (pData[0] >= startEpoch && pData[0] <= endEpoch)
+                            processDataList->push_back(pData);
+                    }
+                }
+                else
+                {
+                    throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "MissionThread::Run() Epoch Out of Condition!");
+                }
             }
 
         }
@@ -813,59 +1054,71 @@ namespace SpaceDSL {
                           "MissionThread::Run (Can Find Vehicle in SpaceVehicleMap by index ID)");
 
             SpaceVehicle *pVehicle = iter->second;
-            Propagator * pPropagator = m_pSpaceVehiclPropagatorMap->find(pVehicle->GetID())->second;
-            *pPropagator = *m_pInitialPropagator;
 
-            OrbitPredict orbit;
-            OrbitPredictConfig predictConfig;
-
-            Mjd_UTC0 = pVehicle->GetEpoch();
-            Mjd_UTC = Mjd_UTC0;
-            pos = pVehicle->GetCartState().Pos();
-            vel = pVehicle->GetCartState().Vel();
-            mass = pVehicle->GetMass();
-
-            auto Ap = m_pEnvironment->GetGeomagneticIndex();
-            double *ap = new double[7];
-            memcpy(ap, &Ap[0], 7*sizeof(double));
-
-            predictConfig.Initializer(Mjd_UTC0, m_pEnvironment->GetCenterStarType(),
-                                      pPropagator->GetIsUseNormalize(),
-                                      m_pEnvironment->GetGravModelType(),
-                                      m_pEnvironment->GetGravMaxDegree() ,
-                                      m_pEnvironment->GetGravMaxOrder(),
-                                      m_pEnvironment->GetThirdBodySign(),
-                                      m_pEnvironment->GetGeodeticCoordType(),
-                                      m_pEnvironment->GetAtmosphereModelType(),
-                                      pVehicle->GetDragCoef(),
-                                      pVehicle->GetDragArea(),
-                                      m_pEnvironment->GetAverageF107(),
-                                      m_pEnvironment->GetDailyF107(),
-                                      ap,
-                                      pVehicle->GetSRPCoef(),
-                                      pVehicle->GetSRPArea(),
-                                      m_pEnvironment->GetIsUseDrag(),
-                                      m_pEnvironment->GetIsUseSRP());
-            LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
-            this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
-            double step = 0.0;
-            while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
+            double vehicleEpoch = pVehicle->GetEpoch();
+            double startEpoch = m_pMission->GetStartEpoch();
+            double endEpoch = m_pMission->GetEndEpoch();
+            //StartTime - EndTime - VehicleEpoch
+            if(vehicleEpoch > startEpoch && vehicleEpoch >= endEpoch)
             {
-                if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
+                auto dataList = this->IntegralToStartEpoch(pVehicle, startEpoch);
+                reverse(dataList.begin(), dataList.end());
+                auto iter = m_pProcessDataMap->find(pVehicle);
+                if (iter == m_pProcessDataMap->end())
+                    throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "MissionThread::Run Can not Find ProcessData!");
+                auto processDataList = iter->second;
+                for(auto pData:dataList)
                 {
-                    step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
-                    pPropagator->SetAdaptedStep(step);
+                    if (pData[0] >= startEpoch && pData[0] <= endEpoch)
+                        processDataList->push_back(pData);
                 }
-                predictConfig.Update(Mjd_UTC);
-                step = orbit.OrbitStep(predictConfig, pPropagator, mass, pos, vel);
-                Mjd_UTC +=  step/DayToSec;
-                LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
-                pVehicle->UpdateState(Mjd_UTC, pos, vel, mass);
-                this->SaveProcessDataLine(pVehicle, Mjd_UTC, pos, vel, LLA, mass);
-                MjdToCalendarTime(Mjd_UTC, m_pMission->m_TerminationEpoch);
             }
+            //StartTime - Epoch - EndTime
+            else if (vehicleEpoch > startEpoch && vehicleEpoch < endEpoch)
+            {
+                auto iter = m_pProcessDataMap->find(pVehicle);
+                if (iter == m_pProcessDataMap->end())
+                    throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "MissionThread::Run Can not Find ProcessData!");
+                auto processDataList = iter->second;
 
-            delete [] ap;
+                auto dataList1 = this->IntegralToStartEpoch(pVehicle, startEpoch);
+                reverse(dataList1.begin(), dataList1.end());
+                for(auto pData:dataList1)
+                {
+                    if (pData[0] >= startEpoch && pData[0] <= vehicleEpoch)
+                        processDataList->push_back(pData);
+                }
+
+                auto dataList2 = this->IntegralToEndEpoch(pVehicle, endEpoch);
+                for(auto pData:dataList2)
+                {
+                    if (pData[0] > vehicleEpoch && pData[0] <= endEpoch)
+                        processDataList->push_back(pData);
+                }
+            }
+            //Epoch - StartTime - EndTime
+            else if (vehicleEpoch <= startEpoch && vehicleEpoch < endEpoch)
+            {
+                auto dataList = this->IntegralToEndEpoch(pVehicle, endEpoch);
+
+                auto iter = m_pProcessDataMap->find(pVehicle);
+                if (iter == m_pProcessDataMap->end())
+                    throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                              "MissionThread::Run Can not Find ProcessData!");
+                auto processDataList = iter->second;
+                for(auto pData:dataList)
+                {
+                    if (pData[0] >= startEpoch && pData[0] <= endEpoch)
+                        processDataList->push_back(pData);
+                }
+            }
+            else
+            {
+                throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                          "MissionThread::Run() Epoch Out of Condition!");
+            }
         }
 
     }

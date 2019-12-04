@@ -60,7 +60,8 @@ namespace SpaceDSL {
         m_pMission = nullptr;                                 
         m_pTargetMap = nullptr;
         m_pSpaceVehicleMap = nullptr;
-        m_pInitialEpoch = nullptr;
+        m_pStartEpoch = nullptr;
+        m_pEndEpoch = nullptr;
         m_pTerminationEpoch = nullptr;
         m_pProcessDataMap = nullptr;
         m_pAccessDataMap = nullptr;
@@ -71,7 +72,8 @@ namespace SpaceDSL {
         m_pMission = pMission;
         m_pTargetMap = &(pMission->m_TargetMap);
         m_pSpaceVehicleMap = &(pMission->m_SpaceVehicleMap);
-        m_pInitialEpoch = &(pMission->m_InitialEpoch);
+        m_pStartEpoch = &(pMission->m_StartEpoch);
+        m_pEndEpoch = &(pMission->m_EndEpoch);
         m_pTerminationEpoch = &(pMission->m_TerminationEpoch);
         m_pProcessDataMap = &(pMission->m_ProcessDataMap);
         m_pAccessDataMap = &(pMission->m_AccessDataMap);
@@ -87,7 +89,8 @@ namespace SpaceDSL {
         m_pMission = pMission;
         m_pTargetMap = &(pMission->m_TargetMap);
         m_pSpaceVehicleMap = &(pMission->m_SpaceVehicleMap);
-        m_pInitialEpoch = &(pMission->m_InitialEpoch);
+        m_pStartEpoch = &(pMission->m_StartEpoch);
+        m_pEndEpoch = &(pMission->m_EndEpoch);
         m_pTerminationEpoch = &(pMission->m_TerminationEpoch);
         m_pProcessDataMap = &(pMission->m_ProcessDataMap);
         m_pAccessDataMap = &(pMission->m_AccessDataMap);
@@ -653,7 +656,8 @@ namespace SpaceDSL {
         m_pMission = nullptr;
         m_pTargetMap = nullptr;
         m_pSpaceVehicleMap = nullptr;
-        m_pInitialEpoch = nullptr;
+        m_pStartEpoch = nullptr;
+        m_pEndEpoch = nullptr;
         m_pTerminationEpoch = nullptr;
         m_pProcessDataMap = nullptr;
         m_pAccessDataMap = nullptr;
