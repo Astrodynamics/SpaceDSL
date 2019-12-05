@@ -135,7 +135,7 @@ namespace SpaceDSL {
             delete m_pAccessAnalysis;
     }
 
-    SpaceVehicle *Mission::InsertSpaceVehicle(const string &name, const CalendarTime& initialEpoch,
+    SpaceVehicle *Mission::InsertSpaceVehicle(const string &name, const CalendarTime& initialEpochDate,
                                      const CartState& initialState, const double initialMass,
                                      const double dragCoef, const double dragArea,
                                      const double SRPCoef, const double SRPArea)
@@ -145,7 +145,34 @@ namespace SpaceDSL {
             throw SPException(__FILE__, __FUNCTION__, __LINE__,
                       "Mission::InsertSpaceVehicle (SpaceVehicleNumber) != (SpaceVehicleList.Size)! ");
         }
-        SpaceVehicle *pVehicle = new SpaceVehicle(  name,           initialEpoch,
+        SpaceVehicle *pVehicle = new SpaceVehicle(  name,           initialEpochDate,
+                                                    initialState,   initialMass,
+                                                    dragCoef,       dragArea,
+                                                    SRPCoef,        SRPArea);
+        int vehicleID = pVehicle->GetID();
+        ++m_SpaceVehicleNumber;
+        m_SpaceVehicleMap.insert(pair<int, SpaceVehicle *>(vehicleID, pVehicle));
+
+        Propagator * pPropagator = new Propagator();
+        m_SpaceVehiclPropagatorMap.insert(pair<int, Propagator *>(vehicleID, pPropagator));
+
+        vector<double *> *pOneVehicleData = new vector<double *>;
+        m_ProcessDataMap.insert(pair<SpaceVehicle *, vector<double *> *>(pVehicle ,pOneVehicleData));
+
+        return pVehicle;
+    }
+
+    SpaceVehicle *Mission::InsertSpaceVehicle(const string &name, const double initialEpochMjd,
+                                              const CartState &initialState, const double initialMass,
+                                              const double dragCoef, const double dragArea,
+                                              const double SRPCoef, const double SRPArea)
+    {
+        if (m_SpaceVehicleNumber != int(m_SpaceVehicleMap.size()))
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::InsertSpaceVehicle (SpaceVehicleNumber) != (SpaceVehicleList.Size)! ");
+        }
+        SpaceVehicle *pVehicle = new SpaceVehicle(  name,           initialEpochMjd,
                                                     initialState,   initialMass,
                                                     dragCoef,       dragArea,
                                                     SRPCoef,        SRPArea);
@@ -865,14 +892,14 @@ namespace SpaceDSL {
                                   pVehicle->GetSRPArea(),
                                   m_pEnvironment->GetIsUseDrag(),
                                   m_pEnvironment->GetIsUseSRP());
-        LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
+        LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
         this->SaveProcessDataLine(processDataList, Mjd_UTC, pos, vel, LLA, mass);
         double step = 0.0;
-        while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
+        while (fabs(startEpoch - Mjd_UTC)*DayToSec > 0.001)
         {
-            if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
+            if (fabs(startEpoch - Mjd_UTC)*DayToSec < step)
             {
-                step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
+                step = (startEpoch - Mjd_UTC )*DayToSec;
                 pPropagator->SetAdaptedStep(step);
             }
             predictConfig.Update(Mjd_UTC);
@@ -936,14 +963,14 @@ namespace SpaceDSL {
                                   pVehicle->GetSRPArea(),
                                   m_pEnvironment->GetIsUseDrag(),
                                   m_pEnvironment->GetIsUseSRP());
-        LLA = GEO.GetGeodeticCoord(pos,Mjd_UTC);
+        LLA = GEO.GetGeodeticCoord(pos, Mjd_UTC);
         this->SaveProcessDataLine(processDataList, Mjd_UTC, pos, vel, LLA, mass);
         double step = 0.0;
-        while (m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec > 0.001)
+        while ( fabs(endEpoch - Mjd_UTC)*DayToSec > 0.001 )
         {
-            if ((Mjd_UTC - Mjd_UTC0)*DayToSec + step >  m_pMission->m_DurationSec)
+            if (fabs(endEpoch - Mjd_UTC)*DayToSec < step)
             {
-                step = m_pMission->m_DurationSec - (Mjd_UTC - Mjd_UTC0)*DayToSec;
+                step = (endEpoch - Mjd_UTC)*DayToSec;
                 pPropagator->SetAdaptedStep(step);
             }
             predictConfig.Update(Mjd_UTC);

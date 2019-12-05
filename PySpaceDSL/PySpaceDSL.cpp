@@ -1264,11 +1264,29 @@ PYBIND11_MODULE(PySpaceDSL, m) {
                                                                 )pbdoc")
             .def(py::init<>())
             .def("Destory", &Mission::Destory)
-            .def("InsertSpaceVehicle", &Mission::InsertSpaceVehicle, py::return_value_policy::reference_internal,
+            .def("InsertSpaceVehicle",
+                 py::overload_cast<const string &, const CalendarTime&, const CartState&, const double,
+                 const double, const double, const double, const double>(&Mission::InsertSpaceVehicle),
+                 py::return_value_policy::reference_internal,
                  R"pbdoc(
                  @Input
                  const string &name,
-                 const CalendarTime& initialEpoch,
+                 const CalendarTime& initialEpochDate,
+                 const CartState& initialState,
+                 const double initialMass,
+                 const double dragCoef,
+                 const double dragArea,
+                 const double SRPCoef,
+                 const double SRPArea
+                 )pbdoc")
+            .def("InsertSpaceVehicle",
+                 py::overload_cast<const string &, const double, const CartState&, const double,
+                 const double, const double, const double, const double>(&Mission::InsertSpaceVehicle),
+                 py::return_value_policy::reference_internal,
+                 R"pbdoc(
+                 @Input
+                 const string &name,
+                 const double initialEpochMjd,
                  const CartState& initialState,
                  const double initialMass,
                  const double dragCoef,

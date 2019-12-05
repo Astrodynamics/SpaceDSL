@@ -92,7 +92,12 @@ namespace SpaceDSL {
         /// @Param
         /// @Return SpaceVehicle *  The SpaceVehicle Point Which Insert into The Mission
         /**********************************************************************/
-        SpaceVehicle    *InsertSpaceVehicle(const string &name, const CalendarTime& initialEpoch,
+        SpaceVehicle    *InsertSpaceVehicle(const string &name, const CalendarTime& initialEpochDate,
+                                           const CartState& initialState, const double initialMass,
+                                           const double dragCoef, const double dragArea,
+                                           const double SRPCoef, const double SRPArea);
+
+        SpaceVehicle    *InsertSpaceVehicle(const string &name, const double initialEpochMjd,
                                            const CartState& initialState, const double initialMass,
                                            const double dragCoef, const double dragArea,
                                            const double SRPCoef, const double SRPArea);
