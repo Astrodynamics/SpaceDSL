@@ -6,7 +6,10 @@
         "start": "electron ."
     },
     "devDependencies": {
-        "cesium": "^1.57.0",
-        "electron": "^2.0.18"
+        "cesium": "^1.64.0",
+        "electron": "^4.2.12"
+    },
+    "dependencies": {
+        "glob": "^7.1.6"
     }
 }
