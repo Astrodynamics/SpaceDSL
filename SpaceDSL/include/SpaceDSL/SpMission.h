@@ -272,9 +272,29 @@ namespace SpaceDSL {
         /**********************************************************************/
         void    Clear();
 
+        /********************************************************************/
+        /// Get Cart State Data in Mission At Mjd
+        /// By Fifth Order Lagrange Polynomial Interpolation
+        /// @Author     Niu Zhiyong
+        /// @Date       2020-01-03
+        /// @Input
+        /// @Output
+        /// @Return
+        /**********************************************************************/
+        CartState   GetCartState(SpaceVehicle * vehicle, double Mjd);
+
+        /********************************************************************/
+        /// Get All Data in Mission
+        /// @Author     Niu Zhiyong
+        /// @Date       2020-01-03
+        /// @Input
+        /// @Output
+        /// @Return
+        /**********************************************************************/
         const map<SpaceVehicle *, vector<double *> *>                                       *GetProcessDataMap() const;
 
         const map<pair<Target *, SpaceVehicle *>, vector<pair<UTCCalTime, UTCCalTime> > >   *GetAccessData() const;
+
 
     private:
 

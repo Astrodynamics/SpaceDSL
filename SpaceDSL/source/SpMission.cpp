@@ -39,6 +39,7 @@
 #include "SpaceDSL/SpSpaceVehicle.h"
 #include "SpaceDSL/SpFacility.h"
 #include "SpaceDSL/SpOrbitPredict.h"
+#include "SpaceDSL/SpInterpolation.h"
 #include "SpaceDSL/SpUtils.h"
 #include "SpaceDSL/SpConst.h"
 
@@ -767,6 +768,124 @@ namespace SpaceDSL {
             delete m_pInitialPropagator;
             m_pInitialPropagator = nullptr;
         }
+    }
+
+    CartState Mission::GetCartState(SpaceVehicle *vehicle, double Mjd)
+    {
+        CartState cart;
+        auto iterProcessData = m_ProcessDataMap.find(vehicle);
+        if (iterProcessData == m_ProcessDataMap.end())
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::GetCartState (Can not find Process Data of The vehicle)! ");
+        }
+        //[Mjd_UTC, pos(3), vel(3), LLA(3), mass]
+        auto pProcessData = iterProcessData->second;
+        double startMjd = (*pProcessData)[0][0];
+        double endMjd = (*pProcessData).back()[0];
+        if (Mjd < startMjd)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::GetCartState (Mjd < startMjd)! ");
+        }
+        if (Mjd > endMjd)
+        {
+            throw SPException(__FILE__, __FUNCTION__, __LINE__,
+                      "Mission::GetCartState (Mjd > endMjd)! ");
+        }
+
+        int order = 5;
+        VectorXd mjdList;   mjdList.resize(order);  mjdList.fill(0);
+        VectorXd xList;     xList.resize(order);  xList.fill(0);
+        VectorXd yList;     yList.resize(order);  yList.fill(0);
+        VectorXd zList;     zList.resize(order);  zList.fill(0);
+
+        VectorXd vxList;    vxList.resize(order);  vxList.fill(0);
+        VectorXd vyList;    vyList.resize(order);  vyList.fill(0);
+        VectorXd vzList;    vzList.resize(order);  vzList.fill(0);
+
+        int midNum = int(order/2);
+        int dataSize = (*pProcessData).size();
+        int count = 0;
+        for (auto &data:(*pProcessData))
+        {
+            if (Mjd <= data[0])
+                break;
+            ++count;
+        }
+
+        if (count <= midNum)
+        {
+            for (int i = 0; i < order; ++i)
+            {
+                mjdList(i) = (*pProcessData)[i][0];
+                xList(i) = (*pProcessData)[i][1];
+                yList(i) = (*pProcessData)[i][2];
+                zList(i) = (*pProcessData)[i][3];
+
+                vxList(i) = (*pProcessData)[i][4];
+                vyList(i) = (*pProcessData)[i][5];
+                vzList(i) = (*pProcessData)[i][6];
+            }
+        }
+        else if (count + midNum >= dataSize)
+        {
+            for (int i = 5; i > 0; --i)
+            {
+                mjdList(5-i) = (*pProcessData)[dataSize - i][0];
+                xList(5-i) = (*pProcessData)[dataSize - i][1];
+                yList(5-i) = (*pProcessData)[dataSize - i][2];
+                zList(5-i) = (*pProcessData)[dataSize - i][3];
+
+                vxList(5-i) = (*pProcessData)[dataSize - i][4];
+                vyList(5-i) = (*pProcessData)[dataSize - i][5];
+                vzList(5-i) = (*pProcessData)[dataSize - i][6];
+            }
+        }
+        else
+        {
+            for (int i = midNum; i > 0; --i)
+            {
+                mjdList(midNum - i) = (*pProcessData)[count - i][0];
+                xList(midNum - i) = (*pProcessData)[count - i][1];
+                yList(midNum - i) = (*pProcessData)[count - i][2];
+                zList(midNum - i) = (*pProcessData)[count - i][3];
+
+                vxList(midNum - i) = (*pProcessData)[count - i][4];
+                vyList(midNum - i) = (*pProcessData)[count - i][5];
+                vzList(midNum - i) = (*pProcessData)[count - i][6];
+            }
+
+            for (int i = 0; i <= midNum; ++i)
+            {
+                if (midNum + i < order)
+                {
+                    mjdList(midNum + i) = (*pProcessData)[count + i][0];
+                    xList(midNum + i) = (*pProcessData)[count + i][1];
+                    yList(midNum + i) = (*pProcessData)[count + i][2];
+                    zList(midNum + i) = (*pProcessData)[count + i][3];
+
+                    vxList(midNum + i) = (*pProcessData)[count + i][4];
+                    vyList(midNum + i) = (*pProcessData)[count + i][5];
+                    vzList(midNum + i) = (*pProcessData)[count + i][6];
+                }
+
+            }
+
+        }
+        double x = LagrangePolynomialInterpolation(mjdList, xList, Mjd);
+        double y = LagrangePolynomialInterpolation(mjdList, yList, Mjd);
+        double z = LagrangePolynomialInterpolation(mjdList, zList, Mjd);
+
+        double vx = LagrangePolynomialInterpolation(mjdList, vxList, Mjd);
+        double vy = LagrangePolynomialInterpolation(mjdList, vyList, Mjd);
+        double vz = LagrangePolynomialInterpolation(mjdList, vzList, Mjd);
+
+        cart.SetPos(x,y,z);
+        cart.SetVel(vx,vy,vz);
+        return  cart;
+
+
     }
 
     const map<SpaceVehicle *, vector<double *> *> *Mission::GetProcessDataMap() const

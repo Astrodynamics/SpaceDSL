@@ -1413,8 +1413,9 @@ PYBIND11_MODULE(PySpaceDSL, m) {
             .def("Start", &Mission::Start, py::arg("bIsMultThread") = false)
             .def("ClearProcessData", &Mission::ClearProcessData)
             .def("Clear", &Mission::Clear)
-            .def("GetProcessDataMap", &Mission::GetProcessDataMap, py::return_value_policy::reference_internal)
-            .def("GetAccessData", &Mission::GetAccessData, py::return_value_policy::reference_internal);
+            .def("GetCartState", &Mission::GetCartState)
+            .def("GetProcessDataMap", &Mission::GetProcessDataMap, py::return_value_policy::copy)
+            .def("GetAccessData", &Mission::GetAccessData, py::return_value_policy::copy);
 
     //**************************SpCZMLScript.h**************************
     py::class_<CZMLScript>(m, "CZMLScript",

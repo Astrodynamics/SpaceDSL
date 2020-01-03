@@ -49,7 +49,8 @@ int main(int argc, char *argv[])
         pMission->SetPropagator(E_RungeKutta4, 60);
         //pMission->SetPropagator(E_RungeKutta78, 60, 0.01, 1, 120, 100);
         UTCCalTime initial_time     (2018,1,5,16,58,11.1);
-        pMission->SetMissionSequence(initial_time, 86123);
+        double initial_mjd = CalendarTimeToMjd(initial_time);
+        pMission->SetMissionSequence(initial_time, 86400);
         pMission->Start(true);
 
         cout<<"------First Calculation Finished ------"<<endl;
@@ -70,6 +71,22 @@ int main(int argc, char *argv[])
                 cout<<mjd<<"    "<<data.first.ToString()<<"    "<<data.second.ToString()<<"    "<<(data.second - data.first)<<endl;
             }
         }
+
+        auto initial_data = (*pMission->GetProcessDataMap()->find(pVehicle1)->second)[0];
+        cout<<"Get Initial Cart"<<endl;
+        cout<<initial_data[0]<<"    "<<initial_data[1]<<"    "<<initial_data[2]<<"    "<<initial_data[3]
+           <<"    "<<initial_data[4]<<"    "<<initial_data[5]<<"    "<<initial_data[6]<<endl;
+
+        auto end_data = (*pMission->GetProcessDataMap()->find(pVehicle1)->second).back();
+        cout<<"Get End Cart"<<endl;
+        cout<<end_data[0]<<"    "<<end_data[1]<<"    "<<end_data[2]<<"    "<<end_data[3]
+           <<"    "<<end_data[4]<<"    "<<end_data[5]<<"    "<<end_data[6]<<endl;
+
+        double midMjd = 58124.70707291;
+        CartState midCart = pMission->GetCartState(pVehicle1, midMjd);
+        cout<<"Get Mid Cart"<<endl;
+        cout<<midMjd<<"    "<<midCart.Pos()(0)<<"    "<<midCart.Pos()(1)<<"    "<<midCart.Pos()(2)
+           <<"    "<<midCart.Vel()(0)<<"    "<<midCart.Vel()(1)<<"    "<<midCart.Vel()(2)<<endl;
 
         pVehicle1->Reset();
         pMission->ClearProcessData();
