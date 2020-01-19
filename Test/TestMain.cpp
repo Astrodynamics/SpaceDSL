@@ -72,17 +72,7 @@ int main(int argc, char *argv[])
             }
         }
 
-        auto initial_data = (*pMission->GetProcessDataMap()->find(pVehicle1)->second)[0];
-        cout<<"Get Initial Cart"<<endl;
-        cout<<initial_data[0]<<"    "<<initial_data[1]<<"    "<<initial_data[2]<<"    "<<initial_data[3]
-           <<"    "<<initial_data[4]<<"    "<<initial_data[5]<<"    "<<initial_data[6]<<endl;
-
-        auto end_data = (*pMission->GetProcessDataMap()->find(pVehicle1)->second).back();
-        cout<<"Get End Cart"<<endl;
-        cout<<end_data[0]<<"    "<<end_data[1]<<"    "<<end_data[2]<<"    "<<end_data[3]
-           <<"    "<<end_data[4]<<"    "<<end_data[5]<<"    "<<end_data[6]<<endl;
-
-        double midMjd = 58124.70707291;
+        double midMjd = 58124.50707291;
         CartState midCart = pMission->GetCartState(pVehicle1, midMjd);
         cout<<"Get Mid Cart"<<endl;
         cout<<midMjd<<"    "<<midCart.Pos()(0)<<"    "<<midCart.Pos()(1)<<"    "<<midCart.Pos()(2)
