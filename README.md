@@ -22,7 +22,7 @@ This library can compiled into `static library`, `dynamic library` and `python l
 - Common Physical Constants
 - Multi Thread Parallel Support: Similar to Qt API, including Thread and Thread Pool.
 - Support Exception Handling Based on STL.
-- Provide Nonlinear Optimization Library, Base on [NLopt](https://nlopt.readthedocs.io/en/latest/).
+- Provide Nonlinear Optimization Library, Base on [NLopt](https://nlopt.readthedocs.io/en/latest/)V2.6.1.
 - Provide ElectronVisualizer, Base on [Electron](https://electronjs.org) and [Cesium](https://cesiumjs.org/).
 ### Later support
 

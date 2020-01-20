@@ -7,17 +7,17 @@
  * distribute, sublicense, and/or sell copies of the Software, and to
  * permit persons to whom the Software is furnished to do so, subject to
  * the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be
  * included in all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
  * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
  * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #include <stdio.h>
@@ -52,6 +52,7 @@ void NLOPT_STDCALL nlopt_destroy(nlopt_opt opt)
         free(opt->lb);
         free(opt->ub);
         free(opt->xtol_abs);
+        free(opt->x_weights);
         free(opt->fc);
         free(opt->h);
         nlopt_destroy(opt->local_opt);
@@ -88,6 +89,7 @@ nlopt_opt NLOPT_STDCALL nlopt_create(nlopt_algorithm algorithm, unsigned n)
         opt->stopval = -HUGE_VAL;
         opt->ftol_rel = opt->ftol_abs = 0;
         opt->xtol_rel = 0;
+        opt->x_weights = NULL;
         opt->xtol_abs = NULL;
         opt->maxeval = 0;
         opt->numevals = 0;
@@ -133,7 +135,7 @@ nlopt_opt NLOPT_STDCALL nlopt_copy(const nlopt_opt opt)
         nlopt_munge munge;
         nopt = (nlopt_opt) malloc(sizeof(struct nlopt_opt_s));
         *nopt = *opt;
-        nopt->lb = nopt->ub = nopt->xtol_abs = NULL;
+        nopt->lb = nopt->ub = nopt->xtol_abs = nopt->x_weights = NULL;
         nopt->fc = nopt->h = NULL;
         nopt->m_alloc = nopt->p_alloc = 0;
         nopt->local_opt = NULL;
@@ -157,6 +159,12 @@ nlopt_opt NLOPT_STDCALL nlopt_copy(const nlopt_opt opt)
             nopt->xtol_abs = (double *) malloc(sizeof(double) * (opt->n));
             if (!opt->xtol_abs)
                 goto oom;
+            if (opt->x_weights) {
+                nopt->x_weights = (double *) malloc(sizeof(double) * (opt->n));
+                if (!opt->x_weights)
+                    goto oom;
+                memcpy(nopt->x_weights, opt->x_weights, sizeof(double) * (opt->n));
+            }
 
             memcpy(nopt->lb, opt->lb, sizeof(double) * (opt->n));
             memcpy(nopt->ub, opt->ub, sizeof(double) * (opt->n));
@@ -308,6 +316,20 @@ nlopt_result NLOPT_STDCALL nlopt_set_lower_bounds1(nlopt_opt opt, double lb)
     return NLOPT_INVALID_ARGS;
 }
 
+nlopt_result NLOPT_STDCALL nlopt_set_lower_bound(nlopt_opt opt, int i, double lb)
+{
+    nlopt_unset_errmsg(opt);
+    if (opt) {
+        if (i < 0 || i >= (int) opt->n)
+            return ERR(NLOPT_INVALID_ARGS, opt, "invalid bound index");
+        opt->lb[i] = lb;
+        if (opt->lb[i] < opt->ub[i] && nlopt_istiny(opt->ub[i] - opt->lb[i]))
+            opt->lb[i] = opt->ub[i];
+        return NLOPT_SUCCESS;
+    }
+    return NLOPT_INVALID_ARGS;
+}
+
 nlopt_result NLOPT_STDCALL nlopt_get_lower_bounds(const nlopt_opt opt, double *lb)
 {
     nlopt_unset_errmsg(opt);
@@ -343,6 +365,20 @@ nlopt_result NLOPT_STDCALL nlopt_set_upper_bounds1(nlopt_opt opt, double ub)
             if (opt->lb[i] < opt->ub[i] && nlopt_istiny(opt->ub[i] - opt->lb[i]))
                 opt->ub[i] = opt->lb[i];
         }
+        return NLOPT_SUCCESS;
+    }
+    return NLOPT_INVALID_ARGS;
+}
+
+nlopt_result NLOPT_STDCALL nlopt_set_upper_bound(nlopt_opt opt, int i, double ub)
+{
+    nlopt_unset_errmsg(opt);
+    if (opt) {
+        if (i < 0 || i >= (int) opt->n)
+            return ERR(NLOPT_INVALID_ARGS, opt, "invalid bound index");
+        opt->ub[i] = ub;
+        if (opt->lb[i] < opt->ub[i] && nlopt_istiny(opt->ub[i] - opt->lb[i]))
+            opt->ub[i] = opt->lb[i];
         return NLOPT_SUCCESS;
     }
     return NLOPT_INVALID_ARGS;
@@ -410,7 +446,7 @@ static nlopt_result add_constraint(nlopt_opt opt,
 
     *m += 1;
     if (*m > *m_alloc) {
-        /* allocate by repeated doubling so that 
+        /* allocate by repeated doubling so that
            we end up with O(log m) mallocs rather than O(m). */
         *m_alloc = 2 * (*m);
         *c = (nlopt_constraint *) realloc(*c, sizeof(nlopt_constraint)
@@ -596,8 +632,64 @@ nlopt_result NLOPT_STDCALL nlopt_set_xtol_abs1(nlopt_opt opt, double xtol_abs)
 
 nlopt_result NLOPT_STDCALL nlopt_get_xtol_abs(const nlopt_opt opt, double *xtol_abs)
 {
-    memcpy(xtol_abs, opt->xtol_abs, opt->n * sizeof(double));
-    return NLOPT_SUCCESS;
+    nlopt_unset_errmsg(opt);
+    if (opt && (opt->n == 0 || xtol_abs)) {
+        memcpy(xtol_abs, opt->xtol_abs, opt->n * sizeof(double));
+        return NLOPT_SUCCESS;
+    }
+    return NLOPT_INVALID_ARGS;
+}
+
+nlopt_result NLOPT_STDCALL nlopt_set_x_weights(nlopt_opt opt, const double *x_weights)
+{
+    if (opt) {
+        unsigned i;
+        nlopt_unset_errmsg(opt);
+        for (i = 0; i < opt->n; i++)
+            if (x_weights[i] < 0)
+                return ERR(NLOPT_INVALID_ARGS, opt, "invalid negative weight");
+        if (!opt->x_weights && opt->n > 0) {
+            opt->x_weights = (double *) calloc(opt->n, sizeof(double));
+            if (!opt->x_weights) return NLOPT_OUT_OF_MEMORY;
+        }
+        if (opt->n > 0) memcpy(opt->x_weights, x_weights, opt->n * sizeof(double));
+        return NLOPT_SUCCESS;
+    }
+    return NLOPT_INVALID_ARGS;
+}
+
+nlopt_result NLOPT_STDCALL nlopt_set_x_weights1(nlopt_opt opt, double x_weight)
+{
+    if (opt) {
+        unsigned i;
+        if (x_weight < 0) return ERR(NLOPT_INVALID_ARGS, opt, "invalid negative weight");
+        nlopt_unset_errmsg(opt);
+        if (!opt->x_weights && opt->n > 0) {
+            opt->x_weights = (double *) calloc(opt->n, sizeof(double));
+            if (!opt->x_weights) return NLOPT_OUT_OF_MEMORY;
+        }
+        for (i = 0; i < opt->n; ++i)
+            opt->x_weights[i] = x_weight;
+        return NLOPT_SUCCESS;
+    }
+    return NLOPT_INVALID_ARGS;
+}
+
+nlopt_result NLOPT_STDCALL nlopt_get_x_weights(const nlopt_opt opt, double *x_weights)
+{
+    if (opt) {
+	if (opt->n > 0 && !x_weights) return ERR(NLOPT_INVALID_ARGS, opt, "invalid NULL weights");
+        nlopt_unset_errmsg(opt);
+        if (opt->x_weights) {
+            memcpy(x_weights, opt->x_weights, sizeof(double) * (opt->n));
+        } else {
+            unsigned i;
+            for (i = 0; i < opt->n; ++i)
+                x_weights[i] = 1;
+        }
+        return NLOPT_SUCCESS;
+    }
+    return NLOPT_INVALID_ARGS;
 }
 
 GETSET(maxeval, int, maxeval)
