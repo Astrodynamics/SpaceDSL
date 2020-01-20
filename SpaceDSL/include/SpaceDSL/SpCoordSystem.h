@@ -188,16 +188,69 @@ namespace SpaceDSL {
     void SPACEDSL_API GetAzEl (const Vector3d &range, double& azimuth, double& elevation);
 
     /********************************************************************/
+    /// Computes Orbit Angle Vel By Vehicle State
+    /// @Author	Niu Zhiyong
+    /// @Date	2019-01-20
+    /// @Input
+    /// @Param	range       Topocentric local tangent coordinates (East-North-Zenith frame)
+    /// @Param	A           Azimuth [rad]
+    /// @Param	E           Elevation [rad]
+    /// @Return
+    /********************************************************************/
+    Vector3d CartStateToOrbAngVelVector(const CartState& state);
+    double	 CartStateToOrbAngVel(const CartState& state);		//得到飞行器的轨道角速度
+
+    /********************************************************************/
     /// Transformation VVLH(Vehicle Velocity Local Horizontal) to ICRS Each Other
     /// ICRS Can be J2000 or ECF(Earth Centered Fixed)
     /// @Author	Sun Zhenjiang, Niu Zhiyong
     /// @Date	2018-12-20
     /// @Input
-    /// @Param	CartState      Position and Velocity in ICRS
+    /// @Param	cart      Position and Velocity in ICRS
     /// @Return Pole matrix
     /********************************************************************/
-    Matrix3d SPACEDSL_API VVLHToICSMtx (CartState &cart);
-    Matrix3d SPACEDSL_API ICSToVVLHMtx (CartState &cart);
+    Matrix3d SPACEDSL_API VVLHToICSMtx (const CartState &cart);
+    Matrix3d SPACEDSL_API ICSToVVLHMtx (const CartState &cart);
+
+    /********************************************************************/
+    /// Transformation LVLH((Local Vertical Local Horizontal) to ICRS Each Other
+    /// ICRS Can be J2000 or ECF(Earth Centered Fixed)
+    /// @Author	Sun Zhenjiang, Niu Zhiyong
+    /// @Date	2019-01-20
+    /// @Input
+    /// @Param	cart      Position and Velocity in ICRS
+    /// @Return Pole matrix
+    /********************************************************************/
+    Matrix3d SPACEDSL_API LVLHToICSMtx (const CartState &cart);
+    Matrix3d SPACEDSL_API ICSToLVLHMtx (const CartState &cart);
+
+    /********************************************************************/
+    /// Transformation ICRS Absolute State to VVLH Relative State Each Other
+    /// ICRS Can be J2000 or ECF(Earth Centered Fixed)
+    /// @Author	Niu Zhiyong
+    /// @Date	2019-01-20
+    /// @Input
+    /// @Param	cart            Absolute Position and Velocity in ICRS
+    /// @Param	tarCart         Absolute Position and Velocity in ICRS of Target Vehicle
+    /// @Output
+    /// @Return	relCart/Cart    Relative Position and Velocity in VVLH/Absolute Position and Velocity in ICRS
+    /********************************************************************/
+    CartState StateToVVLHRelState(const CartState& cart, const CartState& tarCart);
+    CartState VVLHRelStateToState(const CartState& relCart, const CartState& tarCart);
+
+    /********************************************************************/
+    /// Transformation ICRS Absolute State to LVLH Relative State Each Other
+    /// ICRS Can be J2000 or ECF(Earth Centered Fixed)
+    /// @Author	Niu Zhiyong
+    /// @Date	2019-01-20
+    /// @Input
+    /// @Param	Cart            Absolute Position and Velocity in ICRS
+    /// @Param	tarCart         Absolute Position and Velocity in ICRS of Target Vehicle
+    /// @Output
+    /// @Return	relCart/Cart    Relative Position and Velocity in LVLH/Absolute Position and Velocity in ICRS
+    /********************************************************************/
+    CartState StateToLVLHRelState(const CartState& cart, const CartState& tarCart);
+    CartState LVLHRelStateToState(const CartState& relCart, const CartState& tarCart);
 
     /*****************************************************************
      * Class type: Geodetic Coordingot System

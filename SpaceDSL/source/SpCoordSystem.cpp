@@ -365,7 +365,21 @@ namespace SpaceDSL {
         elevation = atan ( range(2) / sqrt(range(0)*range(0)+range(1)*range(1)) );
     }
 
-    Matrix3d VVLHToICSMtx(CartState &cart)
+    Vector3d CartStateToOrbAngVelVector(const CartState &cart)
+    {
+        Vector3d angVel;
+        angVel = cart.Pos().cross(cart.Vel()) / sqrt(cart.Pos().norm());
+        return angVel;
+    }
+
+
+    double CartStateToOrbAngVel(const CartState &cart)
+    {
+        Vector3d angVel = CartStateToOrbAngVelVector(cart);
+        return angVel.norm();
+    }
+
+    Matrix3d VVLHToICSMtx(const CartState &cart)
     {
         auto r = cart.Pos().norm();
         auto nn = cart.Pos().cross(cart.Vel());
@@ -383,7 +397,7 @@ namespace SpaceDSL {
         return mtx;
     }
 
-    Matrix3d ICSToVVLHMtx(CartState &cart)
+    Matrix3d ICSToVVLHMtx(const CartState &cart)
     {
         auto r = cart.Pos().norm();
         auto nn = cart.Pos().cross(cart.Vel());
@@ -397,6 +411,114 @@ namespace SpaceDSL {
         mtx.row(2) = -cart.Pos() / r;
 
         return mtx;
+    }
+
+    Matrix3d LVLHToICSMtx(const CartState &cart)
+    {
+        // Radiation direction, x
+        auto r = cart.Pos().norm();
+        // Normal direction, z
+        auto nn = cart.Pos().cross(cart.Vel());
+        auto n = nn.norm();
+        // Co-velocity direction, y
+        auto ss = nn.cross(cart.Pos());
+        auto s = ss.norm();
+
+        Matrix3d mtx;
+        Matrix3d mtxTmp;
+        mtxTmp.row(0) = cart.Pos() / r;
+        mtxTmp.row(1) = ss / s;
+        mtxTmp.row(2) = nn / n;
+        mtx = mtxTmp.inverse();
+
+        return mtx;
+    }
+
+    Matrix3d ICSToLVLHMtx(const CartState &cart)
+    {
+        // Radiation direction, x
+        auto r = cart.Pos().norm();
+        // Normal direction, z
+        auto nn = cart.Pos().cross(cart.Vel());
+        auto n = nn.norm();
+        // Co-velocity direction, y
+        auto ss = nn.cross(cart.Pos());
+        auto s = ss.norm();
+
+        Matrix3d mtx;
+        mtx.row(0) = cart.Pos() / r;
+        mtx.row(1) = ss / s;
+        mtx.row(2) = nn / n;
+
+        return mtx;
+    }
+
+
+    CartState StateToVVLHRelState(const CartState &cart, const CartState &tarCart)
+    {
+        CartState   relCart;
+        Vector3d    angVel;
+        Matrix3d    transMtx;
+
+        angVel = CartStateToOrbAngVelVector(tarCart);
+        relCart.SetPos(cart.Pos()-tarCart.Pos());
+        relCart.SetVel(cart.Vel()-tarCart.Vel()-angVel.cross(relCart.Pos()));
+
+        transMtx = ICSToVVLHMtx(tarCart);
+        relCart.SetPos(transMtx*relCart.Pos());
+        relCart.SetVel(transMtx*relCart.Vel());
+
+        return relCart;
+    }
+
+    CartState VVLHRelStateToState(const CartState &relCart, const CartState &tarCart)
+    {
+        CartState   cart;
+        Vector3d    angVel;
+        Matrix3d    transMtx;
+
+        transMtx = VVLHToICSMtx(tarCart);
+        cart.SetPos(transMtx*relCart.Pos());
+        cart.SetVel(transMtx*relCart.Vel());
+
+        angVel = CartStateToOrbAngVelVector(tarCart);
+        cart.SetVel( cart.Vel() + tarCart.Vel() + angVel.cross(cart.Pos()));
+        cart.SetPos( cart.Pos() + tarCart.Pos());
+        return cart;
+    }
+
+
+    CartState StateToLVLHRelState(const CartState &cart, const CartState &tarCart)
+    {
+        CartState   relCart;
+        Vector3d    angVel;
+        Matrix3d    transMtx;
+
+        angVel = CartStateToOrbAngVelVector(tarCart);
+        relCart.SetPos(cart.Pos()-tarCart.Pos());
+        relCart.SetVel(cart.Vel()-tarCart.Vel()-angVel.cross(relCart.Pos()));
+
+        transMtx = ICSToLVLHMtx(tarCart);
+        relCart.SetPos(transMtx*relCart.Pos());
+        relCart.SetVel(transMtx*relCart.Vel());
+
+        return relCart;
+    }
+
+    CartState LVLHRelStateToState(const CartState &relCart, const CartState &tarCart)
+    {
+        CartState   cart;
+        Vector3d    angVel;
+        Matrix3d    transMtx;
+
+        transMtx = LVLHToICSMtx(tarCart);
+        cart.SetPos(transMtx*relCart.Pos());
+        cart.SetVel(transMtx*relCart.Vel());
+
+        angVel = CartStateToOrbAngVelVector(tarCart);
+        cart.SetVel( cart.Vel() + tarCart.Vel() + angVel.cross(cart.Pos()));
+        cart.SetPos( cart.Pos() + tarCart.Pos());
+        return cart;
     }
 
     /*****************************************************************
