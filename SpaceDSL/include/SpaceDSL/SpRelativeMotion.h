@@ -85,7 +85,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return MatrixXd(6x6)       CW State Transition Matrix
         //********************************************************************/
-        MatrixXd            GetStateTranMtx(double angVel, double duration);
+        virtual MatrixXd    GetStateTranMtx(double angVel, double duration);
 
         //********************************************************************
         /// CW State Transition Block Matrix
@@ -101,7 +101,7 @@ namespace SpaceDSL {
         /// @Param  TranMtxVV           Velocity to Velocity State Transition Matrix
         /// @Return
         //********************************************************************/
-        void                GetStateTranBlockMtx(double angVel, double duration,
+        virtual void        GetStateTranBlockMtx(double angVel, double duration,
                                                  Matrix3d &TranMtxRR, Matrix3d &TranMtxRV,
                                                  Matrix3d &TranMtxVR, Matrix3d &TranMtxVV);
 
@@ -116,7 +116,7 @@ namespace SpaceDSL {
         /// @Output
         /// @Return MatrixXd(6x3)       CW Velocity(Impulse) Deviation Transition Matrix
         //********************************************************************/
-        MatrixXd            GetImpluTranMtx(double angVel, double duration);
+        virtual MatrixXd    GetImpluTranMtx(double angVel, double duration);
 
         //********************************************************************
         /// CW Relative Orbit Prediction
@@ -130,10 +130,125 @@ namespace SpaceDSL {
         /// @Output
         /// @Return CartState
         //********************************************************************/
-        CartState           RelOrbitPredict(double angVel, double duration, CartState &relCart);
+        virtual CartState   RelOrbitPredict(double angVel, double duration, CartState &relCart);
 
     protected:
         RelativeCoordType       m_CoordType;
+        double                  m_RadRef;                        ///<Reference Radius
+        double                  m_IncRef;                        ///<Reference Inclination
+        double                  m_VelRef;                        ///<Reference Velocity
+        double                  m_AngVelRef;                     ///<Reference Angular Velocity
+
+    };
+
+    /*************************************************
+     * Class type: Space Vehicle Relative Motion C-W With J2 Equation Class
+     * Author: Niu ZhiYong
+     * Date:2020-01-21
+     * Description:
+    **************************************************/
+    class SPACEDSL_API CWJ2RelMotion: public CWRelMotion
+    {
+    public:
+        explicit CWJ2RelMotion();
+        virtual ~CWJ2RelMotion();
+
+    public:
+        //********************************************************************
+        /// Set/Get Orbit Reference Inclination Angle
+        //********************************************************************/
+        void        SetIncRef(double incRef);
+        double      GetIncRef();
+
+        //********************************************************************
+        /// CW With J2 State Transition Matrix
+        /// @Author	Niu Zhiyong
+        /// @Date	2020-01-21
+        /// @Input
+        /// @Param  angVel              Reference Orbital Angular Velocity
+        /// @Param  duration            Length of time
+        /// @Output
+        /// @Return MatrixXd(6x6)       CW State Transition Matrix
+        //********************************************************************/
+        virtual MatrixXd    GetStateTranMtx(double angVel, double duration) override;
+
+        //********************************************************************
+        /// CW With J2 State Transition Block Matrix
+        /// @Author	Niu Zhiyong
+        /// @Date	2020-01-21
+        /// @Input
+        /// @Param  angVel              Reference Orbital Angular Velocity
+        /// @Param  duration            Length of time
+        /// @Output
+        /// @Param  TranMtxRR           Position to Position State Transition Matrix
+        /// @Param  TranMtxRV           Velocity to Position State Transition Matrix
+        /// @Param  TranMtxVR           Position to Velocity State Transition Matrix
+        /// @Param  TranMtxVV           Velocity to Velocity State Transition Matrix
+        /// @Return
+        //********************************************************************/
+        virtual void        GetStateTranBlockMtx(double angVel, double duration,
+                                                 Matrix3d &TranMtxRR, Matrix3d &TranMtxRV,
+                                                 Matrix3d &TranMtxVR, Matrix3d &TranMtxVV) override;
+
+        //********************************************************************
+        /// Transfer Matrix of Impulse as Deviation With J2
+        /// @Author	Niu Zhiyong
+        /// @Date	2020-01-21
+        /// @Input
+        /// @Param  angVel              Reference Orbital Angular Velocity
+        /// @Param  duration            Length of time
+        /// @In/Out
+        /// @Output
+        /// @Return MatrixXd(6x3)       CW Velocity(Impulse) Deviation Transition Matrix
+        //********************************************************************/
+        virtual MatrixXd    GetImpluTranMtx(double angVel, double duration) override;
+
+        //********************************************************************
+        /// CW With J2 Relative Orbit Prediction
+        /// @Author	Niu Zhiyong
+        /// @Date	2020-01-21
+        /// @Input
+        /// @Param  angVel          Reference Orbital Angular Velocity
+        /// @Param  duration        Length of time
+        /// @Param  relCart         Initial Relative State
+        /// @In/Out
+        /// @Output
+        /// @Return CartState
+        //********************************************************************/
+        virtual CartState   RelOrbitPredict(double angVel, double duration, CartState &relCart) override;
+    private:
+        //********************************************************************
+        /// Construction of Out of Orbit Plane State Transfer Matrix
+        /// @Author	Niu Zhiyong
+        /// @Date	2020-01-21
+        /// @Input
+        /// @Param  OrbAngVel           Orbit Angular Velocity without Considering J2
+        /// @Param  duration            Length of time
+        /// @In/Out
+        /// @Output
+        /// @Return Matrix2d            State Transfer Matrix in Z
+        //********************************************************************/
+        Matrix2d            StateTranMtx_Z(double angVel, double duration);
+
+        //********************************************************************
+        /// Construction of In Orbit Plane State Transfer Matrix
+        /// @Author	Niu Zhiyong
+        /// @Date	2020-01-21
+        /// @Input
+        /// @Param  OrbAngVel           Orbit Angular Velocity without Considering J2
+        /// @Param  duration            Length of time
+        /// @In/Out
+        /// @Output
+        /// @Return Matrix4d            State Transfer Matrix in XY
+        //********************************************************************/
+        MatrixXd            StateTranMtx_XY(double angVel, double duration);
+
+    protected:
+        bool                m_bIsInitialized = false;
+        double              m_J2;           ///< J2 Oblateness Perturbation
+        double              m_RCenter;      ///< Radius of Central Celestial Body
+        double              m_GM;           ///< Geocentric Gravitation Constant of Central Celestial Body
+        double              m_S;            ///< Intermediate Variable
 
     };
 
