@@ -48,7 +48,10 @@ namespace SpaceDSL {
 // Machine accuracy
 //
 const double EPS = std::numeric_limits<double>::epsilon();
-
+//__int64 __NaN=0xFFF8000000000000,__Infinity=0x7FF0000000000000,__Neg_Infinity=0xFFF0000000000000;
+const double NaN = 0xFFF8000000000000;
+const double Infinity = 0x7FF0000000000000;
+const double Neg_Infinity = 0xFFF0000000000000;
 //
 // Constants representing various multiples of PI.
 //

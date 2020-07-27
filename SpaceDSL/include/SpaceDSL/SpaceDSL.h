@@ -72,6 +72,7 @@
 #include "SpSensor.h"
 #include "SpEnvironment.h"
 #include "SpPropagator.h"
+#include "SpAlgorithm.h"
 #include "SpOptimize.h"
 #include "SpMission.h"
 
