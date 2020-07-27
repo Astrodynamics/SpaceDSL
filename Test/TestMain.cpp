@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         Mission *pMission = new Mission();
         auto pVehicle1 = pMission->InsertSpaceVehicle(vehicle_name1,vehicle_epoch,vehicle1_cart0,vehicle1_mass, 2.2, 3, 1.0, 3);
         auto pVehicle2 = pMission->InsertSpaceVehicle(vehicle_name2,vehicle_epoch,vehicle2_cart0,vehicle2_mass, 2.2, 6, 1.0, 6);
-        pMission->RemoveSpaceVehicle(pVehicle2->GetID());
+        //pMission->RemoveSpaceVehicle(pVehicle2->GetID());
         pMission->InsertFacility(targetName1,-75.5966*DegToRad, 40.0386*DegToRad, 0, 10*DegToRad);
         ThirdBodyGravitySign thirdGravSign;
         thirdGravSign.bIsUseSunGrav = true;
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
         pMission->SetMissionSequence(initial_time, 86400);
         pMission->Start(true);
 
-        cout<<"------First Calculation Finished ------"<<endl;
+        cout<<"------ Calculation Finished ------"<<endl;
         pMission->CalMissionAccessData();
         auto accessListMap = pMission->GetAccessData();
         for (auto iterMap = accessListMap->begin();
@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
             }
         }
 
+        /*
         double midMjd = 58124.50707291;
         CartState midCart = pMission->GetCartState(pVehicle1, midMjd);
         cout<<"Get Mid Cart"<<endl;
@@ -100,8 +101,7 @@ int main(int argc, char *argv[])
                 cout<<mjd<<"    "<<data.first.ToString()<<"    "<<data.second.ToString()<<"    "<<(data.second - data.first)<<endl;
             }
         }
-
-        //CalObservationAll();
+        */
 
         cout<<"Calculation Finished!"<<endl;
 
