@@ -408,8 +408,8 @@ PYBIND11_MODULE(PySpaceDSL, m) {
     m.def("TrueAnomalyToEcc", &TrueAnomalyToEcc);
     m.def("EccAnomalyToTrue", &EccAnomalyToTrue);
 
-    m.def("TrueAnomalyToEcc", &MeanAnomalyToTrue);
-    m.def("EccAnomalyToTrue", &TrueAnomalyToMean);
+    m.def("MeanAnomalyToTrue", &MeanAnomalyToTrue);
+    m.def("TrueAnomalyToMean", &TrueAnomalyToMean);
 
     m.def("OrbitElemToCart", &OrbitElemToCart);
     m.def("CartToOrbitElem", &CartToOrbitElem);
