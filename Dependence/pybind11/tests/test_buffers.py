@@ -1,5 +1,9 @@
+# -*- coding: utf-8 -*-
+import io
 import struct
+
 import pytest
+
 from pybind11_tests import buffers as m
 from pybind11_tests import ConstructorStats
 
@@ -85,3 +89,28 @@ def test_pointer_to_member_fn():
         buf.value = 0x12345678
         value = struct.unpack('i', bytearray(buf))[0]
         assert value == 0x12345678
+
+
+@pytest.unsupported_on_pypy
+def test_readonly_buffer():
+    buf = m.BufferReadOnly(0x64)
+    view = memoryview(buf)
+    assert view[0] == b'd' if pytest.PY2 else 0x64
+    assert view.readonly
+
+
+@pytest.unsupported_on_pypy
+def test_selective_readonly_buffer():
+    buf = m.BufferReadOnlySelect()
+
+    memoryview(buf)[0] = b'd' if pytest.PY2 else 0x64
+    assert buf.value == 0x64
+
+    io.BytesIO(b'A').readinto(buf)
+    assert buf.value == ord(b'A')
+
+    buf.readonly = True
+    with pytest.raises(TypeError):
+        memoryview(buf)[0] = b'\0' if pytest.PY2 else 0
+    with pytest.raises(TypeError):
+        io.BytesIO(b'1').readinto(buf)

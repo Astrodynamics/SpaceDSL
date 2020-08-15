@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pytest
 from pybind11_tests import numpy_array as m
 
@@ -286,13 +287,13 @@ def test_overload_resolution(msg):
         m.overloaded("not an array")
     assert msg(excinfo.value) == """
         overloaded(): incompatible function arguments. The following argument types are supported:
-            1. (arg0: numpy.ndarray[float64]) -> str
-            2. (arg0: numpy.ndarray[float32]) -> str
-            3. (arg0: numpy.ndarray[int32]) -> str
-            4. (arg0: numpy.ndarray[uint16]) -> str
-            5. (arg0: numpy.ndarray[int64]) -> str
-            6. (arg0: numpy.ndarray[complex128]) -> str
-            7. (arg0: numpy.ndarray[complex64]) -> str
+            1. (arg0: numpy.ndarray[numpy.float64]) -> str
+            2. (arg0: numpy.ndarray[numpy.float32]) -> str
+            3. (arg0: numpy.ndarray[numpy.int32]) -> str
+            4. (arg0: numpy.ndarray[numpy.uint16]) -> str
+            5. (arg0: numpy.ndarray[numpy.int64]) -> str
+            6. (arg0: numpy.ndarray[numpy.complex128]) -> str
+            7. (arg0: numpy.ndarray[numpy.complex64]) -> str
 
         Invoked with: 'not an array'
     """
@@ -307,8 +308,8 @@ def test_overload_resolution(msg):
     assert m.overloaded3(np.array([1], dtype='intc')) == 'int'
     expected_exc = """
         overloaded3(): incompatible function arguments. The following argument types are supported:
-            1. (arg0: numpy.ndarray[int32]) -> str
-            2. (arg0: numpy.ndarray[float64]) -> str
+            1. (arg0: numpy.ndarray[numpy.int32]) -> str
+            2. (arg0: numpy.ndarray[numpy.float64]) -> str
 
         Invoked with: """
 
@@ -430,7 +431,6 @@ def test_array_create_and_resize(msg):
     assert(np.all(a == 42.))
 
 
-@pytest.unsupported_on_py2
 def test_index_using_ellipsis():
     a = m.index_using_ellipsis(np.zeros((5, 6, 7)))
     assert a.shape == (6,)

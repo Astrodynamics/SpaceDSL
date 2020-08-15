@@ -82,7 +82,7 @@ helper class that is defined as follows:
 
 The macro :c:macro:`PYBIND11_OVERLOAD_PURE` should be used for pure virtual
 functions, and :c:macro:`PYBIND11_OVERLOAD` should be used for functions which have
-a default implementation.  There are also two alternate macros 
+a default implementation.  There are also two alternate macros
 :c:macro:`PYBIND11_OVERLOAD_PURE_NAME` and :c:macro:`PYBIND11_OVERLOAD_NAME` which
 take a string-valued name argument between the *Parent class* and *Name of the
 function* slots, which defines the name of function in Python. This is required
@@ -148,6 +148,11 @@ ensure that you explicitly call the bound C++ constructor using ``__init__``,
 memory for the C++ portion of the instance will be left uninitialized, which
 will generally leave the C++ instance in an invalid state and cause undefined
 behavior if the C++ instance is subsequently used.
+
+.. versionadded:: 2.5.1
+
+   The default pybind11 metaclass will throw a ``TypeError`` when it detects
+   that ``__init__`` was not called by a derived class.
 
 Here is an example:
 
@@ -298,8 +303,8 @@ The classes are then registered with pybind11 using:
 .. code-block:: cpp
 
     py::class_<Animal, PyAnimal<>> animal(m, "Animal");
-    py::class_<Dog, PyDog<>> dog(m, "Dog");
-    py::class_<Husky, PyDog<Husky>> husky(m, "Husky");
+    py::class_<Dog, Animal, PyDog<>> dog(m, "Dog");
+    py::class_<Husky, Dog, PyDog<Husky>> husky(m, "Husky");
     // ... add animal, dog, husky definitions
 
 Note that ``Husky`` did not require a dedicated trampoline template class at
@@ -768,13 +773,17 @@ An instance can now be pickled as follows:
     p.setExtra(15)
     data = pickle.dumps(p, 2)
 
-Note that only the cPickle module is supported on Python 2.7. The second
-argument to ``dumps`` is also crucial: it selects the pickle protocol version
-2, since the older version 1 is not supported. Newer versions are also fine—for
-instance, specify ``-1`` to always use the latest available version. Beware:
-failure to follow these instructions will cause important pybind11 memory
-allocation routines to be skipped during unpickling, which will likely lead to
-memory corruption and/or segmentation faults.
+
+.. note::
+    Note that only the cPickle module is supported on Python 2.7.
+
+    The second argument to ``dumps`` is also crucial: it selects the pickle
+    protocol version 2, since the older version 1 is not supported. Newer
+    versions are also fine—for instance, specify ``-1`` to always use the
+    latest available version. Beware: failure to follow these instructions
+    will cause important pybind11 memory allocation routines to be skipped
+    during unpickling, which will likely lead to memory corruption and/or
+    segmentation faults.
 
 .. seealso::
 
@@ -783,6 +792,38 @@ memory corruption and/or segmentation faults.
     detail.
 
 .. [#f3] http://docs.python.org/3/library/pickle.html#pickling-class-instances
+
+Deepcopy support
+================
+
+Python normally uses references in assignments. Sometimes a real copy is needed
+to prevent changing all copies. The ``copy`` module [#f5]_ provides these
+capabilities.
+
+On Python 3, a class with pickle support is automatically also (deep)copy
+compatible. However, performance can be improved by adding custom
+``__copy__`` and ``__deepcopy__`` methods. With Python 2.7, these custom methods
+are mandatory for (deep)copy compatibility, because pybind11 only supports
+cPickle.
+
+For simple classes (deep)copy can be enabled by using the copy constructor,
+which should look as follows:
+
+.. code-block:: cpp
+
+    py::class_<Copyable>(m, "Copyable")
+        .def("__copy__",  [](const Copyable &self) {
+            return Copyable(self);
+        })
+        .def("__deepcopy__", [](const Copyable &self, py::dict) {
+            return Copyable(self);
+        }, "memo"_a);
+
+.. note::
+
+    Dynamic attributes will not be copied in this example.
+
+.. [#f5] https://docs.python.org/3/library/copy.html
 
 Multiple Inheritance
 ====================
@@ -1041,6 +1082,32 @@ described trampoline:
     requires a more explicit function binding in the form of
     ``.def("foo", static_cast<int (A::*)() const>(&Publicist::foo));``
     where ``int (A::*)() const`` is the type of ``A::foo``.
+
+Binding final classes
+=====================
+
+Some classes may not be appropriate to inherit from. In C++11, classes can
+use the ``final`` specifier to ensure that a class cannot be inherited from.
+The ``py::is_final`` attribute can be used to ensure that Python classes
+cannot inherit from a specified type. The underlying C++ type does not need
+to be declared final.
+
+.. code-block:: cpp
+
+    class IsFinal final {};
+
+    py::class_<IsFinal>(m, "IsFinal", py::is_final());
+
+When you try to inherit from such a class in Python, you will now get this
+error:
+
+.. code-block:: pycon
+
+    >>> class PyFinalChild(IsFinal):
+    ...     pass
+    TypeError: type 'IsFinal' is not an acceptable base type
+
+.. note:: This attribute is currently ignored on PyPy
 
 Custom automatic downcasters
 ============================

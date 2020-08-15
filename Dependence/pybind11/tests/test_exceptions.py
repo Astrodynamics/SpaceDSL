@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pytest
 
 from pybind11_tests import exceptions as m
@@ -78,6 +79,10 @@ def test_custom(msg):
     with pytest.raises(RuntimeError) as excinfo:
         m.throws_logic_error()
     assert msg(excinfo.value) == "this error should fall through to the standard handler"
+
+    # OverFlow error translation.
+    with pytest.raises(OverflowError) as excinfo:
+        m.throws_overflow_error()
 
     # Can we handle a helper-declared exception?
     with pytest.raises(m.MyException5) as excinfo:

@@ -1,9 +1,22 @@
+# -*- coding: utf-8 -*-
 from __future__ import division
 import pytest
 import sys
 
 from pybind11_tests import pytypes as m
 from pybind11_tests import debug_enabled
+
+
+def test_int(doc):
+    assert doc(m.get_int) == "get_int() -> int"
+
+
+def test_iterator(doc):
+    assert doc(m.get_iterator) == "get_iterator() -> Iterator"
+
+
+def test_iterable(doc):
+    assert doc(m.get_iterable) == "get_iterable() -> Iterable"
 
 
 def test_list(capture, doc):
@@ -23,6 +36,11 @@ def test_list(capture, doc):
 
     assert doc(m.get_list) == "get_list() -> list"
     assert doc(m.print_list) == "print_list(arg0: list) -> None"
+
+
+def test_none(capture, doc):
+    assert doc(m.get_none) == "get_none() -> None"
+    assert doc(m.print_none) == "print_none(arg0: None) -> None"
 
 
 def test_set(capture, doc):
@@ -95,7 +113,7 @@ def test_bytes(doc):
     assert m.bytes_from_str().decode() == "bar"
 
     assert doc(m.bytes_from_str) == "bytes_from_str() -> {}".format(
-        "bytes" if sys.version_info[0] == 3 else "str"
+        "str" if pytest.PY2 else "bytes"
     )
 
 
@@ -202,6 +220,38 @@ def test_constructors():
         assert noconv2[k] is expected[k]
 
 
+def test_pybind11_str_raw_str():
+    # specifically to exercise pybind11::str::raw_str
+    cvt = m.convert_to_pybind11_str
+    assert cvt(u"Str") == u"Str"
+    assert cvt(b'Bytes') == u"Bytes" if pytest.PY2 else "b'Bytes'"
+    assert cvt(None) == u"None"
+    assert cvt(False) == u"False"
+    assert cvt(True) == u"True"
+    assert cvt(42) == u"42"
+    assert cvt(2**65) == u"36893488147419103232"
+    assert cvt(-1.50) == u"-1.5"
+    assert cvt(()) == u"()"
+    assert cvt((18,)) == u"(18,)"
+    assert cvt([]) == u"[]"
+    assert cvt([28]) == u"[28]"
+    assert cvt({}) == u"{}"
+    assert cvt({3: 4}) == u"{3: 4}"
+    assert cvt(set()) == u"set([])" if pytest.PY2 else "set()"
+    assert cvt({3, 3}) == u"set([3])" if pytest.PY2 else "{3}"
+
+    valid_orig = u"Ǳ"
+    valid_utf8 = valid_orig.encode("utf-8")
+    valid_cvt = cvt(valid_utf8)
+    assert type(valid_cvt) == bytes  # Probably surprising.
+    assert valid_cvt == b'\xc7\xb1'
+
+    malformed_utf8 = b'\x80'
+    malformed_cvt = cvt(malformed_utf8)
+    assert type(malformed_cvt) == bytes  # Probably surprising.
+    assert malformed_cvt == b'\x80'
+
+
 def test_implicit_casting():
     """Tests implicit casting when assigning or appending to dicts and lists."""
     z = m.get_implicit_casting()
@@ -261,3 +311,71 @@ def test_number_protocol():
 def test_list_slicing():
     li = list(range(100))
     assert li[::2] == m.test_list_slicing(li)
+
+
+@pytest.mark.parametrize('method, args, fmt, expected_view', [
+    (m.test_memoryview_object, (b'red',), 'B', b'red'),
+    (m.test_memoryview_buffer_info, (b'green',), 'B', b'green'),
+    (m.test_memoryview_from_buffer, (False,), 'h', [3, 1, 4, 1, 5]),
+    (m.test_memoryview_from_buffer, (True,), 'H', [2, 7, 1, 8]),
+    (m.test_memoryview_from_buffer_nativeformat, (), '@i', [4, 7, 5]),
+])
+def test_memoryview(method, args, fmt, expected_view):
+    view = method(*args)
+    assert isinstance(view, memoryview)
+    assert view.format == fmt
+    if isinstance(expected_view, bytes) or not pytest.PY2:
+        view_as_list = list(view)
+    else:
+        # Using max to pick non-zero byte (big-endian vs little-endian).
+        view_as_list = [max([ord(c) for c in s]) for s in view]
+    assert view_as_list == list(expected_view)
+
+
+@pytest.mark.skipif(
+    not hasattr(sys, 'getrefcount'),
+    reason='getrefcount is not available')
+@pytest.mark.parametrize('method', [
+    m.test_memoryview_object,
+    m.test_memoryview_buffer_info,
+])
+def test_memoryview_refcount(method):
+    buf = b'\x0a\x0b\x0c\x0d'
+    ref_before = sys.getrefcount(buf)
+    view = method(buf)
+    ref_after = sys.getrefcount(buf)
+    assert ref_before < ref_after
+    assert list(view) == list(buf)
+
+
+def test_memoryview_from_buffer_empty_shape():
+    view = m.test_memoryview_from_buffer_empty_shape()
+    assert isinstance(view, memoryview)
+    assert view.format == 'B'
+    if pytest.PY2:
+        # Python 2 behavior is weird, but Python 3 (the future) is fine.
+        # PyPy3 has <memoryview, while CPython 2 has <memory
+        assert bytes(view).startswith(b'<memory')
+    else:
+        assert bytes(view) == b''
+
+
+def test_test_memoryview_from_buffer_invalid_strides():
+    with pytest.raises(RuntimeError):
+        m.test_memoryview_from_buffer_invalid_strides()
+
+
+def test_test_memoryview_from_buffer_nullptr():
+    if pytest.PY2:
+        m.test_memoryview_from_buffer_nullptr()
+    else:
+        with pytest.raises(ValueError):
+            m.test_memoryview_from_buffer_nullptr()
+
+
+@pytest.unsupported_on_py2
+def test_memoryview_from_memory():
+    view = m.test_memoryview_from_memory()
+    assert isinstance(view, memoryview)
+    assert view.format == 'B'
+    assert bytes(view) == b'\xff\xe1\xab\x37'

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 #
 #  Syntax: mkdoc.py [-I<path> ..] [.. a list of header files ..]
 #
@@ -106,8 +107,8 @@ def process_comment(comment):
         result = result2
 
     # Doxygen tags
-    cpp_group = '([\w:]+)'
-    param_group = '([\[\w:\]]+)'
+    cpp_group = r'([\w:]+)'
+    param_group = r'([\[\w:\]]+)'
 
     s = result
     s = re.sub(r'\\c\s+%s' % cpp_group, r'``\1``', s)
@@ -254,6 +255,13 @@ def read_args(args):
             parameters.append('-isysroot')
             parameters.append(sysroot_dir)
     elif platform.system() == 'Linux':
+        # cython.util.find_library does not find `libclang` for all clang
+        # versions and distributions. LLVM switched to a monolithical setup
+        # that includes everything under /usr/lib/llvm{version_number}/
+        # We therefore glob for the library and select the highest version
+        library_file = sorted(glob("/usr/lib/llvm-*/lib/libclang.so"), reverse=True)[0]
+        cindex.Config.set_library_file(library_file)
+
         # clang doesn't find its own base includes by default on Linux,
         # but different distros install them in different paths.
         # Try to autodetect, preferring the highest numbered version.

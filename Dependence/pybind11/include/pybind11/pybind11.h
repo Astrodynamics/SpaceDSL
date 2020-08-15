@@ -50,7 +50,7 @@
 #  include <cxxabi.h>
 #endif
 
-NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
+PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
 
 /// Wraps an arbitrary C++ function/method/lambda function/.. into a callable Python object
 class cpp_function : public function {
@@ -72,16 +72,34 @@ public:
                    (detail::function_signature_t<Func> *) nullptr, extra...);
     }
 
-    /// Construct a cpp_function from a class method (non-const)
+    /// Construct a cpp_function from a class method (non-const, no ref-qualifier)
     template <typename Return, typename Class, typename... Arg, typename... Extra>
     cpp_function(Return (Class::*f)(Arg...), const Extra&... extra) {
+        initialize([f](Class *c, Arg... args) -> Return { return (c->*f)(std::forward<Arg>(args)...); },
+                   (Return (*) (Class *, Arg...)) nullptr, extra...);
+    }
+
+    /// Construct a cpp_function from a class method (non-const, lvalue ref-qualifier)
+    /// A copy of the overload for non-const functions without explicit ref-qualifier
+    /// but with an added `&`.
+    template <typename Return, typename Class, typename... Arg, typename... Extra>
+    cpp_function(Return (Class::*f)(Arg...)&, const Extra&... extra) {
         initialize([f](Class *c, Arg... args) -> Return { return (c->*f)(args...); },
                    (Return (*) (Class *, Arg...)) nullptr, extra...);
     }
 
-    /// Construct a cpp_function from a class method (const)
+    /// Construct a cpp_function from a class method (const, no ref-qualifier)
     template <typename Return, typename Class, typename... Arg, typename... Extra>
     cpp_function(Return (Class::*f)(Arg...) const, const Extra&... extra) {
+        initialize([f](const Class *c, Arg... args) -> Return { return (c->*f)(std::forward<Arg>(args)...); },
+                   (Return (*)(const Class *, Arg ...)) nullptr, extra...);
+    }
+
+    /// Construct a cpp_function from a class method (const, lvalue ref-qualifier)
+    /// A copy of the overload for const functions without explicit ref-qualifier
+    /// but with an added `&`.
+    template <typename Return, typename Class, typename... Arg, typename... Extra>
+    cpp_function(Return (Class::*f)(Arg...) const&, const Extra&... extra) {
         initialize([f](const Class *c, Arg... args) -> Return { return (c->*f)(args...); },
                    (Return (*)(const Class *, Arg ...)) nullptr, extra...);
     }
@@ -168,6 +186,14 @@ protected:
         /* Process any user-provided function attributes */
         process_attributes<Extra...>::init(extra..., rec);
 
+        {
+            constexpr bool has_kwonly_args = any_of<std::is_same<kwonly, Extra>...>::value,
+                           has_args = any_of<std::is_same<args, Args>...>::value,
+                           has_arg_annotations = any_of<is_keyword<Extra>...>::value;
+            static_assert(has_arg_annotations || !has_kwonly_args, "py::kwonly requires the use of argument annotations");
+            static_assert(!(has_args && has_kwonly_args), "py::kwonly cannot be combined with a py::args argument");
+        }
+
         /* Generate a readable signature describing the function's arguments and return value types */
         static constexpr auto signature = _("(") + cast_in::arg_names + _(") -> ") + cast_out::name;
         PYBIND11_DESCR_CONSTEXPR auto types = decltype(signature)::types();
@@ -202,7 +228,7 @@ protected:
             if (a.descr)
                 a.descr = strdup(a.descr);
             else if (a.value)
-                a.descr = strdup(a.value.attr("__repr__")().cast<std::string>().c_str());
+                a.descr = strdup(repr(a.value).cast<std::string>().c_str());
         }
 
         rec->is_constructor = !strcmp(rec->name, "__init__") || !strcmp(rec->name, "__setstate__");
@@ -483,15 +509,16 @@ protected:
                  */
 
                 const function_record &func = *it;
-                size_t pos_args = func.nargs;    // Number of positional arguments that we need
-                if (func.has_args) --pos_args;   // (but don't count py::args
-                if (func.has_kwargs) --pos_args; //  or py::kwargs)
+                size_t num_args = func.nargs;    // Number of positional arguments that we need
+                if (func.has_args) --num_args;   // (but don't count py::args
+                if (func.has_kwargs) --num_args; //  or py::kwargs)
+                size_t pos_args = num_args - func.nargs_kwonly;
 
                 if (!func.has_args && n_args_in > pos_args)
-                    continue; // Too many arguments for this overload
+                    continue; // Too many positional arguments for this overload
 
                 if (n_args_in < pos_args && func.args.size() < pos_args)
-                    continue; // Not enough arguments given, and not enough defaults to fill in the blanks
+                    continue; // Not enough positional arguments given, and not enough defaults to fill in the blanks
 
                 function_call call(func, parent);
 
@@ -535,10 +562,10 @@ protected:
                 dict kwargs = reinterpret_borrow<dict>(kwargs_in);
 
                 // 2. Check kwargs and, failing that, defaults that may help complete the list
-                if (args_copied < pos_args) {
+                if (args_copied < num_args) {
                     bool copied_kwargs = false;
 
-                    for (; args_copied < pos_args; ++args_copied) {
+                    for (; args_copied < num_args; ++args_copied) {
                         const auto &arg = func.args[args_copied];
 
                         handle value;
@@ -564,7 +591,7 @@ protected:
                             break;
                     }
 
-                    if (args_copied < pos_args)
+                    if (args_copied < num_args)
                         continue; // Not enough arguments, defaults, or kwargs to fill the positional arguments
                 }
 
@@ -882,7 +909,7 @@ inline dict globals() {
     return reinterpret_borrow<dict>(p ? p : module::import("__main__").attr("__dict__").ptr());
 }
 
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(detail)
 /// Generic support for creating new Python heap types
 class generic_type : public object {
     template <typename...> friend class class_;
@@ -1003,17 +1030,31 @@ void call_operator_delete(T *p, size_t s, size_t) { T::operator delete(p, s); }
 
 inline void call_operator_delete(void *p, size_t s, size_t a) {
     (void)s; (void)a;
-#if defined(PYBIND11_CPP17)
-    if (a > __STDCPP_DEFAULT_NEW_ALIGNMENT__)
-        ::operator delete(p, s, std::align_val_t(a));
-    else
+    #if defined(__cpp_aligned_new) && (!defined(_MSC_VER) || _MSC_VER >= 1912)
+        if (a > __STDCPP_DEFAULT_NEW_ALIGNMENT__) {
+            #ifdef __cpp_sized_deallocation
+                ::operator delete(p, s, std::align_val_t(a));
+            #else
+                ::operator delete(p, std::align_val_t(a));
+            #endif
+            return;
+        }
+    #endif
+    #ifdef __cpp_sized_deallocation
         ::operator delete(p, s);
-#else
-    ::operator delete(p);
-#endif
+    #else
+        ::operator delete(p);
+    #endif
 }
 
-NAMESPACE_END(detail)
+inline void add_class_method(object& cls, const char *name_, const cpp_function &cf) {
+    cls.attr(cf.name()) = cf;
+    if (strcmp(name_, "__eq__") == 0 && !cls.attr("__dict__").contains("__hash__")) {
+      cls.attr("__hash__") = none();
+    }
+}
+
+PYBIND11_NAMESPACE_END(detail)
 
 /// Given a pointer to a member function, cast it to its `Derived` version.
 /// Forward everything else unchanged.
@@ -1110,7 +1151,7 @@ public:
     class_ &def(const char *name_, Func&& f, const Extra&... extra) {
         cpp_function cf(method_adaptor<type>(std::forward<Func>(f)), name(name_), is_method(*this),
                         sibling(getattr(*this, name_, none())), extra...);
-        attr(cf.name()) = cf;
+        add_class_method(*this, name_, cf);
         return *this;
     }
 
@@ -1347,6 +1388,13 @@ private:
 
     /// Deallocates an instance; via holder, if constructed; otherwise via operator delete.
     static void dealloc(detail::value_and_holder &v_h) {
+        // We could be deallocating because we are cleaning up after a Python exception.
+        // If so, the Python error indicator will be set. We need to clear that before
+        // running the destructor, in case the destructor code calls more Python.
+        // If we don't, the Python API will exit with an exception, and pybind11 will
+        // throw error_already_set from the C++ destructor which is forbidden and triggers
+        // std::terminate().
+        error_scope scope;
         if (v_h.holder_constructed()) {
             v_h.holder<holder_type>().~holder_type();
             v_h.set_holder_constructed(false);
@@ -1391,7 +1439,7 @@ detail::initimpl::pickle_factory<GetState, SetState> pickle(GetState &&g, SetSta
     return {std::forward<GetState>(g), std::forward<SetState>(s)};
 }
 
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(detail)
 struct enum_base {
     enum_base(handle base, handle parent) : m_base(base), m_parent(parent) { }
 
@@ -1411,7 +1459,7 @@ struct enum_base {
                         return pybind11::str("{}.{}").format(type_name, kv.first);
                 }
                 return pybind11::str("{}.???").format(type_name);
-            }, is_method(m_base)
+            }, name("__repr__"), is_method(m_base)
         );
 
         m_base.attr("name") = property(cpp_function(
@@ -1422,7 +1470,7 @@ struct enum_base {
                         return pybind11::str(kv.first);
                 }
                 return "???";
-            }, is_method(m_base)
+            }, name("name"), is_method(m_base)
         ));
 
         m_base.attr("__doc__") = static_property(cpp_function(
@@ -1440,7 +1488,7 @@ struct enum_base {
                         docstring += " : " + (std::string) pybind11::str(comment);
                 }
                 return docstring;
-            }
+            }, name("__doc__")
         ), none(), none(), "");
 
         m_base.attr("__members__") = static_property(cpp_function(
@@ -1449,7 +1497,7 @@ struct enum_base {
                 for (const auto &kv : entries)
                     m[kv.first] = kv.second[int_(0)];
                 return m;
-            }), none(), none(), ""
+            }, name("__members__")), none(), none(), ""
         );
 
         #define PYBIND11_ENUM_OP_STRICT(op, expr, strict_behavior)                     \
@@ -1459,7 +1507,7 @@ struct enum_base {
                         strict_behavior;                                               \
                     return expr;                                                       \
                 },                                                                     \
-                is_method(m_base))
+                name(op), is_method(m_base))
 
         #define PYBIND11_ENUM_OP_CONV(op, expr)                                        \
             m_base.attr(op) = cpp_function(                                            \
@@ -1467,7 +1515,7 @@ struct enum_base {
                     int_ a(a_), b(b_);                                                 \
                     return expr;                                                       \
                 },                                                                     \
-                is_method(m_base))
+                name(op), is_method(m_base))
 
         #define PYBIND11_ENUM_OP_CONV_LHS(op, expr)                                    \
             m_base.attr(op) = cpp_function(                                            \
@@ -1475,7 +1523,7 @@ struct enum_base {
                     int_ a(a_);                                                        \
                     return expr;                                                       \
                 },                                                                     \
-                is_method(m_base))
+                name(op), is_method(m_base))
 
         if (is_convertible) {
             PYBIND11_ENUM_OP_CONV_LHS("__eq__", !b.is_none() &&  a.equal(b));
@@ -1493,7 +1541,7 @@ struct enum_base {
                 PYBIND11_ENUM_OP_CONV("__xor__",  a ^  b);
                 PYBIND11_ENUM_OP_CONV("__rxor__", a ^  b);
                 m_base.attr("__invert__") = cpp_function(
-                    [](object arg) { return ~(int_(arg)); }, is_method(m_base));
+                    [](object arg) { return ~(int_(arg)); }, name("__invert__"), is_method(m_base));
             }
         } else {
             PYBIND11_ENUM_OP_STRICT("__eq__",  int_(a).equal(int_(b)), return false);
@@ -1513,11 +1561,11 @@ struct enum_base {
         #undef PYBIND11_ENUM_OP_CONV
         #undef PYBIND11_ENUM_OP_STRICT
 
-        object getstate = cpp_function(
-            [](object arg) { return int_(arg); }, is_method(m_base));
+        m_base.attr("__getstate__") = cpp_function(
+            [](object arg) { return int_(arg); }, name("__getstate__"), is_method(m_base));
 
-        m_base.attr("__getstate__") = getstate;
-        m_base.attr("__hash__") = getstate;
+        m_base.attr("__hash__") = cpp_function(
+            [](object arg) { return int_(arg); }, name("__hash__"), is_method(m_base));
     }
 
     PYBIND11_NOINLINE void value(char const* name_, object value, const char *doc = nullptr) {
@@ -1542,7 +1590,7 @@ struct enum_base {
     handle m_parent;
 };
 
-NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(detail)
 
 /// Binds C++ enumerations and enumeration classes to Python
 template <typename Type> class enum_ : public class_<Type> {
@@ -1566,10 +1614,16 @@ public:
         #if PY_MAJOR_VERSION < 3
             def("__long__", [](Type value) { return (Scalar) value; });
         #endif
-        cpp_function setstate(
-            [](Type &value, Scalar arg) { value = static_cast<Type>(arg); },
-            is_method(*this));
-        attr("__setstate__") = setstate;
+        #if PY_MAJOR_VERSION > 3 || (PY_MAJOR_VERSION == 3 && PY_MINOR_VERSION >= 8)
+            def("__index__", [](Type value) { return (Scalar) value; });
+        #endif
+
+        attr("__setstate__") = cpp_function(
+            [](detail::value_and_holder &v_h, Scalar arg) {
+                detail::initimpl::setstate<Base>(v_h, static_cast<Type>(arg),
+                        Py_TYPE(v_h.inst) != v_h.type->type); },
+            detail::is_new_style_constructor(),
+            pybind11::name("__setstate__"), is_method(*this));
     }
 
     /// Export enumeration entries into the parent scope
@@ -1588,7 +1642,7 @@ private:
     detail::enum_base m_base;
 };
 
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(detail)
 
 
 inline void keep_alive_impl(handle nurse, handle patient) {
@@ -1658,7 +1712,7 @@ struct iterator_state {
     bool first_or_done;
 };
 
-NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(detail)
 
 /// Makes a python iterator from a first and past-the-end C++ InputIterator.
 template <return_value_policy Policy = return_value_policy::reference_internal,
@@ -1791,13 +1845,13 @@ public:
     }
 };
 
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(detail)
 // Returns a reference to a function-local static exception object used in the simple
 // register_exception approach below.  (It would be simpler to have the static local variable
 // directly in register_exception, but that makes clang <3.5 segfault - issue #1349).
 template <typename CppException>
 exception<CppException> &get_exception_object() { static exception<CppException> ex; return ex; }
-NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(detail)
 
 /**
  * Registers a Python exception in `m` of the given `name` and installs an exception translator to
@@ -1823,7 +1877,7 @@ exception<CppException> &register_exception(handle scope,
     return ex;
 }
 
-NAMESPACE_BEGIN(detail)
+PYBIND11_NAMESPACE_BEGIN(detail)
 PYBIND11_NOINLINE inline void print(tuple args, dict kwargs) {
     auto strings = tuple(args.size());
     for (size_t i = 0; i < args.size(); ++i) {
@@ -1854,7 +1908,7 @@ PYBIND11_NOINLINE inline void print(tuple args, dict kwargs) {
     if (kwargs.contains("flush") && kwargs["flush"].cast<bool>())
         file.attr("flush")();
 }
-NAMESPACE_END(detail)
+PYBIND11_NAMESPACE_END(detail)
 
 template <return_value_policy policy = return_value_policy::automatic_reference, typename... Args>
 void print(Args &&...args) {
@@ -2112,8 +2166,8 @@ template <class T> function get_overload(const T *this_ptr, const char *name) {
         PYBIND11_OVERLOAD_NAME(
             std::string, // Return type (ret_type)
             Animal,      // Parent class (cname)
-            toString,    // Name of function in C++ (name)
-            "__str__",   // Name of method in Python (fn)
+            "__str__",   // Name of method in Python (name)
+            toString,    // Name of function in C++ (fn)
         );
       }
 \endrst */
@@ -2163,7 +2217,7 @@ template <class T> function get_overload(const T *this_ptr, const char *name) {
 #define PYBIND11_OVERLOAD_PURE(ret_type, cname, fn, ...) \
     PYBIND11_OVERLOAD_PURE_NAME(PYBIND11_TYPE(ret_type), PYBIND11_TYPE(cname), #fn, fn, __VA_ARGS__)
 
-NAMESPACE_END(PYBIND11_NAMESPACE)
+PYBIND11_NAMESPACE_END(PYBIND11_NAMESPACE)
 
 #if defined(_MSC_VER) && !defined(__INTEL_COMPILER)
 #  pragma warning(pop)

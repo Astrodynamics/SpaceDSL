@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
         ap.resize(7);
         ap.fill(0.0);
         ap(0) = GeomagneticKpToAp(kp);
+        cout << "kp = 3 ----ap = " << ap(0) << endl;
         pMission->SetEnvironment(E_Earth, GravityModel::GravModelType::E_EGM08Model,
                                  20 , 20, thirdGravSign,
                                  GeodeticCoordSystem::GeodeticCoordType::E_WGS84System,

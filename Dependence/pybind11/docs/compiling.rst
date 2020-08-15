@@ -33,7 +33,7 @@ extension module can be created with just a few lines of code:
 
 .. code-block:: cmake
 
-    cmake_minimum_required(VERSION 2.8.12)
+    cmake_minimum_required(VERSION 3.7)
     project(example)
 
     add_subdirectory(pybind11)
@@ -59,7 +59,7 @@ function with the following signature:
 .. code-block:: cmake
 
     pybind11_add_module(<name> [MODULE | SHARED] [EXCLUDE_FROM_ALL]
-                        [NO_EXTRAS] [SYSTEM] [THIN_LTO] source1 [source2 ...])
+                        [NO_EXTRAS] [THIN_LTO] source1 [source2 ...])
 
 This function behaves very much like CMake's builtin ``add_library`` (in fact,
 it's a wrapper function around that command). It will add a library target
@@ -86,10 +86,6 @@ latter optimizations are never applied in ``Debug`` mode.  If ``NO_EXTRAS`` is
 given, they will always be disabled, even in ``Release`` mode. However, this
 will result in code bloat and is generally not recommended.
 
-By default, pybind11 and Python headers will be included with ``-I``. In order
-to include pybind11 as system library, e.g. to avoid warnings in downstream
-code with warn-levels outside of pybind11's scope, set the option ``SYSTEM``.
-
 As stated above, LTO is enabled by default. Some newer compilers also support
 different flavors of LTO such as `ThinLTO`_. Setting ``THIN_LTO`` will cause
 the function to prefer this flavor if available. The function falls back to
@@ -100,29 +96,22 @@ regular LTO if ``-flto=thin`` is not available.
 Configuration variables
 -----------------------
 
-By default, pybind11 will compile modules with the C++14 standard, if available
-on the target compiler, falling back to C++11 if C++14 support is not
-available.  Note, however, that this default is subject to change: future
-pybind11 releases are expected to migrate to newer C++ standards as they become
-available.  To override this, the standard flag can be given explicitly in
-``PYBIND11_CPP_STANDARD``:
+By default, pybind11 will compile modules with the compiler default or the
+minimum standard required by pybind11, whichever is higher.  You can set the
+standard explicitly with
+`CMAKE_CXX_STANDARD <https://cmake.org/cmake/help/latest/variable/CMAKE_CXX_STANDARD.html>`_:
 
 .. code-block:: cmake
 
-    # Use just one of these:
-    # GCC/clang:
-    set(PYBIND11_CPP_STANDARD -std=c++11)
-    set(PYBIND11_CPP_STANDARD -std=c++14)
-    set(PYBIND11_CPP_STANDARD -std=c++1z) # Experimental C++17 support
-    # MSVC:
-    set(PYBIND11_CPP_STANDARD /std:c++14)
-    set(PYBIND11_CPP_STANDARD /std:c++latest) # Enables some MSVC C++17 features
+    set(CMAKE_CXX_STANDARD 14)  # or 11, 14, 17, 20
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)  # optional, ensure standard is supported
+    set(CMAKE_CXX_EXTENSIONS OFF)  # optional, keep compiler extensionsn off
 
-    add_subdirectory(pybind11)  # or find_package(pybind11)
 
-Note that this and all other configuration variables must be set **before** the
-call to ``add_subdirectory`` or ``find_package``. The variables can also be set
-when calling CMake from the command line using the ``-D<variable>=<value>`` flag.
+The variables can also be set when calling CMake from the command line using
+the ``-D<variable>=<value>`` flag. You can also manually set ``CXX_STANDARD``
+on a target or use ``target_compile_features`` on your targets - anything that
+CMake supports.
 
 The target Python version can be selected by setting ``PYBIND11_PYTHON_VERSION``
 or an exact Python installation can be specified with ``PYTHON_EXECUTABLE``.
@@ -131,8 +120,12 @@ For example:
 .. code-block:: bash
 
     cmake -DPYBIND11_PYTHON_VERSION=3.6 ..
-    # or
-    cmake -DPYTHON_EXECUTABLE=path/to/python ..
+
+    # Another method:
+    cmake -DPYTHON_EXECUTABLE=/path/to/python ..
+
+    # This often is a good way to get the current Python, works in environments:
+    cmake -DPYTHON_EXECUTABLE=$(python3 -c "import sys; print(sys.executable)") ..
 
 find_package vs. add_subdirectory
 ---------------------------------
@@ -143,7 +136,7 @@ See the `Config file`_ docstring for details of relevant CMake variables.
 
 .. code-block:: cmake
 
-    cmake_minimum_required(VERSION 2.8.12)
+    cmake_minimum_required(VERSION 3.7)
     project(example)
 
     find_package(pybind11 REQUIRED)
@@ -155,11 +148,18 @@ the pybind11 repository  :
 
 .. code-block:: bash
 
+    # Classic CMake
     cd pybind11
     mkdir build
     cd build
     cmake ..
     make install
+
+    # CMake 3.15+
+    cd pybind11
+    cmake -S . -B build
+    cmake --build build -j 2  # Build on 2 cores
+    cmake --install build
 
 Once detected, the aforementioned ``pybind11_add_module`` can be employed as
 before. The function usage and configuration variables are identical no matter
@@ -175,13 +175,13 @@ Advanced: interface library target
 When using a version of CMake greater than 3.0, pybind11 can additionally
 be used as a special *interface library* . The target ``pybind11::module``
 is available with pybind11 headers, Python headers and libraries as needed,
-and C++ compile definitions attached. This target is suitable for linking
+and C++ compile features attached. This target is suitable for linking
 to an independently constructed (through ``add_library``, not
 ``pybind11_add_module``) target in the consuming project.
 
 .. code-block:: cmake
 
-    cmake_minimum_required(VERSION 3.0)
+    cmake_minimum_required(VERSION 3.7)
     project(example)
 
     find_package(pybind11 REQUIRED)  # or add_subdirectory(pybind11)
@@ -205,6 +205,17 @@ to an independently constructed (through ``add_library``, not
     Studio (``/bigobj``).  The :ref:`FAQ <faq:symhidden>` contains an
     explanation on why these are needed.
 
+    If you want to add these in yourself, you can use:
+
+    .. code-block:: cmake
+
+        set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+        set(CMAKE_VISIBILITY_INLINES_HIDDEN ON)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)  # CMake 3.9+ required
+
+    or set the corresponding property (without the ``CMAKE_``) on the targets
+    manually.
+
 Embedding the Python interpreter
 --------------------------------
 
@@ -217,7 +228,7 @@ information about usage in C++, see :doc:`/advanced/embedding`.
 
 .. code-block:: cmake
 
-    cmake_minimum_required(VERSION 3.0)
+    cmake_minimum_required(VERSION 3.7)
     project(example)
 
     find_package(pybind11 REQUIRED)  # or add_subdirectory(pybind11)
@@ -287,3 +298,18 @@ code by introspecting existing C++ codebases using LLVM/Clang. See the
 [binder]_ documentation for details.
 
 .. [binder] http://cppbinder.readthedocs.io/en/latest/about.html
+
+[AutoWIG]_ is a Python library that wraps automatically compiled libraries into
+high-level languages. It parses C++ code using LLVM/Clang technologies and
+generates the wrappers using the Mako templating engine. The approach is automatic,
+extensible, and applies to very complex C++ libraries, composed of thousands of
+classes or incorporating modern meta-programming constructs.
+
+.. [AutoWIG] https://github.com/StatisKit/AutoWIG
+
+[robotpy-build]_ is a is a pure python, cross platform build tool that aims to
+simplify creation of python wheels for pybind11 projects, and provide
+cross-project dependency management. Additionally, it is able to autogenerate
+customizable pybind11-based wrappers by parsing C++ header files.
+
+.. [robotpy-build] https://robotpy-build.readthedocs.io
